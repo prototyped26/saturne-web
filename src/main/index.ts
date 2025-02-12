@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import installExtension, {REACT_DEVELOPER_TOOLS} from 'electron-devtools-installer'
 
 function createWindow(): void {
   // Create the browser window.
@@ -14,10 +15,13 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
-    }
+    },
+    icon: '../renderer/src/assets/icon.png'
   })
 
   mainWindow.on('ready-to-show', () => {
+    mainWindow.maximize()
+    mainWindow.webContents.openDevTools()
     mainWindow.show()
   })
 
@@ -59,6 +63,10 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+
+  installExtension(REACT_DEVELOPER_TOOLS)
+    .then((name) => console.log(`Added Extension:  ${name}`))
+    .catch((err) => console.log('An error occurred: ', err))
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common

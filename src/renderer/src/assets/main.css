@@ -1,1 +1,47 @@
 @import './base.css';
+
+.bg-metal-gray {
+  background-color: #F1EFEA;
+}
+
+.bg-app-primary {
+  background-color: #E5B666;
+}
+
+.border-app-primary {
+  --tw-border-opacity: 1;
+  border-color: #E5B666;
+}
+
+.text-app-primary {
+  --tw-text-opacity: 1;
+  color: #E5B666;
+}
+
+.text-app-title {
+  color: #4C4B4B;
+}
+
+.text-app-sub-title {
+  color: #C9C4AD;
+}
+
+.badge-app-primary {
+  border-color: transparent;
+  --tw-bg-opacity: 1;
+  background-color:  #E5B666;
+  --tw-text-opacity: 1;
+  color: white;
+  border-radius: 5px !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
+a.active {
+  background-color: rgba(229, 182, 102, 0.87);
+  color: white;
+}
+
+a:hover {
+  color: black !important;
+}

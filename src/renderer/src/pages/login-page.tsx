@@ -43,6 +43,7 @@ function LoginPage(): JSX.Element {
       }
     } catch (err) {
       setError(true)
+      setLoading(false)
       console.log(err)
     }
   }

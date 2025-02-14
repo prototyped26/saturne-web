@@ -8,12 +8,13 @@ import DashPage from './pages/dash-page'
 import DashLayout from './pages/dash-layout'
 import ReportHebdo from './pages/report-hebdo'
 import FundsPage from './pages/funds-page'
-import IntermediariesPage from './pages/intermediaries-page'
+import IntermediariesPage from './pages/intermediaries/intermediaries-page'
 import { Provider } from 'react-redux'
 import { store } from './store/store'
 import UsersPage from './pages/users/users-page'
 import AddUserPage from './pages/users/add-user-page'
 import UpdateUserPage from './pages/users/update-user-page'
+import AddIntermediaryPage from './pages/intermediaries/add-intermediary-page'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <Provider store={store}>
@@ -26,6 +27,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           <Route path="main" element={<DashPage />} />
           <Route path="reports" element={<ReportHebdo />} />
           <Route path="intermediaries" element={<IntermediariesPage />} />
+          <Route path="intermediaries/new" element={<AddIntermediaryPage />} />
           <Route path="funds" element={<FundsPage />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="users/new" element={<AddUserPage />} />

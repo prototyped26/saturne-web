@@ -1,108 +1,118 @@
-import { FiEye, FiMoreHorizontal, FiPlus, FiSearch, FiTrash } from 'react-icons/fi'
-import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store/store'
-import { IRole, IUser } from '../../type'
-import { deleteUser, getRoles, getUsers } from '../../services/userService'
-import { removeElt, selectedUser, setRoles, setUsers } from '../../store/userSlice'
+import { ICategory, IIntermediary, IOrganization } from '../../type'
+import { useEffect, useState } from 'react'
+import { toast, ToastContainer } from 'react-toastify'
+import { getMessageErrorRequestEx } from '../../utils/errors'
+import {
+  deleteIntermediary,
+  getCategories,
+  getIntermediaries,
+  getOrganizations
+} from '../../services/intermediaryService'
+import { removeIntermediary, setCategories, setIntermediaries, setOrganizations } from '../../store/intermediarySlice'
+import { FiEye, FiMoreHorizontal, FiPlus, FiSearch, FiTrash } from 'react-icons/fi'
 import LoadingTable from '../../components/LoadingTable'
 import NoDataList from '../../components/NoDataList'
 import ConfirmDeleteDialog from '../../components/ConfirmDeleteDialog'
-import { setInformationMessage, setSuccess } from '../../store/informationSlice'
-import AlertNotificationSuccess from '../../components/AlertNotificationSuccess'
-import DialogChangePassword from './DialogChangePassword'
+import moment from 'moment'
 
-function UsersPage(): JSX.Element {
+function IntermediariesPage(): JSX.Element {
   const navigate = useNavigate()
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
 
   const token: string | null = useAppSelector((state) => state.user.token)
-  const users: IUser[] = useAppSelector((state) => state.user.users)
-  const roles: IRole[] = useAppSelector((state) => state.user.roles)
+  const intermediaries: IIntermediary[] = useAppSelector(
+    (state) => state.intermediary.intermediaries
+  )
+  const categories: ICategory[] = useAppSelector((state) => state.intermediary.categories)
+  const organizations: IOrganization[] = useAppSelector((state) => state.intermediary.organizations)
 
   const message: string | null = useAppSelector((state) => state.information.message)
   const success: string | null = useAppSelector((state) => state.information.success)
 
   const [loading, setLoading] = useState(true)
-  const [selectedRole, setSelectedRole] = useState<number|string|null>(null)
-  const [contentDelete, setContentDelete] = useState("")
-  const [toDelete, setToDelete] = useState<IUser | null>(null)
-  const [user, setUser] = useState<IUser | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState('')
+  const [contentDelete, setContentDelete] = useState('')
+  const [toDelete, setToDelete] = useState<IIntermediary | null>(null)
 
   useEffect(() => {
-    loadRoles(token)
-    loadUsers(token)
+    loadCategories(token as string)
+    loadOrganizations(token as string)
+    loadIntermediaries(token as string)
   }, [])
 
-  useEffect(() => {
-    if (success !== null) setTimeout(() => dispatch(setSuccess(null)), 5000)
-  }, [success])
-
-  const loadUsers = async (t: string | null): Promise<void> => {
+  const loadIntermediaries = async (t: string): Promise<void> => {
     try {
-      const res = await getUsers(t)
-      dispatch(setUsers(res.data as IUser[]))
+      const res = await getIntermediaries(t)
+      dispatch(setIntermediaries(res.data))
     } catch (e) {
-      console.log(e)
+      toast.error(getMessageErrorRequestEx(e), {
+        theme: 'colored'
+      })
     } finally {
       setLoading(false)
     }
   }
 
-  const loadRoles = async (t: string | null): Promise<void> => {
+  const loadCategories = async (t: string): Promise<void> => {
     try {
-      const res = await getRoles(t)
-      dispatch(setRoles(res.data as IRole[]))
+      const res = await getCategories(t)
+      dispatch(setCategories(res.data))
     } catch (e) {
-      console.log(e)
+      toast.error(getMessageErrorRequestEx(e), {
+        theme: 'colored'
+      })
     }
   }
 
-  const onHandleConfirmDelete = (user: IUser): void => {
-    setToDelete(user)
-    setContentDelete("L'utilisateur " + user.email + " ?")
+  const loadOrganizations = async (t: string): Promise<void> => {
+    try {
+      const res = await getOrganizations(t)
+      dispatch(setOrganizations(res.data))
+    } catch (e) {
+      toast.error(getMessageErrorRequestEx(e), {
+        theme: 'colored'
+      })
+    }
+  }
+
+  const onHandleConfirmDelete = async (inter: IIntermediary): Promise<void> => {
+    setToDelete(inter)
+    setContentDelete("L'intermédiare " + inter.label + " ?")
     document?.getElementById('modal')?.showModal()
   }
 
+  const onHandleNavToUpdate = async (inter: IIntermediary): Promise<void> => {
+
+  }
+
   const onHandleDelete = async (): Promise<void> => {
-    const user: IUser = toDelete as IUser
-    const res = await deleteUser(token, user?.id as number)
-    console.log(res)
-    dispatch(removeElt(user))
-    console.log("SUPPRIMER " + user.email)
-  }
-
-  const onHandleChangePass = (user: IUser): void => {
-    console.log("CLICK SUR CHANGE PASS")
-    setUser(user)
-    document?.getElementById('modal-password')?.showModal()
-  }
-
-  const onHandleNavToUpdate = (user: IUser): void => {
-    dispatch(selectedUser(user))
-    navigate("update")
+    const inter: IIntermediary = toDelete
+    const res = await deleteIntermediary(token as string, inter?.id as number)
+    dispatch(removeIntermediary(inter))
   }
 
   return (
-    <div className="border bg-white rounded-lg dark:border-gray-50 h-full p-6 mb-4 z-20">
+    <div className="border bg-white rounded-lg dark:border-gray-50 h-96 p-6 mb-4 z-20">
+      <ToastContainer />
 
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="">
-          <h3 className="tracking-tight font-bold text-3xl text-app-title">
-            Gestion des Utilisateurs
-          </h3>
+          <h3 className="tracking-tight font-bold text-3xl text-app-title">Les Intermédiaires</h3>
           <p className="tracking-tight font-light text-1xl text-app-sub-title">
-            Gérer les utilisateurs du système
+            Suivi et gestion des différents intermédiaires
           </p>
         </div>
         <div className="flex  justify-end ">
           <Link to="new" className="btn btn-md bg-app-primary text-white font-medium">
             <FiPlus />
-            Nouvel Utilisateur
+            Nouvel Intermédiaire
           </Link>
+          <button className="btn btn-md btn-outline ml-2">Importer (Excel)</button>
           <button className="btn btn-md btn-outline ml-2">Exporter</button>
         </div>
       </div>
@@ -112,17 +122,17 @@ function UsersPage(): JSX.Element {
           <div className="flex mr-2 w-1/3">
             <label className="form-control w-full max-w-xs">
               <div className="label">
-                <span className="label-text">Tri par type d'utilisateur</span>
+                <span className="label-text">Tri par type </span>
               </div>
               <select
-                value={selectedRole}
-                onChange={(e) => setSelectedRole(e.target.value)}
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
                 className="select select-bordered"
               >
                 <option>Tous</option>
-                {roles.map((role) => (
-                  <option key={role.id} value={role.id}>
-                    {role.label}
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.label}
                   </option>
                 ))}
               </select>
@@ -139,11 +149,9 @@ function UsersPage(): JSX.Element {
 
       {loading && <LoadingTable />}
 
-      {!loading && users.length === 0 && <NoDataList />}
+      {!loading && intermediaries.length === 0 && <NoDataList />}
 
-      {success !== null && <AlertNotificationSuccess message={message} />}
-
-      {!loading && users.length > 0 && (
+      {!loading && intermediaries.length > 0 && (
         <div className="grid">
           <div className="max-w-screen-2xl ">
             <div className="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
@@ -152,8 +160,9 @@ function UsersPage(): JSX.Element {
                   <h5>
                     <span className="text-gray-500">Il y a :</span>
                     <span className="dark:text-white">
-                      {' '}
-                      {users.length + ' utilisateur' + (users.length > 1 ? 's' : '')}{' '}
+                      {intermediaries.length +
+                        ' intermédiaire' +
+                        (intermediaries.length > 1 ? 's' : '')}{' '}
                     </span>
                   </h5>
                 </div>
@@ -175,21 +184,30 @@ function UsersPage(): JSX.Element {
                         </div>
                       </th>
                       <th scope="col" className="px-4 py-3">
-                        Nom & Prénom
+                        Dénomination/Nom
                       </th>
                       <th scope="col" className="px-4 py-3">
-                        Email
+                        Siège
                       </th>
                       <th scope="col" className="px-4 py-3">
-                        Role
+                        Agrément
+                      </th>
+                      <th scope="col" className="px-4 py-3">
+                        Dirigéant
+                      </th>
+                      <th scope="col" className="px-4 py-3">
+                        Nb. Fonds
+                      </th>
+                      <th scope="col" className="px-4 py-3">
+                        Nb. Mandats
                       </th>
                       <th scope="col" className="px-4 py-3"></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {users.map((user) => (
+                    {intermediaries.map((intermediaire) => (
                       <tr
-                        key={user.id}
+                        key={intermediaire.id}
                         className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
                         <td className="w-4 px-4 py-3">
@@ -206,19 +224,33 @@ function UsersPage(): JSX.Element {
                         </td>
                         <th
                           scope="row"
-                          className="flex items-center px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                          className=" items-center px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                         >
-                          {user?.first_name + ' ' + user?.last_name}
+                          {intermediaire?.label} <br />
+                          <label className="font-light">
+                            {intermediaire?.category?.label?.toUpperCase()}
+                          </label>
                         </th>
                         <td className="px-4 py-2">
                           <span className="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
-                            {user?.email}
+                            {intermediaire?.head.toUpperCase()}
                           </span>
                         </td>
-                        <td className="px-4 py-2">{user?.role?.label.toUpperCase()}</td>
+                        <td className="px-4 py-2">
+                          <label className="font-medium">{intermediaire?.approval_number}</label>
+                          <br />
+                          <label className="font-light">Du {moment(intermediaire?.approval_date).format("DD MMMM YYYY")}</label>
+                        </td>
+                        <td className="px-4 py-2">{intermediaire?.leader_name}</td>
+                        <td className="px-4 py-2"></td>
+                        <td className="px-4 py-2"></td>
+
                         <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                           <div className="flex justify-end">
-                            <button onClick={() => onHandleNavToUpdate(user)} className="btn btn-sm">
+                            <button
+                              onClick={() => onHandleNavToUpdate(intermediaire)}
+                              className="btn btn-sm"
+                            >
                               <FiEye />
                             </button>
                             <div className="dropdown dropdown-left dropdown-end ml-2">
@@ -230,15 +262,15 @@ function UsersPage(): JSX.Element {
                                 className="dropdown-content menu bg-base-100 rounded-box z-[1] w-56 p-1 shadow"
                               >
                                 <li>
-                                  <a onClick={() => onHandleNavToUpdate(user)}>Modifier</a>
+                                  <a onClick={() => onHandleNavToUpdate(intermediaire)}>Modifier</a>
                                 </li>
                                 <li>
-                                  <a onClick={() => onHandleChangePass(user)}>Changer de mot de passe</a>
+                                  <a>Changer de mot de passe</a>
                                 </li>
                               </ul>
                             </div>
                             <button
-                              onClick={() => onHandleConfirmDelete(user)}
+                              onClick={() => onHandleConfirmDelete(intermediaire)}
                               className="btn btn-sm btn-error ml-2 font-bold text-white"
                             >
                               <FiTrash />
@@ -323,9 +355,6 @@ function UsersPage(): JSX.Element {
             </div>
 
             <ConfirmDeleteDialog content={contentDelete} action={onHandleDelete} />
-
-            <DialogChangePassword user={user} />
-
           </div>
         </div>
       )}
@@ -333,4 +362,4 @@ function UsersPage(): JSX.Element {
   )
 }
 
-export default UsersPage
+export default IntermediariesPage

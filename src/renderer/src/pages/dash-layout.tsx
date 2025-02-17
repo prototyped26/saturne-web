@@ -3,27 +3,39 @@ import { LuBriefcaseBusiness, LuBuilding2 } from 'react-icons/lu'
 import { SlWallet } from 'react-icons/sl'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router'
 import imageLogo from "./../assets/icon.png"
-import { TypedUseSelectorHook, useSelector } from 'react-redux'
-import { RootState } from '../store/store'
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '../store/store'
 import { useEffect } from 'react'
-import { IUser } from '../type'
+import { ISysInfo, IUser, IWeek, IYear } from '../type'
+import { getCurrentInformation } from '../services/systemService'
+import { setCurrentWeek, setCurrentYear } from '../store/systemSlice'
 
 function DashLayout(): JSX.Element {
   const navigate = useNavigate()
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
-  // const useAppDispatch = () => useDispatch<AppDispatch>()
-  //const dispatch = useAppDispatch()
+  const useAppDispatch = () => useDispatch<AppDispatch>()
+  const dispatch = useAppDispatch()
 
   const user: IUser = useAppSelector((state) => state.user.current)
+  const token: string | null = useAppSelector((state) => state.user.token)
 
   useEffect(() => {
     console.log(user)
     if (user === null) navigate('/login')
+
+    loadCurrentSysInfo()
   }, [])
 
   useEffect(() => {
     if (user === null) navigate('/login')
   }, [user])
+
+  const loadCurrentSysInfo = async (): Promise<void> => {
+    const res = await getCurrentInformation(token)
+    const data: ISysInfo = res.data
+    dispatch(setCurrentYear(data.year as IYear))
+    dispatch(setCurrentWeek(data.currentWeek as IWeek))
+  }
 
   return (
     <div className="antialiased bg-gray-50 dark:bg-gray-900">
@@ -120,13 +132,13 @@ function DashLayout(): JSX.Element {
               </a>
             </li>
             <li>
-              <a
-                href="#"
-                className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+              <NavLink
+                to="/dash/system/years"
+                className={({ isActive }) => isActive ? "active flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group": "flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"}
               >
                 <FiSettings />
                 <span className="ml-3">Système</span>
-              </a>
+              </NavLink>
             </li>
           </ul>
         </div>

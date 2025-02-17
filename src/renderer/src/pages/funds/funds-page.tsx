@@ -1,68 +1,76 @@
 import { Link, useNavigate } from 'react-router'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store/store'
-import { ICategory, IIntermediary, IOrganization, ISearchIntermediary } from '../../type'
+import { IClassification, IDepository, IDistribution, IFund, IIntermediary, ITypeOpc } from '../../type'
 import { useEffect, useState } from 'react'
+import { getIntermediaries, getSgos } from '../../services/intermediaryService'
+import { setIntermediaries } from '../../store/intermediarySlice'
 import { toast, ToastContainer } from 'react-toastify'
 import { getMessageErrorRequestEx } from '../../utils/errors'
 import {
-  deleteIntermediary,
-  getCategories,
-  getIntermediaries,
-  getOrganizations, searchIntermediaries
-} from '../../services/intermediaryService'
+  deleteFund,
+  getClassifications,
+  getDepositaries,
+  getDistributions,
+  getFunds,
+  getTypesOpc
+} from '../../services/fundService'
 import {
-  addIntermediaries,
-  removeIntermediary,
-  setCategories,
-  setIntermediaries, setIntermediary,
-  setOrganizations
-} from '../../store/intermediarySlice'
+  refreshFund,
+  removeFund,
+  setClassifications,
+  setDepositaries,
+  setDistributions, setFund,
+  setFunds,
+  setTypesOpc
+} from '../../store/fundSlice'
 import { FiEye, FiMoreHorizontal, FiPlus, FiSearch, FiTrash } from 'react-icons/fi'
 import LoadingTable from '../../components/LoadingTable'
 import NoDataList from '../../components/NoDataList'
+import moment from 'moment/moment'
 import ConfirmDeleteDialog from '../../components/ConfirmDeleteDialog'
-import moment from 'moment'
-import ImportIntermediaryModal from './import-intermediary-modal'
+import AlertNotificationSuccess from '../../components/AlertNotificationSuccess'
+import { setSuccess } from '../../store/informationSlice'
+import ImportFundModal from './import-fund-modal'
 
-function IntermediariesPage(): JSX.Element {
+function FundsPage() : JSX.Element {
   const navigate = useNavigate()
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
 
   const token: string | null = useAppSelector((state) => state.user.token)
-  const intermediaries: IIntermediary[] = useAppSelector(
-    (state) => state.intermediary.intermediaries
-  )
-  const categories: ICategory[] = useAppSelector((state) => state.intermediary.categories)
-  const organizations: IOrganization[] = useAppSelector((state) => state.intermediary.organizations)
+  const funds: IFund[] = useAppSelector((state) => state.fund.funds)
+  const typesOpc: ITypeOpc[] = useAppSelector((state) => state.fund.typesOpc)
+  const claissifications: IClassification[] = useAppSelector((state) => state.fund.classifications)
+  const depositaries: IDepository[] = useAppSelector((state) => state.fund.depositaries)
+  const distributions: IDistribution[] = useAppSelector((state) => state.fund.distributions)
+  const intermediaries: IIntermediary[] = useAppSelector((state) => state.intermediary.intermediaries)
 
   const message: string | null = useAppSelector((state) => state.information.message)
   const success: string | null = useAppSelector((state) => state.information.success)
 
-  const initSeach: ISearchIntermediary = {
-    term: null,
-    category_id: null
-  }
-
   const [loading, setLoading] = useState(true)
-  const [searchLoading, setSearchLoading] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState('')
   const [contentDelete, setContentDelete] = useState('')
-  const [toDelete, setToDelete] = useState<IIntermediary | null>(null)
-  const [search, setSearch] = useState<ISearchIntermediary>(initSeach)
+  const [toDelete, setToDelete] = useState<IFund | null>(null)
 
   useEffect(() => {
-    loadCategories(token as string)
-    loadOrganizations(token as string)
-    loadIntermediaries(token as string)
+    loadClassifications(token as string)
+    loadSgos(token as string)
+    loadTypesOpc(token as string)
+    loadDepositaries(token as string)
+    loadDistributions(token as string)
+    loadFunds(token as string)
   }, [])
 
-  const loadIntermediaries = async (t: string): Promise<void> => {
+  useEffect(() => {
+    if (success !== null) setTimeout(() => dispatch(setSuccess(null)), 5000)
+  })
+
+  const loadFunds = async (t: string): Promise<void> => {
     try {
-      const res = await getIntermediaries(t)
-      dispatch(setIntermediaries(res.data))
+      const res = await getFunds(t)
+      dispatch(setFunds(res.data))
     } catch (e) {
       toast.error(getMessageErrorRequestEx(e), {
         theme: 'colored'
@@ -72,10 +80,10 @@ function IntermediariesPage(): JSX.Element {
     }
   }
 
-  const loadCategories = async (t: string): Promise<void> => {
+  const loadClassifications = async (t: string): Promise<void> => {
     try {
-      const res = await getCategories(t)
-      dispatch(setCategories(res.data))
+      const res = await getClassifications(t)
+      dispatch(setClassifications(res.data))
     } catch (e) {
       toast.error(getMessageErrorRequestEx(e), {
         theme: 'colored'
@@ -83,10 +91,10 @@ function IntermediariesPage(): JSX.Element {
     }
   }
 
-  const loadOrganizations = async (t: string): Promise<void> => {
+  const loadSgos = async (t: string): Promise<void> => {
     try {
-      const res = await getOrganizations(t)
-      dispatch(setOrganizations(res.data))
+      const res = await getSgos(t)
+      dispatch(setIntermediaries(res.data))
     } catch (e) {
       toast.error(getMessageErrorRequestEx(e), {
         theme: 'colored'
@@ -94,62 +102,62 @@ function IntermediariesPage(): JSX.Element {
     }
   }
 
-  const onHandleConfirmDelete = async (inter: IIntermediary): Promise<void> => {
-    setToDelete(inter)
-    setContentDelete("L'intermédiare " + inter.label + " ?")
-    document?.getElementById('modal')?.showModal()
+  const loadDepositaries = async (t: string): Promise<void> => {
+    try {
+      const res = await getDepositaries(t)
+      dispatch(setDepositaries(res.data))
+    } catch (e) {
+      toast.error(getMessageErrorRequestEx(e), {
+        theme: 'colored'
+      })
+    }
   }
 
-  const onHandleNavToUpdate = async (inter: IIntermediary): Promise<void> => {
-    dispatch(setIntermediary(inter))
-    setTimeout(() => {
-      navigate("update")
-    }, 500)
+  const loadDistributions = async (t: string): Promise<void> => {
+    try {
+      const res = await getDistributions(t)
+      dispatch(setDistributions(res.data))
+    } catch (e) {
+      toast.error(getMessageErrorRequestEx(e), {
+        theme: 'colored'
+      })
+    }
   }
 
-  const onHandleNavToDetails = (inter: IIntermediary): void => {
-    dispatch(setIntermediary(inter))
-    setTimeout(() => {
-      navigate("sgo")
-    }, 500)
-  }
-
-  const onHandleDelete = async (): Promise<void> => {
-    const inter: IIntermediary = toDelete
-    await deleteIntermediary(token as string, inter?.id as number)
-    dispatch(removeIntermediary(inter))
+  const loadTypesOpc = async (t: string): Promise<void> => {
+    try {
+      const res = await getTypesOpc(t)
+      dispatch(setTypesOpc(res.data))
+    } catch (e) {
+      toast.error(getMessageErrorRequestEx(e), {
+        theme: 'colored'
+      })
+    }
   }
 
   const onHandleClickImport = (): void => {
-    document?.getElementById('modal-import-intermediary')?.showModal()
+    document?.getElementById('modal-import-fund')?.showModal()
   }
 
-  const onHandleTermChange = (val): void => {
-    const s = search
-    s.term = val
-    setSearch(s)
+  const onHandleNavToUpdate = (fund: IFund): void => {
+    dispatch(setFund(fund))
+    navigate('update')
   }
 
-  const onHandleChangeCat = (val): void => {
-    const s = search
-    s.category_id = Number(val)
-    setSelectedCategory(val)
-    setSearch(s)
+  const onHandleNavToDetails = (fund: IFund): void => {
+
   }
 
-  const onHandleSearch = async (): Promise<void> => {
-    if (search?.term?.length === 0) search.term = null
+  const onHandleConfirmDelete = async (f: IFund): Promise<void> => {
+    setToDelete(f)
+    setContentDelete("du fond " + f.label + " ?")
+    document?.getElementById('modal')?.showModal()
+  }
 
-    setSearchLoading(true)
-
-    try {
-      const res = await searchIntermediaries(token as string, search)
-      dispatch(setIntermediaries(res.data as IIntermediary[]))
-    } catch (e) {
-      toast.error(getMessageErrorRequestEx(e), { theme: 'colored' })
-    } finally {
-      setSearchLoading(false)
-    }
+  const onHandleDelete = async (): Promise<void> => {
+    const f = toDelete as IFund
+    await deleteFund(token as string, f.id as number)
+    dispatch(removeFund(f))
   }
 
   const showSuccessToast = (msg: string): void => {
@@ -162,22 +170,24 @@ function IntermediariesPage(): JSX.Element {
 
   return (
     <div className="border bg-white rounded-lg dark:border-gray-50 h-96 p-6 mb-4 z-20">
-      <ToastContainer key={112233}/>
-      <ImportIntermediaryModal token={token as string} />
+      <ToastContainer key={11223223} />
+      <ImportFundModal token={token as string} action={showSuccessToast} error={showErrorToast()} />
 
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="">
-          <h3 className="tracking-tight font-bold text-3xl text-app-title">Les Intermédiaires</h3>
+          <h3 className="tracking-tight font-bold text-3xl text-app-title">Les Fonds</h3>
           <p className="tracking-tight font-light text-1xl text-app-sub-title">
-            Suivi et gestion des différents intermédiaires
+            Suivi et gestion des différents fonds
           </p>
         </div>
         <div className="flex  justify-end ">
           <Link to="new" className="btn btn-md bg-app-primary text-white font-medium">
             <FiPlus />
-            Nouvel Intermédiaire
+            Nouveau Fond
           </Link>
-          <button onClick={() => onHandleClickImport()} className="btn btn-md btn-outline ml-2">Importer (Excel)</button>
+          <button onClick={() => onHandleClickImport()} className="btn btn-md btn-outline ml-2">
+            Importer (Excel)
+          </button>
           <button className="btn btn-md btn-outline ml-2">Exporter</button>
         </div>
       </div>
@@ -185,28 +195,11 @@ function IntermediariesPage(): JSX.Element {
       <div className="grid grid-cols-1 gap-4 mb-4">
         <div className="border-b-2 border-app-primary flex items-center pb-4">
           <div className="flex mr-2 w-1/3">
-            <label className="form-control w-full max-w-xs">
-              <div className="label">
-                <span className="label-text">Tri par type </span>
-              </div>
-              <select
-                value={selectedCategory}
-                onChange={(e) => onHandleChangeCat(e.target.value)}
-                className="select select-bordered"
-              >
-                <option>Tous</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <button className="btn btn-sm">Filtre</button>
           </div>
           <div className="flex mt-8 w-full">
-            <input onChange={(e) => onHandleTermChange(e.target.value)} type="text" placeholder="Recherche..." className="input input-bordered w-1/3" />
-            <button onClick={() => onHandleSearch()} className="btn btn-md ml-2">
-              <FiSearch size={24} />
+            <button className="btn btn-sm ml-2">
+              <FiSearch size={18} />
             </button>
           </div>
         </div>
@@ -214,9 +207,11 @@ function IntermediariesPage(): JSX.Element {
 
       {loading && <LoadingTable />}
 
-      {!loading && intermediaries.length === 0 && <NoDataList />}
+      {!loading && funds.length === 0 && <NoDataList />}
 
-      {!loading && intermediaries.length > 0 && (
+      {success !== null && <AlertNotificationSuccess message={message} />}
+
+      {!loading && funds.length > 0 && (
         <div className="grid">
           <div className="max-w-screen-2xl ">
             <div className="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
@@ -225,9 +220,7 @@ function IntermediariesPage(): JSX.Element {
                   <h5>
                     <span className="text-gray-500">Il y a :</span>
                     <span className="dark:text-white">
-                      {intermediaries.length +
-                        ' intermédiaire' +
-                        (intermediaries.length > 1 ? 's' : '')}{' '}
+                      {funds.length + ' intermédiaire' + (funds.length > 1 ? 's' : '')}{' '}
                     </span>
                   </h5>
                 </div>
@@ -249,30 +242,30 @@ function IntermediariesPage(): JSX.Element {
                         </div>
                       </th>
                       <th scope="col" className="px-4 py-3">
-                        Dénomination/Nom
-                      </th>
-                      <th scope="col" className="px-4 py-3">
-                        Siège
+                        Dénomination
                       </th>
                       <th scope="col" className="px-4 py-3">
                         Agrément
                       </th>
                       <th scope="col" className="px-4 py-3">
-                        Dirigéant
+                        Type OPC
                       </th>
                       <th scope="col" className="px-4 py-3">
-                        Nb. Fonds
+                        Dépositaire
                       </th>
                       <th scope="col" className="px-4 py-3">
-                        Nb. Mandats
+                        Classification
+                      </th>
+                      <th scope="col" className="px-4 py-3">
+                        Distribution
                       </th>
                       <th scope="col" className="px-4 py-3"></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {intermediaries.map((intermediaire) => (
+                    {funds.map((fund) => (
                       <tr
-                        key={intermediaire.id}
+                        key={fund.id}
                         className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
                         <td className="w-4 px-4 py-3">
@@ -291,29 +284,31 @@ function IntermediariesPage(): JSX.Element {
                           scope="row"
                           className=" items-center px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                         >
-                          {intermediaire?.label} <br />
+                          {fund?.label} <br />
                           <label className="font-light">
-                            {intermediaire?.category?.label?.toUpperCase()}
+                            {fund?.intermediary?.label?.toUpperCase()}
                           </label>
                         </th>
                         <td className="px-4 py-2">
-                          <span className="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
-                            {intermediaire?.head.toUpperCase()}
-                          </span>
+                          <label className="font-medium">{fund?.approval_number}</label>
+                          <br />
+                          <label className="font-light">
+                            Du {moment(fund?.approval_date).format('DD MMMM YYYY')}
+                          </label>
                         </td>
                         <td className="px-4 py-2">
-                          <label className="font-medium">{intermediaire?.approval_number}</label>
-                          <br />
-                          <label className="font-light">Du {moment(intermediaire?.approval_date).format("DD MMMM YYYY")}</label>
+                          <span className="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
+                            {fund?.typeOpc?.label?.toUpperCase()}
+                          </span>
                         </td>
-                        <td className="px-4 py-2">{intermediaire?.leader_name}</td>
-                        <td className="px-4 py-2"></td>
-                        <td className="px-4 py-2"></td>
+                        <td className="px-4 py-2">{fund?.depositary?.label?.toUpperCase()}</td>
+                        <td className="px-4 py-2">{fund?.classification?.label?.toUpperCase()}</td>
+                        <td className="px-4 py-2">{fund?.distribution?.label?.toUpperCase()}</td>
 
                         <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                           <div className="flex justify-end">
                             <button
-                              onClick={() => onHandleNavToUpdate(intermediaire)}
+                              onClick={() => onHandleNavToUpdate(fund)}
                               className="btn btn-sm"
                             >
                               <FiEye />
@@ -327,15 +322,18 @@ function IntermediariesPage(): JSX.Element {
                                 className="dropdown-content menu bg-base-100 rounded-box z-[1] w-56 p-1 shadow"
                               >
                                 <li>
-                                  <a onClick={() => onHandleNavToUpdate(intermediaire)}>Modifier</a>
+                                  <a onClick={() => onHandleNavToUpdate(fund)}>Historique Valeur L.</a>
                                 </li>
                                 <li>
-                                  <a onClick={() => onHandleNavToDetails(intermediaire)} >Détails</a>
+                                  <a onClick={() => onHandleNavToUpdate(fund)}>Modifier</a>
+                                </li>
+                                <li>
+                                  <a onClick={() => onHandleNavToDetails(fund)}>Détails</a>
                                 </li>
                               </ul>
                             </div>
                             <button
-                              onClick={() => onHandleConfirmDelete(intermediaire)}
+                              onClick={() => onHandleConfirmDelete(fund)}
                               className="btn btn-sm btn-error ml-2 font-bold text-white"
                             >
                               <FiTrash />
@@ -419,7 +417,12 @@ function IntermediariesPage(): JSX.Element {
               </nav>
             </div>
 
-            <ConfirmDeleteDialog content={contentDelete} action={onHandleDelete} success={showSuccessToast} error={showErrorToast} />
+            <ConfirmDeleteDialog
+              content={contentDelete}
+              action={onHandleDelete}
+              success={showSuccessToast}
+              error={showErrorToast}
+            />
           </div>
         </div>
       )}
@@ -427,4 +430,4 @@ function IntermediariesPage(): JSX.Element {
   )
 }
 
-export default IntermediariesPage
+export default FundsPage

@@ -22,9 +22,11 @@ export const intermediarySlice = createSlice({
     addIntermediary: (state, action: PayloadAction<IIntermediary>) => {
       state.intermediaries?.push(action.payload)
     },
+    addIntermediaries: (state, action: PayloadAction<IIntermediary[]>) => {
+      const arr: IIntermediary[] = [...state.intermediaries, ...action.payload]
+      state.intermediaries = arr
+    },
     refreshIntermediary: (state, action: PayloadAction<IIntermediary>) => {
-      state.intermediaries?.push(action.payload)
-
       state.intermediaries = state.intermediaries?.map((inter) => {
         inter.id === action.payload.id ? action.payload : inter
       })
@@ -48,5 +50,5 @@ export const intermediarySlice = createSlice({
   }
 })
 
-export const { addIntermediary, refreshIntermediary, removeIntermediary, setIntermediary, setIntermediaries, setCategories, setOrganizations } = intermediarySlice.actions
+export const { addIntermediary, refreshIntermediary, removeIntermediary, setIntermediary, setIntermediaries, setCategories, setOrganizations, addIntermediaries } = intermediarySlice.actions
 export default intermediarySlice.reducer

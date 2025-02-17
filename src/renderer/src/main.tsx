@@ -6,8 +6,8 @@ import { BrowserRouter, Route, Routes } from 'react-router'
 import LoginPage from './pages/login-page'
 import DashPage from './pages/dash-page'
 import DashLayout from './pages/dash-layout'
-import ReportHebdo from './pages/report-hebdo'
-import FundsPage from './pages/funds-page'
+import ReportHebdo from './pages/opc/report-hebdo'
+import FundsPage from './pages/funds/funds-page'
 import IntermediariesPage from './pages/intermediaries/intermediaries-page'
 import { Provider } from 'react-redux'
 import { store } from './store/store'
@@ -15,6 +15,13 @@ import UsersPage from './pages/users/users-page'
 import AddUserPage from './pages/users/add-user-page'
 import UpdateUserPage from './pages/users/update-user-page'
 import AddIntermediaryPage from './pages/intermediaries/add-intermediary-page'
+import EditIntermediaryPage from './pages/intermediaries/edit-intermediary-page'
+import DetailSgoPage from './pages/intermediaries/detail-sgo-page'
+import AddFundPage from './pages/funds/add-fund-page'
+import EditFundPage from './pages/funds/edit-fund-page'
+import YearsPage from './pages/system/years-page'
+import AddYearPage from './pages/system/add-year-page'
+import UpdateYearPage from './pages/system/update-year-page'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <Provider store={store}>
@@ -28,10 +35,17 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           <Route path="reports" element={<ReportHebdo />} />
           <Route path="intermediaries" element={<IntermediariesPage />} />
           <Route path="intermediaries/new" element={<AddIntermediaryPage />} />
+          <Route path="intermediaries/update" element={<EditIntermediaryPage />} />
+          <Route path="intermediaries/sgo" element={<DetailSgoPage />} />
           <Route path="funds" element={<FundsPage />} />
+          <Route path="funds/new" element={<AddFundPage />} />
+          <Route path="funds/update" element={<EditFundPage />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="users/new" element={<AddUserPage />} />
           <Route path="users/update" element={<UpdateUserPage />} />
+          <Route path="system/years" element={<YearsPage />} />
+          <Route path="system/years/new" element={<AddYearPage />} />
+          <Route path="system/years/edit" element={<UpdateYearPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

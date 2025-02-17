@@ -4,10 +4,12 @@ import { toast, ToastContainer } from 'react-toastify'
 
 type Props = {
   content: string,
-  action: () => void
+  action: () => void,
+  success: (e) => void,
+  error: (e) => void
 }
 
-function ConfirmDeleteDialog({ content, action }: Props): JSX.Element {
+function ConfirmDeleteDialog({ content, action, success, error }: Props): JSX.Element {
 
   const [loading, setLoading] = useState(false)
 
@@ -15,14 +17,10 @@ function ConfirmDeleteDialog({ content, action }: Props): JSX.Element {
     setLoading(true)
     try {
       const res = await action()
-      toast.success("Action effectuée avec success ! ", {
-        theme: 'colored'
-      })
-      setTimeout(() => document?.getElementById('non-btn')?.click(), 1500)
+      success("Action effectuée avec success !")
+      setTimeout(() => document?.getElementById('non-btn-del')?.click(), 200)
     } catch (e) {
-      toast.error(getMessageErrorRequestEx(e), {
-        theme: 'colored'
-      })
+      error(getMessageErrorRequestEx(e))
     } finally {
       setLoading(false)
     }
@@ -41,7 +39,7 @@ function ConfirmDeleteDialog({ content, action }: Props): JSX.Element {
         <p className="py-4">Confirmez-vous la suppréssion <b>{content}</b> </p>
         <div className="flex justify-end">
           <form method="dialog">
-            <button id="non-btn" className="btn btn-sm">NON</button>
+            <button id="non-btn-del" className="btn btn-sm">NON</button>
           </form>
           {loading && (
             <button className="btn btn-sm text-white text-base btn-error ml-2">
@@ -55,8 +53,6 @@ function ConfirmDeleteDialog({ content, action }: Props): JSX.Element {
 
         </div>
       </div>
-
-      <ToastContainer />
     </dialog>
   )
 }

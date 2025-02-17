@@ -87,6 +87,11 @@ export interface IIntermediary {
   organization?: IOrganization
 }
 
+export interface ISearchIntermediary {
+  term?: string | null,
+  category_id?: number | null
+}
+
 export interface IVisaApplication {
   id?: number,
   label?: string,
@@ -97,3 +102,167 @@ export interface IVisaApplication {
   decision?: string,
   created_at?: string
 }
+
+export interface ITypeOpc {
+  id?: number,
+  code?: string,
+  label?: string
+}
+
+export interface ITypeOpc {
+  id?: number,
+  code?: string,
+  label?: string
+}
+
+export interface IDepository {
+  id?: number,
+  code?: string,
+  label?: string
+}
+export interface IClassification {
+  id?: number,
+  code?: string,
+  label?: string
+}
+export interface IDistribution {
+  id?: number,
+  code?: string,
+  label?: string
+}
+export interface IFund {
+  id?: number,
+  label?: string,
+  approval_number?: string,
+  approval_date?: string,
+  other?: string,
+  distribution_network?: string,
+  type_opc_id?: number,
+  typeOpc?: ITypeOpc,
+  classification_id?: number,
+  classification?: IClassification,
+  depositary_id?: number,
+  depositary?: IDepository,
+  distribution_id?: number,
+  distribution?: IDistribution,
+  intermediary_id?: number,
+  intermediary?: IIntermediary,
+  auditor_id?: number,
+  auditor?: IIntermediary
+}
+
+export interface IYear {
+  id?: number,
+  code?: string,
+  label?: string,
+  generated?: boolean,
+  active?: boolean
+}
+
+export interface IWeek {
+  id?: number,
+  label?: string,
+  month?: string,
+  number?: number,
+  start?: string,
+  end?: string,
+  year?: IYear
+}
+
+export interface IAssetLineType {
+  id?: number,
+  label?: string,
+  code?: string
+}
+
+export interface IOpc {
+  id?: number,
+  created_at?: string,
+  estimated_at?: string,
+  fundId?: number,
+  fund?: IFund,
+  week_id?: number,
+  week?: IWeek,
+  opcvms?: Iopcvm[],
+  investmentRules?: IInvestmentRule[],
+  sgoEmployees?: ISgoEmployee[],
+  assetLines?: IAssetLine[],
+  investors?: IInvestor[]
+}
+
+export interface IOpcvmType {
+  id?: number,
+  label?: string,
+  code?: string,
+  parent_id?: number,
+  parent?: IOpcvmType
+}
+
+export interface IInvestmentRuleType {
+  id?: number,
+  label?: string,
+  code?: string
+}
+
+export interface IInvestor {
+  id?: number,
+  label?: string,
+  value?: number,
+  percent?: number,
+  unit?: string,
+  qualified?: boolean,
+  opcId?: number,
+  opc?: IOpc
+}
+
+export interface ISgoEmployee {
+  id?: number,
+  label?: string,
+  quality?: string,
+  part?: number,
+  percent?: number
+  opcId?: number
+  opc?: Iopc
+}
+
+export interface IInvestmentRule {
+  id?: number,
+  label?: string,
+  value?: number,
+  percent?: number,
+  status?: string,
+  rule_type_id?: number,
+  ruleType?: IInvestmentRuleType,
+  opcId?: number,
+  opc?: IOpc
+}
+
+export interface IAssetLine {
+  id?: number,
+  label?: string,
+  value?: number,
+  percent?: number,
+  assetTypeId?: number,
+  assetType?: IAssetLineType
+}
+
+export interface Iopcvm {
+  id?: number,
+  label?: string,
+  number?: number,
+  cours?: number,
+  value?: number,
+  percent?: number,
+  status?: string,
+  typeId?: number
+  type?: IOpcvmType,
+  opcId?: number,
+  opc?: IOpc
+}
+
+export interface ISysInfo {
+  year?: IYear,
+  weeks?: IWeek[],
+  currentWeek?: IWeek
+}
+

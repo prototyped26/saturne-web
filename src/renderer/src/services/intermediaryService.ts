@@ -1,9 +1,17 @@
-import { apiRequestAuth } from '../apiClient'
-import { IHolder, IIntermediary, IOrganization, IResponse } from '../type'
+import { apiRequestAuth, apiRequestAuthUpload } from '../apiClient'
+import { IHolder, IIntermediary, IOrganization, IResponse, ISearchIntermediary } from '../type'
 
 
 export const getIntermediaries = async (token: string): Promise<IResponse> => {
   return await apiRequestAuth<IResponse>('/intermediaries', 'GET', token)
+}
+
+export const getSgos = async (token: string): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/intermediaries/sgo', 'GET', token)
+}
+
+export const searchIntermediaries = async (token: string, data: ISearchIntermediary): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/intermediaries/search/query', 'POST', token, data)
 }
 
 export const getCategories = async (token: string): Promise<IResponse> => {
@@ -50,3 +58,6 @@ export const deleteHolder = async (token: string, id: number): Promise<IResponse
   return await apiRequestAuth<IResponse>('/holders/' + id, 'DELETE', token)
 }
 
+export const importIntermediaries = async (token: string, file: FormData): Promise<IResponse> => {
+  return await apiRequestAuthUpload<IResponse>('/intermediaries/import', 'POST', token, file)
+}

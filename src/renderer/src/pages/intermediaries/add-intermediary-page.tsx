@@ -292,7 +292,7 @@ function AddIntermediaryPage(): JSX.Element {
               </p>
               <select
                 onChange={(e) => setHead(e.target.value)}
-                className="select select-bordered w-full"
+                className="select  select-bordered w-full"
               >
                 <option value=""></option>
                 <option value="Cameroun">Cameroun</option>

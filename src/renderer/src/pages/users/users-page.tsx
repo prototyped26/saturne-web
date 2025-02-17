@@ -12,6 +12,7 @@ import ConfirmDeleteDialog from '../../components/ConfirmDeleteDialog'
 import { setInformationMessage, setSuccess } from '../../store/informationSlice'
 import AlertNotificationSuccess from '../../components/AlertNotificationSuccess'
 import DialogChangePassword from './DialogChangePassword'
+import { toast } from 'react-toastify'
 
 function UsersPage(): JSX.Element {
   const navigate = useNavigate()
@@ -84,6 +85,14 @@ function UsersPage(): JSX.Element {
   const onHandleNavToUpdate = (user: IUser): void => {
     dispatch(selectedUser(user))
     navigate("update")
+  }
+
+  const showSuccessToast = (msg: string): void => {
+    toast.success(msg, { theme: 'colored'})
+  }
+
+  const showErrorToast = (msg: string): void => {
+    toast.error(msg, { theme: 'colored'})
   }
 
   return (
@@ -322,7 +331,7 @@ function UsersPage(): JSX.Element {
               </nav>
             </div>
 
-            <ConfirmDeleteDialog content={contentDelete} action={onHandleDelete} />
+            <ConfirmDeleteDialog content={contentDelete} action={onHandleDelete} success={showSuccessToast} error={showErrorToast} />
 
             <DialogChangePassword user={user} />
 

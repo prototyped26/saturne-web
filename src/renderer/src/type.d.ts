@@ -290,3 +290,7 @@ export interface IFollowFund {
   fund?: IFund
 }
 
+export interface IHolderGrouped {
+  label: string,
+  holders: IHolder[]
+}

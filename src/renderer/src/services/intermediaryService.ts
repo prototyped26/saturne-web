@@ -46,6 +46,10 @@ export const getHoldersOrganization = async (token: string, id: number): Promise
   return await apiRequestAuth<IResponse>('/intermediaries/organizations/' +id+ '/holders', 'GET', token)
 }
 
+export const getHoldersGrouped = async (token: string, orgId: number): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/holders/history/' + orgId, 'GET', token)
+}
+
 export const deleteIntermediary = async (token: string, id: number): Promise<IResponse> => {
   return await apiRequestAuth<IResponse>('/intermediaries/' + id, 'DELETE', token)
 }

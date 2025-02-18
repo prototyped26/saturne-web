@@ -10,6 +10,7 @@ import { setAllHolders } from '../../store/intermediarySlice'
 import { toast, ToastContainer } from 'react-toastify'
 import EditOrganizationModal from './edit-organization-modal'
 import EditHoldersModal from './edit-holders-modal'
+import HistoryHolderModal from './history-holder-modal'
 
 function DetailSgoPage(): JSX.Element {
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
@@ -52,7 +53,11 @@ function DetailSgoPage(): JSX.Element {
   const onHandleUpdateHolders = (): void => {
     //setHolders(holders)
     setOpenModal(true)
-    document.getElementById("modal-edit-holders").showModal()
+    document?.getElementById("modal-edit-holders")?.showModal()
+  }
+
+  const onHandleShowHistoryHolders = (): void => {
+    document?.getElementById("modal-history-holders")?.showModal()
   }
 
   const closeModal = (): void => {
@@ -68,6 +73,7 @@ function DetailSgoPage(): JSX.Element {
       <EditHoldersModal data={holders} token={token as string} success={showSuccessToast}
                         error={showErrorToast} organization={intermediary?.organization as IOrganization}
                         open={openModal} change={closeModal} />
+      <HistoryHolderModal  token={token as string} success={showSuccessToast} error={showErrorToast} organization={intermediary?.organization as IOrganization} />
 
       <div className="border bg-white rounded-lg dark:border-gray-50 p-6 z-20">
         <div className="grid grid-cols-2 gap-4">
@@ -128,7 +134,7 @@ function DetailSgoPage(): JSX.Element {
                   <button onClick={onHandleUpdateHolders} className="btn btn-sm ">
                     <FiEdit />
                   </button>
-                  <button className="btn btn-sm">historique</button>
+                  <button onClick={onHandleShowHistoryHolders} className="btn btn-sm">historique</button>
                 </div>
               </div>
 

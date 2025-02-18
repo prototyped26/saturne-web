@@ -1,8 +1,28 @@
 import { IAssetLine, IResponse } from '../type'
-import { apiRequestAuth, apiRequestAuthUpload } from '../apiClient'
+import { apiRequest, apiRequestAuth, apiRequestAuthUpload } from '../apiClient'
 
 export const weekReport = async (token: string): Promise<IResponse> => {
   return await apiRequestAuth<IResponse>('/opc/current-week', 'GET', token)
+}
+
+export const generateReportAnalyze = async (token: string, id: number): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/analysis/opc/' + id, 'GET', token)
+}
+
+export const getFollowRules = async (): Promise<IResponse> => {
+  return await apiRequest<IResponse>('/analysis/follows/rules', 'GET')
+}
+
+export const getOpcvmTypes = async (): Promise<IResponse> => {
+  return await apiRequest<IResponse>('/opc/opcvm-types', 'GET')
+}
+
+export const getAssetLinesTypes = async (): Promise<IResponse> => {
+  return await apiRequest<IResponse>('/opc/assets-types', 'GET')
+}
+
+export const getInvestmentRuleTypes = async (): Promise<IResponse> => {
+  return await apiRequest<IResponse>('/opc/investment-rule-types', 'GET')
 }
 
 export const loadWeekReport = async (token: string, file: FormData, weekId: number | null): Promise<IResponse> => {

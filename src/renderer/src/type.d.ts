@@ -266,3 +266,27 @@ export interface ISysInfo {
   currentWeek?: IWeek
 }
 
+export interface IFollowRule {
+  id?: number,
+  reference?: string,
+  label?: string,
+  code?: string,
+  periodicity?: string,
+  observation?: string,
+  regulatory_date?: string,
+  parent_id?: number,
+  parent?: IFollowRule,
+  subRules?: IFollowRule[]
+}
+
+export interface IFollowFund {
+  id?: number,
+  standard?: boolean,
+  value?: string,
+  status?: string,
+  week_id?: number,
+  week?: IWeek,
+  fund_id?: number,
+  fund?: IFund
+}
+

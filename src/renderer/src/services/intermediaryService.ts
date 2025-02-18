@@ -42,12 +42,20 @@ export const updateOrganization = async (token: string, id: number, org: IOrgani
   return await apiRequestAuth<IResponse>('/intermediaries/organizations/' + id, 'POST', token, org)
 }
 
+export const getHoldersOrganization = async (token: string, id: number): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/intermediaries/organizations/' +id+ '/holders', 'GET', token)
+}
+
 export const deleteIntermediary = async (token: string, id: number): Promise<IResponse> => {
   return await apiRequestAuth<IResponse>('/intermediaries/' + id, 'DELETE', token)
 }
 
 export const createHolder = async (token: string, hold: IHolder): Promise<IResponse> => {
   return await apiRequestAuth<IResponse>('/holders', 'POST', token, hold)
+}
+
+export const createHolders = async (token: string, data: any): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/holders/all', 'POST', token, data)
 }
 
 export const updateHolder = async (token: string, id: number, hold: IHolder): Promise<IResponse> => {

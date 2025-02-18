@@ -1,4 +1,4 @@
-import { ICategory, IIntermediary, IOrganization } from '../type'
+import { ICategory, IHolder, IIntermediary, IOrganization } from '../type'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 type StateType = {
@@ -6,13 +6,15 @@ type StateType = {
   intermediary: IIntermediary | null,
   categories: ICategory[]
   organizations: IOrganization[],
+  holders: IHolder[]
 }
 
 const initialState: StateType = {
   intermediaries: [],
   intermediary: null,
   categories: [],
-  organizations: []
+  organizations: [],
+  holders: []
 }
 
 export const intermediarySlice = createSlice({
@@ -47,8 +49,17 @@ export const intermediarySlice = createSlice({
     setOrganizations: (state, action: PayloadAction<IOrganization[]>) => {
       state.organizations = action.payload
     },
+    setAllHolders: (state, action: PayloadAction<IHolder[]>) => {
+      state.holders = action.payload
+    },
+    refreshOrganization(state, action: PayloadAction<IOrganization>) {
+      const inter: IIntermediary = state.intermediary as IIntermediary
+      inter.organization = action.payload
+      state.intermediary = inter
+    }
   }
 })
 
-export const { addIntermediary, refreshIntermediary, removeIntermediary, setIntermediary, setIntermediaries, setCategories, setOrganizations, addIntermediaries } = intermediarySlice.actions
+export const { addIntermediary, refreshIntermediary, removeIntermediary, setIntermediary,
+  setIntermediaries, setCategories, setOrganizations, addIntermediaries, setAllHolders, refreshOrganization } = intermediarySlice.actions
 export default intermediarySlice.reducer

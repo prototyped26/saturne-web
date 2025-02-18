@@ -1,5 +1,5 @@
 import { IResponse, IYear } from '../type'
-import { apiRequestAuth } from '../apiClient'
+import { apiRequest, apiRequestAuth } from '../apiClient'
 
 export const getManagedYears = async (token: string | null): Promise<IResponse> => {
   return await apiRequestAuth<IResponse>('/system/years', 'GET', token)
@@ -9,8 +9,8 @@ export const getManagedYear = async (token: string | null, id: number): Promise<
   return await apiRequestAuth<IResponse>('/system/years/' + id, 'GET', token)
 }
 
-export const getCurrentInformation = async (token: string | null): Promise<IResponse> => {
-  return await apiRequestAuth<IResponse>('/system/informations', 'GET', token)
+export const getCurrentInformation = async (): Promise<IResponse> => {
+  return await apiRequest<IResponse>('/system/informations', 'GET')
 }
 
 export const createYear = async (token: string | null, data: IYear): Promise<IResponse> => {

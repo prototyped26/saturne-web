@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { IIntermediary, IOpc, IWeek } from '../../type'
 import { getMessageErrorRequestEx } from '../../utils/errors'
-import { loadWeekReport } from '../../services/opcService'
+import { generateReportAnalyze, loadWeekReport } from '../../services/opcService'
 
 type Props = {
   token: string,
@@ -22,7 +22,9 @@ function LoadReportModal({ token, success, error, currentWeek, reload }: Props):
       const data = new FormData()
       data.append('file', file)
 
-      await loadWeekReport(token, data, currentWeek.id as number)
+      const res = await loadWeekReport(token, data, currentWeek.id as number)
+      const opc = res.data as IOpc
+      await analyzeReport(opc?.id as number)
       reload()
       success("Rapport chargé avec succès ! ")
       document?.getElementById("close-btn-up-report")?.click()
@@ -31,6 +33,10 @@ function LoadReportModal({ token, success, error, currentWeek, reload }: Props):
     } finally {
       setLoading(false)
     }
+  }
+
+  const analyzeReport = async (id: number): Promise<void> => {
+    await generateReportAnalyze(token as string, id)
   }
 
   return (

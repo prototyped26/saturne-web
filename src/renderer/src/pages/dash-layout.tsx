@@ -6,15 +6,12 @@ import imageLogo from "./../assets/icon.png"
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../store/store'
 import { useEffect } from 'react'
-import { ISysInfo, IUser, IWeek, IYear } from '../type'
-import { getCurrentInformation } from '../services/systemService'
-import { setCurrentWeek, setCurrentYear } from '../store/systemSlice'
+import { IUser } from '../type'
 
 function DashLayout(): JSX.Element {
   const navigate = useNavigate()
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
   const useAppDispatch = () => useDispatch<AppDispatch>()
-  const dispatch = useAppDispatch()
 
   const user: IUser = useAppSelector((state) => state.user.current)
   const token: string | null = useAppSelector((state) => state.user.token)
@@ -22,20 +19,11 @@ function DashLayout(): JSX.Element {
   useEffect(() => {
     console.log(user)
     if (user === null) navigate('/login')
-
-    loadCurrentSysInfo()
   }, [])
 
   useEffect(() => {
     if (user === null) navigate('/login')
   }, [user])
-
-  const loadCurrentSysInfo = async (): Promise<void> => {
-    const res = await getCurrentInformation(token)
-    const data: ISysInfo = res.data
-    dispatch(setCurrentYear(data.year as IYear))
-    dispatch(setCurrentWeek(data.currentWeek as IWeek))
-  }
 
   return (
     <div className="antialiased bg-gray-50 dark:bg-gray-900">

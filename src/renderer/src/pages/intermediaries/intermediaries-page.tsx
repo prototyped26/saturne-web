@@ -115,7 +115,7 @@ function IntermediariesPage(): JSX.Element {
   }
 
   const onHandleDelete = async (): Promise<void> => {
-    const inter: IIntermediary = toDelete
+    const inter: IIntermediary = toDelete as IIntermediary
     await deleteIntermediary(token as string, inter?.id as number)
     dispatch(removeIntermediary(inter))
   }

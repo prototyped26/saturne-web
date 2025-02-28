@@ -8,7 +8,7 @@ import { setIntermediaries } from '../../store/intermediarySlice'
 import { toast, ToastContainer } from 'react-toastify'
 import { getMessageErrorRequestEx } from '../../utils/errors'
 import {
-  deleteFund,
+  deleteFund, getAllShareholders,
   getClassifications,
   getDepositaries,
   getDistributions,
@@ -21,7 +21,7 @@ import {
   setClassifications,
   setDepositaries,
   setDistributions, setFund,
-  setFunds,
+  setFunds, setShareholders,
   setTypesOpc
 } from '../../store/fundSlice'
 import { FiEye, FiMoreHorizontal, FiPlus, FiSearch, FiTrash } from 'react-icons/fi'
@@ -60,6 +60,7 @@ function FundsPage() : JSX.Element {
     loadTypesOpc(token as string)
     loadDepositaries(token as string)
     loadDistributions(token as string)
+    loadAllShareholders(token as string)
     loadFunds(token as string)
   }, [])
 
@@ -135,6 +136,17 @@ function FundsPage() : JSX.Element {
     }
   }
 
+  const loadAllShareholders = async (t: string): Promise<void> => {
+    try {
+      const res = await getAllShareholders(t)
+      dispatch(setShareholders(res.data))
+    } catch (e) {
+      toast.error(getMessageErrorRequestEx(e), {
+        theme: 'colored'
+      })
+    }
+  }
+
   const onHandleClickImport = (): void => {
     document?.getElementById('modal-import-fund')?.showModal()
   }
@@ -145,7 +157,8 @@ function FundsPage() : JSX.Element {
   }
 
   const onHandleNavToDetails = (fund: IFund): void => {
-
+    dispatch(setFund(fund))
+    navigate('details')
   }
 
   const onHandleConfirmDelete = async (f: IFund): Promise<void> => {
@@ -226,7 +239,7 @@ function FundsPage() : JSX.Element {
                 </div>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 mb-10">
+                <table className="w-full text-xs text-left text-gray-500 dark:text-gray-400 mb-10">
                   <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
                       <th scope="col" className="p-4">
@@ -308,7 +321,7 @@ function FundsPage() : JSX.Element {
                         <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                           <div className="flex justify-end">
                             <button
-                              onClick={() => onHandleNavToUpdate(fund)}
+                              onClick={() => onHandleNavToDetails(fund)}
                               className="btn btn-sm"
                             >
                               <FiEye />

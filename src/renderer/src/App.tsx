@@ -3,10 +3,10 @@ import { useDispatch } from 'react-redux'
 import { AppDispatch } from './store/store'
 import { useEffect } from 'react'
 import { getCurrentInformation } from './services/systemService'
-import { IAssetLineType, IFollowRule, IOpcvmType, ISysInfo, IWeek, IYear } from './type'
+import { IAssetLineType, IFollowRule, IInvestmentRuleType, IOpcvmType, ISysInfo, IWeek, IYear } from './type'
 import { setCurrentWeek, setCurrentYear } from './store/systemSlice'
-import { getAssetLinesTypes, getFollowRules, getOpcvmTypes } from './services/opcService'
-import { setAssetLineTypes, setFollowsRules, setOpcvmTypes } from './store/opcSlice'
+import { getAssetLinesTypes, getFollowRules, getInvestmentRuleTypes, getOpcvmTypes } from './services/opcService'
+import { setAssetLineTypes, setFollowsRules, setInvestmentRuleTypes, setOpcvmTypes } from './store/opcSlice'
 
 function App(): JSX.Element {
   const navigate = useNavigate()
@@ -18,6 +18,7 @@ function App(): JSX.Element {
     loadFollowsRules()
     loadOpcvmTypes()
     loadAssetLineTypes()
+    loadInvestmentRuleTypes()
     navigate("/login")
   }, [])
 
@@ -36,6 +37,11 @@ function App(): JSX.Element {
   const loadOpcvmTypes = async (): Promise<void> => {
     const res = await getOpcvmTypes()
     dispatch(setOpcvmTypes(res.data as IOpcvmType[]))
+  }
+
+  const loadInvestmentRuleTypes = async (): Promise<void> => {
+    const res = await getInvestmentRuleTypes()
+    dispatch(setInvestmentRuleTypes(res.data as IInvestmentRuleType[]))
   }
 
   const loadAssetLineTypes = async (): Promise<void> => {

@@ -22,6 +22,8 @@ import EditFundPage from './pages/funds/edit-fund-page'
 import YearsPage from './pages/system/years-page'
 import AddYearPage from './pages/system/add-year-page'
 import UpdateYearPage from './pages/system/update-year-page'
+import DetailOpcPage from './pages/opc/detail-opc-page'
+import DetailFundPage from './pages/funds/detail-fund-page'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <Provider store={store}>
@@ -33,6 +35,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           <Route index element={<DashPage />} />
           <Route path="main" element={<DashPage />} />
           <Route path="reports" element={<ReportHebdo />} />
+          <Route path="reports/details" element={<DetailOpcPage />} />
           <Route path="intermediaries" element={<IntermediariesPage />} />
           <Route path="intermediaries/new" element={<AddIntermediaryPage />} />
           <Route path="intermediaries/update" element={<EditIntermediaryPage />} />
@@ -40,6 +43,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           <Route path="funds" element={<FundsPage />} />
           <Route path="funds/new" element={<AddFundPage />} />
           <Route path="funds/update" element={<EditFundPage />} />
+          <Route path="funds/details" element={<DetailFundPage />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="users/new" element={<AddUserPage />} />
           <Route path="users/update" element={<UpdateUserPage />} />

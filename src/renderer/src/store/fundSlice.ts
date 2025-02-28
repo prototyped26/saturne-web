@@ -1,4 +1,12 @@
-import { IClassification, IDepository, IDistribution, IFund, IIntermediary, ITypeOpc } from '../type'
+import {
+  IClassification,
+  IDepository,
+  IDistribution,
+  IFund,
+  IShareholder,
+  IShareholderType,
+  ITypeOpc
+} from '../type'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 
@@ -8,7 +16,11 @@ type StateType = {
   typesOpc: ITypeOpc[],
   classifications: IClassification[],
   depositaries: IDepository[],
-  distributions: IDistribution[]
+  distributions: IDistribution[],
+  shareholders: IShareholder[],
+  shareHoldersFund: IShareholder[],
+  shareholdersTypes: IShareholderType[],
+
 }
 
 const initialState: StateType = {
@@ -17,7 +29,10 @@ const initialState: StateType = {
   typesOpc: [],
   classifications: [],
   depositaries: [],
-  distributions: []
+  distributions: [],
+  shareholders: [],
+  shareHoldersFund: [],
+  shareholdersTypes: []
 }
 
 export const fundSlice = createSlice({
@@ -58,8 +73,15 @@ export const fundSlice = createSlice({
     setClassifications: (state, action: PayloadAction<IClassification[]>) => {
       state.classifications = action.payload
     },
+    setShareholders: (state, action: PayloadAction<IShareholder[]>) => {
+      state.shareholders = action.payload
+    },
+    setShareholdersTypes: (state, action: PayloadAction<IShareholderType[]>) => {
+      state.shareholdersTypes = action.payload
+    },
   }
 })
 
-export const { addFunds, addFund, removeFund, refreshFund, setFund, setFunds, setClassifications, setTypesOpc, setDistributions, setDepositaries } = fundSlice.actions
+export const { addFunds, addFund, removeFund, refreshFund, setFund, setFunds, setClassifications,
+  setTypesOpc, setDistributions, setDepositaries, setShareholdersTypes, setShareholders } = fundSlice.actions
 export default fundSlice.reducer

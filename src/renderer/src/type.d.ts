@@ -106,13 +106,8 @@ export interface IVisaApplication {
 export interface ITypeOpc {
   id?: number,
   code?: string,
-  label?: string
-}
-
-export interface ITypeOpc {
-  id?: number,
-  code?: string,
-  label?: string
+  label?: string,
+  subType?: ITypeOpc[]
 }
 
 export interface IDepository {
@@ -232,7 +227,7 @@ export interface IInvestmentRule {
   percent?: number,
   status?: string,
   rule_type_id?: number,
-  ruleType?: IInvestmentRuleType,
+  investmentRuleType?: IInvestmentRuleType,
   opcId?: number,
   opc?: IOpc
 }
@@ -255,7 +250,7 @@ export interface Iopcvm {
   percent?: number,
   status?: string,
   typeId?: number
-  type?: IOpcvmType,
+  opcvmType?: IOpcvmType,
   opcId?: number,
   opc?: IOpc
 }
@@ -293,4 +288,78 @@ export interface IFollowFund {
 export interface IHolderGrouped {
   label: string,
   holders: IHolder[]
+}
+
+export interface IReportNote {
+  label: string,
+  notation: number,
+  note: string
+}
+
+export interface IRequestHistoryLiquidationValue {
+  date_to?: string | null,
+  date_at?: string | null,
+  fund_id: number
+}
+
+export interface IHistoryLiquidationValue {
+  label: string,
+  value: number,
+  percent: number,
+  period: string
+}
+
+export interface IShareholderType {
+  id?: number,
+  label: string,
+  code: string
+  subTypes?: IShareholderType[]
+}
+
+export interface IOperationType {
+  id?: number,
+  label: string,
+  code: string,
+}
+
+export interface IOperation {
+  id?: number,
+  shares: number,
+  percent: number,
+  amount: number,
+  created_at?: string,
+  type?: IOperationType
+}
+
+export interface IShareholder {
+  id?: number,
+  label: string,
+  nationality?: string,
+  residence?: string,
+  id_number?: string,
+  pp?: string,
+  type?: IShareholderType,
+  type_id?: number,
+  shares?: number,
+  amount?: number,
+  percent?: number,
+  fund_id?: number,
+  operation_id?: number,
+  operations?: IOperation[]
+}
+
+export interface IHistoryShareholder {
+  id?: number,
+  date_start?: string,
+  date_end?: string,
+  shareholder?: IShareholder,
+  fund?: IFund
+}
+
+export interface IShareHolderOperation {
+  label: string,
+  id: number,
+  amount: number,
+  shares: number,
+  percent: number
 }

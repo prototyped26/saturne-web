@@ -1,12 +1,8 @@
-import { IAssetLine, IResponse } from '../type'
+import { IAssetLine, IRequestHistoryLiquidationValue, IResponse } from '../type'
 import { apiRequest, apiRequestAuth, apiRequestAuthUpload } from '../apiClient'
 
 export const weekReport = async (token: string): Promise<IResponse> => {
   return await apiRequestAuth<IResponse>('/opc/current-week', 'GET', token)
-}
-
-export const generateReportAnalyze = async (token: string, id: number): Promise<IResponse> => {
-  return await apiRequestAuth<IResponse>('/analysis/opc/' + id, 'GET', token)
 }
 
 export const getFollowRules = async (): Promise<IResponse> => {
@@ -27,6 +23,22 @@ export const getInvestmentRuleTypes = async (): Promise<IResponse> => {
 
 export const loadWeekReport = async (token: string, file: FormData, weekId: number | null): Promise<IResponse> => {
   return await apiRequestAuthUpload<IResponse>('/opc/load/week/' + weekId, 'POST', token, file)
+}
+
+export const getlastReportOfFund = async (token: string, fundId: number): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/opc/last-report/' + fundId, 'GET', token)
+}
+
+export const generateReportAnalyze = async (token: string, id: number): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/analysis/opc/' + id, 'GET', token)
+}
+
+export const getReportResult = async (token: string, id: number): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/analysis/opc/' + id + '/result', 'GET', token)
+}
+
+export const getHistoryLiquidationValue = async (token: string, data: IRequestHistoryLiquidationValue): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/opc/history/liquidatives', 'POST', token, data)
 }
 
 export const getActifNet = (lines: IAssetLine[]): number | null => {

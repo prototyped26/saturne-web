@@ -9,11 +9,12 @@ import NoDataList from '../../components/NoDataList'
 import AlertNotificationSuccess from '../../components/AlertNotificationSuccess'
 import { IAssetLine, IOpc, IWeek } from '../../type'
 import { getActifNet, getActifSousGestion, getValeurLiquid, weekReport } from '../../services/opcService'
-import { setOpcs } from '../../store/opcSlice'
+import { setOpc, setOpcs } from '../../store/opcSlice'
 import { getMessageErrorRequestEx } from '../../utils/errors'
 import LoadReportModal from './load-report-modal'
 import moment from 'moment'
 import ConfirmDeleteDialog from '../../components/ConfirmDeleteDialog'
+import { NumericFormat } from 'react-number-format'
 
 function ReportHebdo(): JSX.Element {
   const navigate = useNavigate()
@@ -57,6 +58,11 @@ function ReportHebdo(): JSX.Element {
     toast.error(msg, { theme: 'colored'})
   }
 
+  const onHandleDetail = (opc: IOpc): void => {
+    dispatch(setOpc(opc))
+    navigate('details')
+  }
+
   return (
     <div className="border bg-white rounded-lg dark:border-gray-50 h-96 p-6 mb-4 z-20">
       <ToastContainer key={21223223} />
@@ -96,7 +102,7 @@ function ReportHebdo(): JSX.Element {
                 </div>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 mb-10">
+                <table className="w-full text-xs text-left text-gray-500 dark:text-gray-400 mb-10">
                   <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                   <tr>
                     <th scope="col" className="p-4">
@@ -162,13 +168,13 @@ function ReportHebdo(): JSX.Element {
                       <td className="px-4 py-2">
                         <label className="font-medium">{opc?.fund?.label?.toUpperCase()}</label>
                       </td>
-                      <td className="px-4 py-2">{getActifNet(opc?.assetLines as IAssetLine[])} F</td>
-                      <td className="px-4 py-2">{getValeurLiquid(opc?.assetLines as IAssetLine[])} F</td>
-                      <td className="px-4 py-2">{getActifSousGestion(opc?.assetLines as IAssetLine[])} F</td>
+                      <td className="px-4 py-2"> <NumericFormat value={getActifNet(opc?.assetLines as IAssetLine[])} displayType={'text'} thousandSeparator={true}  suffix={' XAF'} /> </td>
+                      <td className="px-4 py-2"> <NumericFormat value={getValeurLiquid(opc?.assetLines as IAssetLine[])} displayType={'text'} thousandSeparator={true}  suffix={' XAF'} /></td>
+                      <td className="px-4 py-2"> <NumericFormat value={getActifSousGestion(opc?.assetLines as IAssetLine[])} displayType={'text'} thousandSeparator={true}  suffix={' XAF'} /></td>
 
                       <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                         <div className="flex justify-end">
-                          <button
+                          <button onClick={() => onHandleDetail(opc)}
                             className="btn btn-sm"
                           >
                             <FiEye />

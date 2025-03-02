@@ -293,7 +293,8 @@ export interface IHolderGrouped {
 export interface IReportNote {
   label: string,
   notation: number,
-  note: string
+  note: string,
+  items?: IFollowFund[]
 }
 
 export interface IRequestHistoryLiquidationValue {
@@ -362,4 +363,23 @@ export interface IShareHolderOperation {
   amount: number,
   shares: number,
   percent: number
+}
+
+export interface ICustomer {
+  id?: int,
+  label?: string,
+  status?: string
+  intermediary?: IIntermediary
+}
+
+export interface IMandate {
+  id?: number,
+  strategy?: string,
+  risk_profile?: string,
+  created_at?: string,
+  opcvms?: Iopcvm[],
+  assetLines?: IAssetLine[],
+  week?: IWeek,
+  customer?: ICustomer,
+  depositary?: IDepository
 }

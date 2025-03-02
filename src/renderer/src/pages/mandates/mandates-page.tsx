@@ -1,29 +1,28 @@
-import { Link, useNavigate } from 'react-router'
+import { useNavigate } from 'react-router'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store/store'
-import { toast, ToastContainer } from 'react-toastify'
-import { FiEye, FiMoreHorizontal, FiPlus, FiTrash } from 'react-icons/fi'
+import { IAssetLine, IMandate, IWeek } from '../../type'
 import { useEffect, useState } from 'react'
+import { weekMandates } from '../../services/mandateService'
+import { setMandate, setMandates } from '../../store/mandateSlice'
+import { toast, ToastContainer } from 'react-toastify'
+import { getMessageErrorRequestEx } from '../../utils/errors'
 import LoadingTable from '../../components/LoadingTable'
 import NoDataList from '../../components/NoDataList'
-import AlertNotificationSuccess from '../../components/AlertNotificationSuccess'
-import { IAssetLine, IOpc, IWeek } from '../../type'
-import { getActifNet, getActifSousGestion, getValeurLiquid, weekReport } from '../../services/opcService'
-import { setOpc, setOpcs } from '../../store/opcSlice'
-import { getMessageErrorRequestEx } from '../../utils/errors'
-import LoadReportModal from './load-report-modal'
-import moment from 'moment'
-import ConfirmDeleteDialog from '../../components/ConfirmDeleteDialog'
+import moment from 'moment/moment'
 import { NumericFormat } from 'react-number-format'
+import { getActifNet, getActifSousGestion, getValeurLiquid } from '../../services/opcService'
+import { FiEye, FiMoreHorizontal, FiTrash } from 'react-icons/fi'
+import LoadMandateModal from './load-mandate-modal'
 
-function ReportHebdo(): JSX.Element {
+function MandatesPage(): JSX.Element {
   const navigate = useNavigate()
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
 
   const token: string | null = useAppSelector((state) => state.user.token)
-  const opcs: IOpc[] = useAppSelector((state) => state.opc.opcs)
+  const mandates: IMandate[] = useAppSelector((state) => state.mandate.mandates)
   const currentWeek: IWeek | null = useAppSelector((state) => state.system.currentWeek)
 
   const message: string | null = useAppSelector((state) => state.information.message)
@@ -32,22 +31,24 @@ function ReportHebdo(): JSX.Element {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadOpcsOfWeek()
+    loadMandates()
   }, [])
 
-  const loadOpcsOfWeek = async (): Promise<void> => {
+  const loadMandates = async (): Promise<void> => {
+    setLoading(true)
     try {
-      const res = await weekReport(token as string)
-      dispatch(setOpcs(res.data as IOpc[]))
+      const res = await weekMandates(token as string);
+      dispatch(setMandates(res.data as IMandate[]))
     } catch (e) {
-      toast.error(getMessageErrorRequestEx(e), { theme: 'colored' })
+      showErrorToast(getMessageErrorRequestEx(e))
     } finally {
       setLoading(false)
     }
   }
 
-  const onHandleUpReport = async (): Promise<void> => {
-    document?.getElementById("modal-load-report-opc")?.showModal()
+  const onHandelSee = (mandate: IMandate): void => {
+    dispatch(setMandate(mandate))
+    navigate('details')
   }
 
   const showSuccessToast = (msg: string): void => {
@@ -58,20 +59,22 @@ function ReportHebdo(): JSX.Element {
     toast.error(msg, { theme: 'colored'})
   }
 
-  const onHandleDetail = (opc: IOpc): void => {
-    dispatch(setOpc(opc))
-    navigate('details')
+  const onHandleUpReport = async (): Promise<void> => {
+    // @ts-ignore show is function off DiasyUI
+    document?.getElementById("modal-load-report-mandate")?.showModal()
   }
 
   return (
     <div className="border bg-white rounded-lg dark:border-gray-50 h-96 p-6 mb-4 z-20">
-      <ToastContainer key={21223223} />
+      <ToastContainer key={Math.random() * Date.now()} />
 
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="">
-          <h3 className="tracking-tight font-bold text-3xl text-app-title">Rapports Hedbomadaires </h3>
+          <h3 className="tracking-tight font-bold text-3xl text-app-title">
+            Mandats Hedbomadaires{' '}
+          </h3>
           <p className="tracking-tight font-light text-1xl text-app-sub-title">
-            Rapports Hebdo, OPC & Mandats
+            Rapports Hebdo, différents Mandats
           </p>
         </div>
         <div className="flex  justify-end ">
@@ -83,20 +86,18 @@ function ReportHebdo(): JSX.Element {
 
       {loading && <LoadingTable />}
 
-      {!loading && opcs.length === 0 && <NoDataList />}
+      {!loading && mandates.length === 0 && <NoDataList />}
 
-      {success !== null && <AlertNotificationSuccess message={message} />}
-
-      {!loading && opcs.length > 0 && (
+      {!loading && mandates.length > 0 && (
         <div className="grid">
           <div className="max-w-screen-2xl ">
             <div className="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
               <div className="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
                 <div className="flex items-center flex-1 space-x-4">
                   <h5>
-                    <span className="text-gray-500">Pour cette semaine, il y a : </span>
+                    <span className="text-gray-500"> Yl y a : </span>
                     <span className="dark:text-white">
-                      {opcs.length + ' rapport' + (opcs.length > 1 ? 's' : '')}
+                      {mandates.length + ' rapport' + (mandates.length > 1 ? 's' : '')}
                     </span>
                   </h5>
                 </div>
@@ -104,107 +105,108 @@ function ReportHebdo(): JSX.Element {
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-left text-gray-500 dark:text-gray-400 mb-10">
                   <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                  <tr>
-                    <th scope="col" className="p-4">
-                      <div className="flex items-center">
-                        <input
-                          id="checkbox-all"
-                          type="checkbox"
-                          className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                        />
-                        <label htmlFor="checkbox-all" className="sr-only">
-                          checkbox
-                        </label>
-                      </div>
-                    </th>
-                    <th scope="col" className="px-4 py-3">
-                      Reçu le
-                    </th>
-                    <th scope="col" className="px-4 py-3">
-                      De la SGO
-                    </th>
-                    <th scope="col" className="px-4 py-3">
-                      Fond
-                    </th>
-                    <th scope="col" className="px-4 py-3">
-                      Actif Net
-                    </th>
-                    <th scope="col" className="px-4 py-3">
-                      Valeur Liquid.
-                    </th>
-                    <th scope="col" className="px-4 py-3">
-                      Actifs S.G.
-                    </th>
-                    <th scope="col" className="px-4 py-3"></th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  {opcs.map((opc) => (
-                    <tr
-                      key={opc.id}
-                      className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      <td className="w-4 px-4 py-3">
+                    <tr>
+                      <th scope="col" className="p-4">
                         <div className="flex items-center">
                           <input
-                            id="checkbox-table-search-1"
+                            id="checkbox-all"
                             type="checkbox"
                             className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                           />
-                          <label htmlFor="checkbox-table-search-1" className="sr-only">
+                          <label htmlFor="checkbox-all" className="sr-only">
                             checkbox
                           </label>
                         </div>
-                      </td>
-                      <th
-                        scope="row"
-                        className=" items-center px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                      >
-                        {moment(opc?.created_at).format('DD MMMM YYYY')}
                       </th>
-                      <td className="px-4 py-2">
-                        <label className="font-medium">{opc?.fund?.intermediary?.label?.toUpperCase()}</label>
-                      </td>
-                      <td className="px-4 py-2">
-                        <label className="font-medium">{opc?.fund?.label?.toUpperCase()}</label>
-                      </td>
-                      <td className="px-4 py-2"> <NumericFormat value={getActifNet(opc?.assetLines as IAssetLine[])} displayType={'text'} thousandSeparator={' '}  suffix={' XAF'} /> </td>
-                      <td className="px-4 py-2"> <NumericFormat value={getValeurLiquid(opc?.assetLines as IAssetLine[])} displayType={'text'} thousandSeparator={' '}  suffix={' XAF'} /></td>
-                      <td className="px-4 py-2"> <NumericFormat value={getActifSousGestion(opc?.assetLines as IAssetLine[])} displayType={'text'} thousandSeparator={ ''}  suffix={' XAF'} /></td>
-
-                      <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                        <div className="flex justify-end">
-                          <button onClick={() => onHandleDetail(opc)}
-                            className="btn btn-sm"
-                          >
-                            <FiEye />
-                          </button>
-                          <div className="dropdown dropdown-left dropdown-end ml-2">
-                            <div tabIndex={0} role="button" className="btn btn-sm ">
-                              <FiMoreHorizontal />
-                            </div>
-                            <ul
-                              tabIndex={0}
-                              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-56 p-1 shadow"
-                            >
-                              <li>
-                                <a>Historique Valeur L.</a>
-                              </li>
-                              <li>
-                                <a >Modifier</a>
-                              </li>
-
-                            </ul>
-                          </div>
-                          <button
-                            className="btn btn-sm btn-error ml-2 font-bold text-white"
-                          >
-                            <FiTrash />
-                          </button>
-                        </div>
-                      </td>
+                      <th scope="col" className="px-4 py-3">
+                        Dénomination/Client
+                      </th>
+                      <th scope="col" className="px-4 py-3">
+                        SGO
+                      </th>
+                      <th scope="col" className="px-4 py-3">
+                        Dépositaire
+                      </th>
+                      <th scope="col" className="px-4 py-3">
+                        Rapport du
+                      </th>
+                      <th scope="col" className="px-4 py-3">
+                        Profil de risque
+                      </th>
+                      <th scope="col" className="px-4 py-3">
+                        Actif Net
+                      </th>
+                      <th scope="col" className="px-4 py-3">
+                        Chargé le
+                      </th>
+                      <th scope="col" className="px-4 py-3"></th>
                     </tr>
-                  ))}
+                  </thead>
+                  <tbody>
+                    {mandates.map((mandate) => (
+                      <tr
+                        key={mandate.id}
+                        className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        <td className="w-4 px-4 py-3">
+                          <div className="flex items-center">
+                            <input
+                              id="checkbox-table-search-1"
+                              type="checkbox"
+                              className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                            />
+                            <label htmlFor="checkbox-table-search-1" className="sr-only">
+                              checkbox
+                            </label>
+                          </div>
+                        </td>
+                        <th
+                          scope="row"
+                          className=" items-center px-4 py-2 font-bold text-gray-900 whitespace-nowrap dark:text-white"
+                        >
+                          {mandate?.customer?.label?.toUpperCase()}
+                        </th>
+                        <td className="px-4 py-2">
+                          <label className="font-medium">
+                            {mandate?.customer?.intermediary?.label?.toUpperCase()}
+                          </label>
+                        </td>
+                        <td className="px-4 py-2">
+                          <label className="font-medium">
+                            {mandate?.depositary?.label?.toUpperCase()}
+                          </label>
+                        </td>
+                        <td className="px-4 py-2">
+                          <label className="font-medium">{moment(mandate?.week?.end).format('DD, MMM YYYY')}</label>
+                        </td>
+                        <td className="px-4 py-2">
+                          <label className="font-medium">{mandate?.risk_profile}</label>
+                        </td>
+                        <td className="px-4 py-2">
+                          <NumericFormat
+                            value={getActifNet(mandate?.assetLines as IAssetLine[])}
+                            displayType={'text'}
+                            thousandSeparator={' '}
+                            suffix={' XAF'}
+                          />
+                        </td>
+                        <td className="px-4 py-2">
+                          <label className="font-medium">
+                            {moment(mandate?.created_at).format('DD, MMM YYYY')}
+                          </label>
+                        </td>
+                        <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                          <div className="flex justify-end">
+                            <button onClick={() => onHandelSee(mandate)} className="btn btn-sm">
+                              <FiEye />
+                            </button>
+                            <button className="btn btn-sm btn-error ml-2 font-bold text-white">
+                              <FiTrash />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -283,9 +285,15 @@ function ReportHebdo(): JSX.Element {
         </div>
       )}
 
-      <LoadReportModal token={token as string} success={showSuccessToast} error={showErrorToast} currentWeek={currentWeek as IWeek} reload={loadOpcsOfWeek} />
+      <LoadMandateModal
+        token={token as string}
+        currentWeek={currentWeek as IWeek}
+        success={showSuccessToast}
+        error={showErrorToast}
+        reload={loadMandates}
+      />
     </div>
   )
 }
 
-export default ReportHebdo
+export default MandatesPage

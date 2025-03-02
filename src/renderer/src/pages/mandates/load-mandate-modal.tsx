@@ -1,21 +1,20 @@
-import { useState } from 'react'
-import { IIntermediary, IOpc, IWeek, IYear } from '../../type'
-import { getMessageErrorRequestEx } from '../../utils/errors'
-import { generateReportAnalyze, loadWeekReport } from '../../services/opcService'
+import { IWeek, IYear } from '../../type'
 import { TypedUseSelectorHook, useSelector } from 'react-redux'
 import { RootState } from '../../store/store'
-import moment from 'moment'
+import { useState } from 'react'
+import { getMessageErrorRequestEx } from '../../utils/errors'
+import { loadWeekMandateReport } from '../../services/mandateService'
+import moment from 'moment/moment'
 
 type Props = {
   token: string,
-  sgo?: IIntermediary[],
   currentWeek: IWeek,
   success: (m) => void,
   error: (m) => void,
   reload: () => void
 }
 
-function LoadReportModal({ token, success, error, currentWeek, reload }: Props): JSX.Element {
+function LoadMandateModal({ token, currentWeek, success, error, reload }: Props): JSX.Element {
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
 
   const currentYear: IYear | null = useAppSelector((state) => state.system.currentYear)
@@ -33,12 +32,10 @@ function LoadReportModal({ token, success, error, currentWeek, reload }: Props):
 
       const weekId: number = selectedWeek.length === 0 ? currentWeek.id as number : Number(selectedWeek)
 
-      const res = await loadWeekReport(token, data, weekId)
-      const opc = res.data as IOpc
-      await analyzeReport(opc?.id as number)
+      await loadWeekMandateReport(token, data, weekId)
       reload()
       success("Rapport chargé avec succès ! ")
-      document?.getElementById("close-btn-up-report")?.click()
+      document?.getElementById("close-btn-up-mandate")?.click()
     } catch (e) {
       error(getMessageErrorRequestEx(e))
     } finally {
@@ -46,19 +43,14 @@ function LoadReportModal({ token, success, error, currentWeek, reload }: Props):
     }
   }
 
-  const analyzeReport = async (id: number): Promise<void> => {
-    await generateReportAnalyze(token as string, id)
-  }
-
-  // @ts-ignore hello
   return (
-    <dialog id="modal-load-report-opc" className="modal">
+    <dialog id="modal-load-report-mandate" className="modal" >
       <div className="modal-box">
         <form method="dialog">
           {/* if there is a button in form, it will close the modal */}
           <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
         </form>
-        <h3 className="font-bold text-lg ">Charger un repport hebdo.</h3>
+        <h3 className="font-bold text-lg ">Charger un repport hebdomadaire du mandat</h3>
         <p className="py-4">
           Le fichier doit être conforme aux exigéances du comité.
         </p>
@@ -93,14 +85,14 @@ function LoadReportModal({ token, success, error, currentWeek, reload }: Props):
         </div>
         <div className="flex justify-end">
           <form method="dialog">
-            <button id="close-btn-up-report" className="btn btn-sm">
+            <button id="close-btn-up-mandate" className="btn btn-sm">
               Fermer
             </button>
           </form>
         </div>
-      </div>
+    </div>
     </dialog>
   )
 }
 
-export default LoadReportModal
+export default LoadMandateModal

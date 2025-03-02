@@ -149,9 +149,9 @@ function DetailOpcPage(): JSX.Element {
         <div className="w-3/12">
           <div className="border bg-white dark:border-gray-50 h-auto rounded-lg p-4">
             {opc?.assetLines?.map((line) => (
-              <div key={line.id}>
-                <p className="text-lg">{line.label}</p>
-                <p className="font-black"><NumericFormat value={Number(line?.value?.toFixed(2))} displayType={'text'} thousandSeparator={true}  suffix={' XAF'} /> </p>
+              <div key={line.id} className="border-b mb-2 pb-1">
+                <p className="text-lg">{line.label.toUpperCase()}</p>
+                <p className="font-black"><NumericFormat value={Number(line?.value?.toFixed(2))} displayType={'text'} thousandSeparator={' '}  suffix={' XAF'} /> </p>
               </div>
             ))}
           </div>

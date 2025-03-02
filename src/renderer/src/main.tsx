@@ -24,6 +24,8 @@ import AddYearPage from './pages/system/add-year-page'
 import UpdateYearPage from './pages/system/update-year-page'
 import DetailOpcPage from './pages/opc/detail-opc-page'
 import DetailFundPage from './pages/funds/detail-fund-page'
+import MandatesPage from './pages/mandates/mandates-page'
+import DetailMandatePage from './pages/mandates/detail-mandate-page'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <Provider store={store}>
@@ -36,6 +38,8 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           <Route path="main" element={<DashPage />} />
           <Route path="reports" element={<ReportHebdo />} />
           <Route path="reports/details" element={<DetailOpcPage />} />
+          <Route path="mandates" element={<MandatesPage />} />
+          <Route path="mandates/details" element={<DetailMandatePage />} />
           <Route path="intermediaries" element={<IntermediariesPage />} />
           <Route path="intermediaries/new" element={<AddIntermediaryPage />} />
           <Route path="intermediaries/update" element={<EditIntermediaryPage />} />

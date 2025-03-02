@@ -4,7 +4,7 @@ import { AppDispatch } from './store/store'
 import { useEffect } from 'react'
 import { getCurrentInformation } from './services/systemService'
 import { IAssetLineType, IFollowRule, IInvestmentRuleType, IOpcvmType, ISysInfo, IWeek, IYear } from './type'
-import { setCurrentWeek, setCurrentYear } from './store/systemSlice'
+import { setCurrentWeek, setCurrentYear, setWeeks } from './store/systemSlice'
 import { getAssetLinesTypes, getFollowRules, getInvestmentRuleTypes, getOpcvmTypes } from './services/opcService'
 import { setAssetLineTypes, setFollowsRules, setInvestmentRuleTypes, setOpcvmTypes } from './store/opcSlice'
 
@@ -27,6 +27,7 @@ function App(): JSX.Element {
     const data: ISysInfo = res.data
     dispatch(setCurrentYear(data.year as IYear))
     dispatch(setCurrentWeek(data.currentWeek as IWeek))
+    dispatch(setWeeks(data.weeks as IWeek[]))
   }
 
   const loadFollowsRules = async (): Promise<void> => {

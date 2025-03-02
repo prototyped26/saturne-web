@@ -5,6 +5,7 @@ import { intermediarySlice } from './intermediarySlice'
 import { fundSlice } from './fundSlice'
 import { systemSlice } from './systemSlice'
 import { opcSlice } from './opcSlice'
+import { mandateSlice } from './mandateSlice'
 
 export const store = configureStore({
   reducer: {
@@ -13,7 +14,8 @@ export const store = configureStore({
     intermediary: intermediarySlice.reducer,
     fund: fundSlice.reducer,
     system: systemSlice.reducer,
-    opc: opcSlice.reducer
+    opc: opcSlice.reducer,
+    mandate: mandateSlice.reducer
   }
 })
 

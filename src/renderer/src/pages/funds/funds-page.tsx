@@ -3,7 +3,7 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store/store'
 import { IClassification, IDepository, IDistribution, IFund, IIntermediary, ITypeOpc } from '../../type'
 import { useEffect, useState } from 'react'
-import { getIntermediaries, getSgos, searchIntermediaries } from '../../services/intermediaryService'
+import { getSgos } from '../../services/intermediaryService'
 import { setIntermediaries } from '../../store/intermediarySlice'
 import { toast, ToastContainer } from 'react-toastify'
 import { getMessageErrorRequestEx } from '../../utils/errors'
@@ -16,7 +16,6 @@ import {
   getTypesOpc
 } from '../../services/fundService'
 import {
-  refreshFund,
   removeFund,
   setClassifications,
   setDepositaries,
@@ -155,6 +154,7 @@ function FundsPage() : JSX.Element {
   }
 
   const onHandleClickImport = (): void => {
+    // @ts-ignore DiasyUI
     document?.getElementById('modal-import-fund')?.showModal()
   }
 
@@ -171,6 +171,7 @@ function FundsPage() : JSX.Element {
   const onHandleConfirmDelete = async (f: IFund): Promise<void> => {
     setToDelete(f)
     setContentDelete("du fond " + f.label + " ?")
+    // @ts-ignore DiasyUI
     document?.getElementById('modal')?.showModal()
   }
 
@@ -189,7 +190,7 @@ function FundsPage() : JSX.Element {
   }
 
   const onHandleSearch = async (): Promise<void> => {
-    if (search?.length === 0) search = ''
+    if (search?.length === 0) setSearch('')
 
     //setSearchLoading(true)
 
@@ -206,7 +207,7 @@ function FundsPage() : JSX.Element {
   return (
     <div className="border bg-white rounded-lg dark:border-gray-50 p-6 mb-4 z-20">
       <ToastContainer key={11223223} />
-      <ImportFundModal token={token as string} action={showSuccessToast} error={showErrorToast()} />
+      <ImportFundModal token={token as string} action={showSuccessToast} error={showErrorToast} />
 
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="">

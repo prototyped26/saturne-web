@@ -71,7 +71,7 @@ function LoginPage(): JSX.Element {
   }, [error])
 
   return (
-    <div className="bg-metal-gray dark:bg-gray-900  h-screen">
+    <div className="bg-app-gray-second dark:bg-gray-900  h-screen">
       <div className="grid grid-cols-2 gap-4 h-full">
         <div className="dark:border-gray-600 h-full items-center content-center mx-auto">
           <img src={LogoCosumaf} height="650" width="600" />
@@ -81,14 +81,14 @@ function LoginPage(): JSX.Element {
           <div className="bg-white h-full rounded-2xl w-full p-10">
             <div className="flex flex-row items-center justify-center w-full mb-4">
               <div className="w-2/3 flex flex-col items-center">
-                <h2 className="tracking-tight font-extrabold text-3xl border-b-2 border-app-primary px-32 pb-3 text-app-primary">
+                <h2 className=" font-extrabold text-3xl border-b-2 border-app-secondary px-32 pb-3 text-app-secondary">
                   SATURNE
                 </h2>
               </div>
             </div>
 
             <div className="mt-14">
-              <h3 className="tracking-tight font-bold text-3xl text-app-title">Connexion</h3>
+              <h3 className="tracking-tight font-bold text-3xl text-app-primary ">Connexion</h3>
               <p className="tracking-tight font-light text-1xl mt-2 text-app-sub-title">
                 Veuillez saisir vos données de connexion au système.
               </p>
@@ -134,13 +134,13 @@ function LoginPage(): JSX.Element {
                     className="input input-bordered w-full mb-10"
                   />
                   {loading ? (
-                    <button className="btn btn-block bg-app-primary text-white text-base disabled">
+                    <button className="btn btn-block bg-app-secondary text-white text-base disabled">
                       <span className="loading loading-spinner"></span> Traitement
                     </button>
                   ) : (
                     <button
                       onClick={onHandleLogin}
-                      className="btn btn-block bg-app-primary text-white text-base"
+                      className="btn btn-block bg-app-secondary text-white text-base"
                     >
                       CONNEXION
                     </button>

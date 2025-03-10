@@ -4,13 +4,30 @@
   background-color: #F1EFEA;
 }
 
+.bg-app-gray {
+  background-color: #595959;
+}
+
+.bg-app-gray-second {
+  background-color: #dad8d9;
+}
+
 .bg-app-primary {
   background-color: #E5B666;
+}
+
+.bg-app-secondary {
+  background-color: #1A8E8E;
 }
 
 .border-app-primary {
   --tw-border-opacity: 1;
   border-color: #E5B666;
+}
+
+.border-app-secondary {
+  --tw-border-opacity: 1;
+  border-color: #1A8E8E;
 }
 
 .text-app-primary {
@@ -54,8 +71,9 @@
 }
 
 a.active {
-  background-color: rgba(229, 182, 102, 0.87);
+  background-color: #1A8E8E;
   color: white;
+  font-weight: bold;
 }
 
 a:hover {

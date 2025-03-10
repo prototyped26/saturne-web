@@ -1,4 +1,4 @@
-import { IAssetLine, IRequestHistoryLiquidationValue, IResponse } from '../type'
+import { IAssetLine, IReqFindFundByRatio, IRequestHistoryLiquidationValue, IResponse } from '../type'
 import { apiRequest, apiRequestAuth, apiRequestAuthUpload } from '../apiClient'
 
 export const weekReport = async (token: string): Promise<IResponse> => {
@@ -25,8 +25,20 @@ export const loadWeekReport = async (token: string, file: FormData, weekId: numb
   return await apiRequestAuthUpload<IResponse>('/opc/load/week/' + weekId, 'POST', token, file)
 }
 
+export const getFollowFundGrouped = async (token: string): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/analysis/opc/follows/rules', 'GET', token)
+}
+
+export const getFundByFollowInstructions = async (token: string, data: IReqFindFundByRatio): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/analysis/funds/follows/rules', 'POST', token, data)
+}
+
 export const getlastReportOfFund = async (token: string, fundId: number): Promise<IResponse> => {
   return await apiRequestAuth<IResponse>('/opc/last-report/' + fundId, 'GET', token)
+}
+
+export const getReportOfFundAndWeek = async (token: string, fundId: number, weekId: number): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/opc/detail/' + fundId + '/week/' + weekId, 'GET', token)
 }
 
 export const generateReportAnalyze = async (token: string, id: number): Promise<IResponse> => {
@@ -58,7 +70,7 @@ export const getValeurLiquid = (lines: IAssetLine[]): number | null => {
       val = line.value as number
     }
   })
-  return val
+  return val !== null ? Number(val.toFixed(2)) : val
 }
 
 export const getActifSousGestion = (lines: IAssetLine[]): number | null => {
@@ -68,5 +80,5 @@ export const getActifSousGestion = (lines: IAssetLine[]): number | null => {
       val = line.value as number
     }
   })
-  return val
+  return val !== null ? Number(val.toFixed(2)) : val
 }

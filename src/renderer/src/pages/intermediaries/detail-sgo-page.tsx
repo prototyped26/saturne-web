@@ -26,6 +26,7 @@ function DetailSgoPage(): JSX.Element {
   const [current, setCurrent] = useState('fonds')
 
   useEffect(() => {
+    console.log(intermediary)
     if (intermediary !== null) {
       if (intermediary?.organization !== null) loadHolders()
     }

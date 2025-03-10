@@ -282,7 +282,8 @@ export interface IFollowFund {
   week_id?: number,
   week?: IWeek,
   fund_id?: number,
-  fund?: IFund
+  fund?: IFund,
+  rule?: IFollowRule
 }
 
 export interface IHolderGrouped {
@@ -382,4 +383,27 @@ export interface IMandate {
   week?: IWeek,
   customer?: ICustomer,
   depositary?: IDepository
+}
+
+export interface IDocument {
+  id?: number,
+  path?: string,
+  label?: string,
+  url?: string,
+  type?: string,
+  created_at?: string,
+  size?: number
+}
+
+export interface IReqFindFundByRatio {
+  rule_id: number,
+  sub_rule_id: number,
+  standard: boolean
+}
+
+export interface IFundWithFollowRule {
+  fund: IFund,
+  rule: IFollowRule,
+  risk: number,
+  observation: string
 }

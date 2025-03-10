@@ -26,6 +26,8 @@ import DetailOpcPage from './pages/opc/detail-opc-page'
 import DetailFundPage from './pages/funds/detail-fund-page'
 import MandatesPage from './pages/mandates/mandates-page'
 import DetailMandatePage from './pages/mandates/detail-mandate-page'
+import DocumentsPage from './pages/documents/documents-page'
+import QueriesPage from './pages/requetes/queries-page'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <Provider store={store}>
@@ -44,6 +46,8 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           <Route path="intermediaries/new" element={<AddIntermediaryPage />} />
           <Route path="intermediaries/update" element={<EditIntermediaryPage />} />
           <Route path="intermediaries/sgo" element={<DetailSgoPage />} />
+          <Route path="documents" element={<DocumentsPage />} />
+          <Route path="queries" element={<QueriesPage />} />
           <Route path="funds" element={<FundsPage />} />
           <Route path="funds/new" element={<AddFundPage />} />
           <Route path="funds/update" element={<EditFundPage />} />

@@ -1,108 +1,90 @@
-import { Link, useNavigate } from 'react-router'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store/store'
-import { toast, ToastContainer } from 'react-toastify'
-import { FiEye, FiMoreHorizontal, FiPlus, FiTrash } from 'react-icons/fi'
+import { IDocument } from '../../type'
 import { useEffect, useState } from 'react'
+import { downloadDocument, getDocuments } from '../../services/documentService'
+import { setDocuments } from '../../store/documentSlice'
+import { FiDownload } from 'react-icons/fi'
 import LoadingTable from '../../components/LoadingTable'
 import NoDataList from '../../components/NoDataList'
-import AlertNotificationSuccess from '../../components/AlertNotificationSuccess'
-import { IAssetLine, IOpc, IWeek } from '../../type'
-import { getActifNet, getActifSousGestion, getValeurLiquid, weekReport } from '../../services/opcService'
-import { setOpc, setOpcs } from '../../store/opcSlice'
-import { getMessageErrorRequestEx } from '../../utils/errors'
-import LoadReportModal from './load-report-modal'
 import moment from 'moment'
-import ConfirmDeleteDialog from '../../components/ConfirmDeleteDialog'
-import { NumericFormat } from 'react-number-format'
+import { toast, ToastContainer } from 'react-toastify'
+import { getMessageErrorRequestEx } from '../../utils/errors'
+import fileDownload from 'js-file-download'
 
-function ReportHebdo(): JSX.Element {
-  const navigate = useNavigate()
+function DocumentsPage(): JSX.Element {
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
 
   const token: string | null = useAppSelector((state) => state.user.token)
-  const opcs: IOpc[] = useAppSelector((state) => state.opc.opcs)
-  const currentWeek: IWeek | null = useAppSelector((state) => state.system.currentWeek)
-
-  const message: string | null = useAppSelector((state) => state.information.message)
-  const success: string | null = useAppSelector((state) => state.information.success)
+  const documents: IDocument[] = useAppSelector((state) => state.document.documents)
 
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadOpcsOfWeek()
+    loadDocuments(token)
   }, [])
 
-  const loadOpcsOfWeek = async (): Promise<void> => {
+  const loadDocuments = async (t: string | null): Promise<void> => {
     try {
-      const res = await weekReport(token as string)
-      dispatch(setOpcs(res.data as IOpc[]))
+      const res = await getDocuments(t as string)
+      dispatch(setDocuments(res.data as IDocument[]))
     } catch (e) {
-      toast.error(getMessageErrorRequestEx(e), { theme: 'colored' })
+      console.log(e)
     } finally {
       setLoading(false)
     }
   }
 
-  const onHandleUpReport = async (): Promise<void> => {
-    document?.getElementById("modal-load-report-opc")?.showModal()
-  }
-
-  const showSuccessToast = (msg: string): void => {
-    toast.success(msg, { theme: 'colored'})
-  }
-
-  const showErrorToast = (msg: string): void => {
-    toast.error(msg, { theme: 'colored'})
-  }
-
-  const onHandleDetail = (opc: IOpc): void => {
-    dispatch(setOpc(opc))
-    navigate('details')
+  const onHandleDown = async (doc: IDocument): Promise<void> => {
+    try {
+      const res = await downloadDocument(doc)
+      fileDownload(res.data, doc?.label as string)
+    } catch (e) {
+      toast.error(getMessageErrorRequestEx(e), { theme: 'colored' })
+    }
   }
 
   return (
-    <div className="border bg-white rounded-lg dark:border-gray-50 p-6 mb-4 z-20">
-      <ToastContainer key={21223223} />
-
-      <div className="grid grid-cols-2 gap-4 mb-4 pb-2 border-b-2 border-app-primary ">
+    <div className="border bg-white rounded-lg dark:border-gray-50 h-full p-6 mb-4 z-20">
+      <ToastContainer />
+      <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="">
-          <h3 className="tracking-tight font-bold text-3xl text-app-title">Rapports Hedbomadaires </h3>
+          <h3 className="tracking-tight font-bold text-3xl text-app-title">
+            Documents
+          </h3>
           <p className="tracking-tight font-light text-1xl text-app-sub-title">
-            Rapports Hebdo, OPC & Mandats
+            Liste des documents
           </p>
         </div>
         <div className="flex  justify-end ">
-          <button onClick={() => onHandleUpReport()} className="btn btn-md btn-outline ml-2">
-            Charger un rapport (Excel)
-          </button>
+
         </div>
       </div>
 
       {loading && <LoadingTable />}
 
-      {!loading && opcs.length === 0 && <NoDataList />}
+      {!loading && documents.length === 0 && <NoDataList />}
 
-      {success !== null && <AlertNotificationSuccess message={message} />}
-
-      {!loading && opcs.length > 0 && (
+      {!loading && documents.length > 0 && (
         <div className="grid">
           <div className="max-w-screen-2xl ">
             <div className="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
               <div className="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
                 <div className="flex items-center flex-1 space-x-4">
                   <h5>
-                    <span className="text-gray-500">Pour cette semaine, il y a : </span>
+                    <span className="text-gray-500">Il y a :</span>
                     <span className="dark:text-white">
-                      {opcs.length + ' rapport' + (opcs.length > 1 ? 's' : '')}
+                      {' '}
+                      {documents.length + ' document' + (documents.length > 1 ? 's' : '')}{' '}
                     </span>
                   </h5>
                 </div>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full text-xs text-left text-gray-500 dark:text-gray-400 mb-10">
+                <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 mb-10">
                   <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                   <tr>
                     <th scope="col" className="p-4">
@@ -118,30 +100,21 @@ function ReportHebdo(): JSX.Element {
                       </div>
                     </th>
                     <th scope="col" className="px-4 py-3">
-                      Reçu le
+                      Document
                     </th>
                     <th scope="col" className="px-4 py-3">
-                      De la SGO
+                      type
                     </th>
                     <th scope="col" className="px-4 py-3">
-                      Fond
-                    </th>
-                    <th scope="col" className="px-4 py-3">
-                      Actif Net
-                    </th>
-                    <th scope="col" className="px-4 py-3">
-                      Valeur Liquid.
-                    </th>
-                    <th scope="col" className="px-4 py-3">
-                      Actifs S.G.
+                      ajouté le
                     </th>
                     <th scope="col" className="px-4 py-3"></th>
                   </tr>
                   </thead>
                   <tbody>
-                  {opcs.map((opc) => (
+                  {documents.map((document) => (
                     <tr
-                      key={opc.id}
+                      key={document.id}
                       className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       <td className="w-4 px-4 py-3">
@@ -158,48 +131,20 @@ function ReportHebdo(): JSX.Element {
                       </td>
                       <th
                         scope="row"
-                        className=" items-center px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                        className="flex items-center px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                       >
-                        {moment(opc?.created_at).format('DD MMMM YYYY')}
+                        {document?.label}
                       </th>
                       <td className="px-4 py-2">
-                        <label className="font-medium">{opc?.fund?.intermediary?.label?.toUpperCase()}</label>
+                          <span className="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
+                            {document?.type}
+                          </span>
                       </td>
-                      <td className="px-4 py-2">
-                        <label className="font-medium">{opc?.fund?.label?.toUpperCase()}</label>
-                      </td>
-                      <td className="px-4 py-2"> <NumericFormat value={getActifNet(opc?.assetLines as IAssetLine[])} displayType={'text'} thousandSeparator={' '}  suffix={' XAF'} /> </td>
-                      <td className="px-4 py-2"> <NumericFormat value={getValeurLiquid(opc?.assetLines as IAssetLine[])} displayType={'text'} thousandSeparator={' '}  suffix={' XAF'} /></td>
-                      <td className="px-4 py-2"> <NumericFormat value={getActifSousGestion(opc?.assetLines as IAssetLine[])} displayType={'text'} thousandSeparator={' '}  suffix={' XAF'} /></td>
-
+                      <td className="px-4 py-2">{moment(document?.created_at).format('DD MMM YYYY')}</td>
                       <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                         <div className="flex justify-end">
-                          <button onClick={() => onHandleDetail(opc)}
-                            className="btn btn-sm"
-                          >
-                            <FiEye />
-                          </button>
-                          <div className="dropdown dropdown-left dropdown-end ml-2">
-                            <div tabIndex={0} role="button" className="btn btn-sm ">
-                              <FiMoreHorizontal />
-                            </div>
-                            <ul
-                              tabIndex={0}
-                              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-56 p-1 shadow"
-                            >
-                              <li>
-                                <a>Historique Valeur L.</a>
-                              </li>
-                              <li>
-                                <a >Modifier</a>
-                              </li>
-
-                            </ul>
-                          </div>
-                          <button
-                            className="btn btn-sm btn-error ml-2 font-bold text-white"
-                          >
-                            <FiTrash />
+                          <button onClick={() => onHandleDown(document)} className="btn btn-sm">
+                            <FiDownload />
                           </button>
                         </div>
                       </td>
@@ -279,13 +224,13 @@ function ReportHebdo(): JSX.Element {
                 </ul>
               </nav>
             </div>
+
           </div>
         </div>
       )}
 
-      <LoadReportModal token={token as string} success={showSuccessToast} error={showErrorToast} currentWeek={currentWeek as IWeek} reload={loadOpcsOfWeek} />
     </div>
   )
 }
 
-export default ReportHebdo
+export default DocumentsPage

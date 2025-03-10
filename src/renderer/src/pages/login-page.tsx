@@ -74,7 +74,7 @@ function LoginPage(): JSX.Element {
     <div className="bg-metal-gray dark:bg-gray-900  h-screen">
       <div className="grid grid-cols-2 gap-4 h-full">
         <div className="dark:border-gray-600 h-full items-center content-center mx-auto">
-          <img src={LogoCosumaf} height="700" width="650" />
+          <img src={LogoCosumaf} height="650" width="600" />
         </div>
 
         <div className="border-gray-300 dark:border-gray-600 p-5">

@@ -18,6 +18,11 @@
   color: #E5B666;
 }
 
+.text-app-secondary {
+  --tw-text-opacity: 1;
+  color: #1A8E8E;
+}
+
 .text-app-title {
   color: #4C4B4B;
 }
@@ -30,6 +35,17 @@
   border-color: transparent;
   --tw-bg-opacity: 1;
   background-color:  #E5B666;
+  --tw-text-opacity: 1;
+  color: white;
+  border-radius: 5px !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
+.badge-app-secondary {
+  border-color: transparent;
+  --tw-bg-opacity: 1;
+  background-color:  #1A8E8E;
   --tw-text-opacity: 1;
   color: white;
   border-radius: 5px !important;

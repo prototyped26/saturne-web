@@ -3,7 +3,7 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store/store'
 import { IClassification, IDepository, IDistribution, IFund, IIntermediary, ITypeOpc } from '../../type'
 import { useEffect, useState } from 'react'
-import { getIntermediaries, getSgos } from '../../services/intermediaryService'
+import { getIntermediaries, getSgos, searchIntermediaries } from '../../services/intermediaryService'
 import { setIntermediaries } from '../../store/intermediarySlice'
 import { toast, ToastContainer } from 'react-toastify'
 import { getMessageErrorRequestEx } from '../../utils/errors'
@@ -53,6 +53,7 @@ function FundsPage() : JSX.Element {
   const [loading, setLoading] = useState(true)
   const [contentDelete, setContentDelete] = useState('')
   const [toDelete, setToDelete] = useState<IFund | null>(null)
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     loadClassifications(token as string)
@@ -147,6 +148,12 @@ function FundsPage() : JSX.Element {
     }
   }
 
+  const onHandleTermChange = (val): void => {
+    //const s = search
+    //s.term = val
+    setSearch(val)
+  }
+
   const onHandleClickImport = (): void => {
     document?.getElementById('modal-import-fund')?.showModal()
   }
@@ -181,8 +188,23 @@ function FundsPage() : JSX.Element {
     toast.error(msg, { theme: 'colored'})
   }
 
+  const onHandleSearch = async (): Promise<void> => {
+    if (search?.length === 0) search = ''
+
+    //setSearchLoading(true)
+
+    try {
+      //const res = await searchIntermediaries(token as string, search)
+     //  dispatch(setIntermediaries(res.data as IIntermediary[]))
+    } catch (e) {
+      toast.error(getMessageErrorRequestEx(e), { theme: 'colored' })
+    } finally {
+      //setSearchLoading(false)
+    }
+  }
+
   return (
-    <div className="border bg-white rounded-lg dark:border-gray-50 h-96 p-6 mb-4 z-20">
+    <div className="border bg-white rounded-lg dark:border-gray-50 p-6 mb-4 z-20">
       <ToastContainer key={11223223} />
       <ImportFundModal token={token as string} action={showSuccessToast} error={showErrorToast()} />
 
@@ -207,12 +229,11 @@ function FundsPage() : JSX.Element {
 
       <div className="grid grid-cols-1 gap-4 mb-4">
         <div className="border-b-2 border-app-primary flex items-center pb-4">
-          <div className="flex mr-2 w-1/3">
-            <button className="btn btn-sm">Filtre</button>
-          </div>
           <div className="flex mt-8 w-full">
-            <button className="btn btn-sm ml-2">
-              <FiSearch size={18} />
+            <input onChange={(e) => onHandleTermChange(e.target.value)} type="text" placeholder="Recherche..."
+                   className="input input-bordered w-1/3" />
+            <button onClick={() => onHandleSearch()} className="btn btn-md ml-2">
+              <FiSearch size={24} />
             </button>
           </div>
         </div>
@@ -228,7 +249,8 @@ function FundsPage() : JSX.Element {
         <div className="grid">
           <div className="max-w-screen-2xl ">
             <div className="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
-              <div className="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
+              <div
+                className="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
                 <div className="flex items-center flex-1 space-x-4">
                   <h5>
                     <span className="text-gray-500">Il y a :</span>
@@ -241,120 +263,121 @@ function FundsPage() : JSX.Element {
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-left text-gray-500 dark:text-gray-400 mb-10">
                   <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                    <tr>
-                      <th scope="col" className="p-4">
+                  <tr>
+                    <th scope="col" className="p-4">
+                      <div className="flex items-center">
+                        <input
+                          id="checkbox-all"
+                          type="checkbox"
+                          className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <label htmlFor="checkbox-all" className="sr-only">
+                          checkbox
+                        </label>
+                      </div>
+                    </th>
+                    <th scope="col" className="px-4 py-3">
+                      Dénomination
+                    </th>
+                    <th scope="col" className="px-4 py-3">
+                      Agrément
+                    </th>
+                    <th scope="col" className="px-4 py-3">
+                      Type OPC
+                    </th>
+                    <th scope="col" className="px-4 py-3">
+                      Dépositaire
+                    </th>
+                    <th scope="col" className="px-4 py-3">
+                      Classification
+                    </th>
+                    <th scope="col" className="px-4 py-3">
+                      Distribution
+                    </th>
+                    <th scope="col" className="px-4 py-3"></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {funds.map((fund) => (
+                    <tr
+                      key={fund.id}
+                      className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <td className="w-4 px-4 py-3">
                         <div className="flex items-center">
                           <input
-                            id="checkbox-all"
+                            id="checkbox-table-search-1"
                             type="checkbox"
                             className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                           />
-                          <label htmlFor="checkbox-all" className="sr-only">
+                          <label htmlFor="checkbox-table-search-1" className="sr-only">
                             checkbox
                           </label>
                         </div>
-                      </th>
-                      <th scope="col" className="px-4 py-3">
-                        Dénomination
-                      </th>
-                      <th scope="col" className="px-4 py-3">
-                        Agrément
-                      </th>
-                      <th scope="col" className="px-4 py-3">
-                        Type OPC
-                      </th>
-                      <th scope="col" className="px-4 py-3">
-                        Dépositaire
-                      </th>
-                      <th scope="col" className="px-4 py-3">
-                        Classification
-                      </th>
-                      <th scope="col" className="px-4 py-3">
-                        Distribution
-                      </th>
-                      <th scope="col" className="px-4 py-3"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {funds.map((fund) => (
-                      <tr
-                        key={fund.id}
-                        className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      </td>
+                      <th
+                        scope="row"
+                        className=" items-center px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                       >
-                        <td className="w-4 px-4 py-3">
-                          <div className="flex items-center">
-                            <input
-                              id="checkbox-table-search-1"
-                              type="checkbox"
-                              className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                            />
-                            <label htmlFor="checkbox-table-search-1" className="sr-only">
-                              checkbox
-                            </label>
-                          </div>
-                        </td>
-                        <th
-                          scope="row"
-                          className=" items-center px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                        >
-                          {fund?.label} <br />
-                          <label className="font-light">
-                            {fund?.intermediary?.label?.toUpperCase()}
-                          </label>
-                        </th>
-                        <td className="px-4 py-2">
-                          <label className="font-medium">{fund?.approval_number}</label>
-                          <br />
-                          <label className="font-light">
-                            Du {moment(fund?.approval_date).format('DD MMMM YYYY')}
-                          </label>
-                        </td>
-                        <td className="px-4 py-2">
-                          <span className="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
+                        {fund?.label} <br />
+                        <label className="font-light">
+                          {fund?.intermediary?.label?.toUpperCase()}
+                        </label>
+                      </th>
+                      <td className="px-4 py-2">
+                        <label className="font-medium">{fund?.approval_number}</label>
+                        <br />
+                        <label className="font-light">
+                          Du {moment(fund?.approval_date).format('DD MMMM YYYY')}
+                        </label>
+                      </td>
+                      <td className="px-4 py-2">
+                          <span
+                            className="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
                             {fund?.typeOpc?.label?.toUpperCase()}
                           </span>
-                        </td>
-                        <td className="px-4 py-2">{fund?.depositary?.label?.toUpperCase()}</td>
-                        <td className="px-4 py-2">{fund?.classification?.label?.toUpperCase()}</td>
-                        <td className="px-4 py-2">{fund?.distribution?.label?.toUpperCase()}</td>
+                      </td>
+                      <td className="px-4 py-2">{fund?.depositary?.label?.toUpperCase()}</td>
+                      <td className="px-4 py-2">{fund?.classification?.label?.toUpperCase()}</td>
+                      <td className="px-4 py-2">{fund?.distribution?.label?.toUpperCase()}</td>
 
-                        <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                          <div className="flex justify-end">
-                            <button
-                              onClick={() => onHandleNavToDetails(fund)}
-                              className="btn btn-sm"
-                            >
-                              <FiEye />
-                            </button>
-                            <div className="dropdown dropdown-left dropdown-end ml-2">
-                              <div tabIndex={0} role="button" className="btn btn-sm ">
-                                <FiMoreHorizontal />
-                              </div>
-                              <ul
-                                tabIndex={0}
-                                className="dropdown-content menu bg-base-100 rounded-box z-[1] w-56 p-1 shadow"
-                              >
-                                <li>
-                                  <a onClick={() => onHandleNavToUpdate(fund)}>Historique Valeur L.</a>
-                                </li>
-                                <li>
-                                  <a onClick={() => onHandleNavToUpdate(fund)}>Modifier</a>
-                                </li>
-                                <li>
-                                  <a onClick={() => onHandleNavToDetails(fund)}>Détails</a>
-                                </li>
-                              </ul>
+                      <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <div className="flex justify-end">
+                          <button
+                            onClick={() => onHandleNavToDetails(fund)}
+                            className="btn btn-sm"
+                          >
+                            <FiEye />
+                          </button>
+                          <div className="dropdown dropdown-left dropdown-end ml-2">
+                            <div tabIndex={0} role="button" className="btn btn-sm ">
+                              <FiMoreHorizontal />
                             </div>
-                            <button
-                              onClick={() => onHandleConfirmDelete(fund)}
-                              className="btn btn-sm btn-error ml-2 font-bold text-white"
+                            <ul
+                              tabIndex={0}
+                              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-56 p-1 shadow"
                             >
-                              <FiTrash />
-                            </button>
+                              <li>
+                                <a onClick={() => onHandleNavToUpdate(fund)}>Historique Valeur L.</a>
+                              </li>
+                              <li>
+                                <a onClick={() => onHandleNavToUpdate(fund)}>Modifier</a>
+                              </li>
+                              <li>
+                                <a onClick={() => onHandleNavToDetails(fund)}>Détails</a>
+                              </li>
+                            </ul>
                           </div>
-                        </td>
-                      </tr>
-                    ))}
+                          <button
+                            onClick={() => onHandleConfirmDelete(fund)}
+                            className="btn btn-sm btn-error ml-2 font-bold text-white"
+                          >
+                            <FiTrash />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                   </tbody>
                 </table>
               </div>

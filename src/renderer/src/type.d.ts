@@ -407,3 +407,15 @@ export interface IFundWithFollowRule {
   risk: number,
   observation: string
 }
+
+export interface IDashActifs {
+  countSgo: number,
+  totalActifs: number,
+  actifsFund: number,
+  actifsMandate: number
+}
+
+export interface IDashLiquidative {
+  label: string,
+  value: number
+}

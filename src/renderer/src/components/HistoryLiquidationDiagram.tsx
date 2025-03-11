@@ -1,6 +1,6 @@
-import { IAssetLine, IFund, IHistoryLiquidationValue, IRequestHistoryLiquidationValue } from '../type'
+import { IFund, IHistoryLiquidationValue, IRequestHistoryLiquidationValue } from '../type'
 import { useEffect, useState } from 'react'
-import { getActifNet, getHistoryLiquidationValue } from '../services/opcService'
+import { getHistoryLiquidationValue } from '../services/opcService'
 import { getMessageErrorRequestEx } from '../utils/errors'
 import {
   Chart as ChartJS,
@@ -14,8 +14,6 @@ import {
 } from 'chart.js'
 import { Line } from 'react-chartjs-2'
 import moment from 'moment/moment'
-import { FiEye, FiMoreHorizontal, FiTrash } from 'react-icons/fi'
-import { NumericFormat } from 'react-number-format'
 import ValueIndicateFluctuation from './ValueIndicateFluctuation'
 
 type Props = {

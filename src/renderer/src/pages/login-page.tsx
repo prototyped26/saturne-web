@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router'
 import { useEffect, useState } from 'react'
 import { current, login } from '../services/userService'
 import { ILogin, IUser } from '../type'
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '../store/store'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '../store/store'
 import { setCurrent, setToken } from '../store/userSlice'
 
 function LoginPage(): JSX.Element {
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const useAppDispatch = () => useDispatch<AppDispatch>()
-  const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
 
   const dispatch = useAppDispatch()
 

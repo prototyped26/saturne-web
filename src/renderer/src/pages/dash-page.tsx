@@ -1,11 +1,172 @@
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js'
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { Bar } from 'react-chartjs-2'
+import ChartActifSousGestion from './dash/ChartActifSousGestion'
+import { useEffect, useState } from 'react'
+import { getMessageErrorRequestEx } from '../utils/errors'
+import { getDashActifs, getDashLiquidatives } from '../services/opcService'
+import { TypedUseSelectorHook, useSelector } from 'react-redux'
+import { RootState } from '../store/store'
+import { IDashActifs, IDashLiquidative } from '../type'
+import { NumericFormat } from 'react-number-format'
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ChartDataLabels
+);
 
 function Dash(): JSX.Element {
+  const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+
+  const token: string | null = useAppSelector((state) => state.user.token)
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: true,
+        text: 'Valeurs Liquidatives des fonds',
+      },
+      chartDataLabels: {
+        display: true,
+        color: 'rgba(256, 256, 256, 1)'
+      }
+    },
+  }
+
+  const [loadActifs, setLoadActifs] = useState(true)
+  const [loadLiquidatives, setLoadLiquidatives] = useState(true)
+  const [dashActifs, setDashActifs] = useState<IDashActifs | null>(null)
+  const [liquidatives, setLiquidatives] = useState<IDashLiquidative[]>([])
+  const [data, setData] = useState<any>(null)
+
+  useEffect(() => {
+    loadDashActifs()
+    loadDashLiquidatives()
+  }, [])
+
+  const loadDashActifs = async (): Promise<void> => {
+    setLoadActifs(true)
+
+    try {
+      const res = await getDashActifs(token as string)
+      setDashActifs(res.data as IDashActifs)
+    } catch (e) {
+      console.log(getMessageErrorRequestEx(e))
+    } finally {
+      setLoadActifs(false)
+    }
+  }
+
+  const loadDashLiquidatives = async (): Promise<void> => {
+    setLoadLiquidatives(true)
+
+    try {
+      const res = await getDashLiquidatives(token as string)
+      setLiquidatives(res.data as IDashLiquidative[])
+      const val = res.data as IDashLiquidative[]
+
+      const labels: string[] = []
+      const values: number[] = []
+
+      val.forEach((elt) => {
+        labels.push(elt.label)
+        values.push(Number(elt.value.toFixed(2)))
+      })
+
+      const data = {
+        labels,
+        datasets: [
+          {
+            label: 'V.L (XAF)',
+            data: values,
+            backgroundColor: 'rgba(229, 182, 102, 0.8)'
+          }
+        ]
+      }
+
+      setData(data)
+    } catch (e) {
+      console.log(getMessageErrorRequestEx(e))
+    } finally {
+      setLoadLiquidatives(false)
+    }
+  }
+
   return (
-    <div className="border bg-white rounded-lg dark:border-gray-50 h-96 p-6 mb-4 z-20">
+    <div className="border bg-white rounded-lg dark:border-gray-50 p-6 mb-4 z-20">
       <h3 className="tracking-tight font-bold text-3xl text-app-title">Tableau de bord</h3>
       <p className="tracking-tight font-light text-1xl text-app-sub-title">
         Suivi de l'ensemble des données du système.
       </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 gap-4 mt-6 mb-4">
+        <div className=" dark:border-gray-600 flex gap-4">
+          {loadActifs && (
+            <div className="flex w-full items-center justify-center">
+              <span className="loading loading-spinner"></span>
+            </div>
+          )}
+          {!loadActifs && (
+            <div className="flex gap-4">
+              <div className="w-1/2 pt-4">
+                <div className="stats shadow bg-app-secondary text-white w-full">
+                  <div className="stat">
+                    <div className="stat-title text-white font-bold">Total Actifs Gérés</div>
+                    <div className="stat-value text-2xl">
+                      <NumericFormat
+                        value={dashActifs?.totalActifs.toFixed(2)}
+                        displayType={'text'}
+                        thousandSeparator={' '}
+                        suffix={' XAF'}
+                      />{' '}
+                    </div>
+                    <div className="stat-desc"></div>
+                  </div>
+                </div>
+
+                <div className="stats shadow w-full mt-10">
+                  <div className="stat">
+                    <div className="stat-title font-bold">Nombre de SGO</div>
+                    <div className="stat-value"> {dashActifs?.countSgo}</div>
+                    <div className="stat-desc"></div>
+                  </div>
+                </div>
+              </div>
+              <div className="w-1/2 flex items-center justify-center ">
+                <ChartActifSousGestion
+                  mandate={dashActifs?.actifsMandate as number}
+                  fund={dashActifs?.actifsFund as number}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 flex items-center justify-center">
+          {loadLiquidatives && (
+            <div className="flex w-full items-center justify-center">
+              <span className="loading loading-spinner"></span>
+            </div>
+          )}
+          {!loadLiquidatives && data !== null && data !== undefined && <Bar options={options} data={data} />}
+        </div>
+      </div>
     </div>
   )
 }

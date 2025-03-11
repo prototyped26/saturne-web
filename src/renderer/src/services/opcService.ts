@@ -53,6 +53,14 @@ export const getHistoryLiquidationValue = async (token: string, data: IRequestHi
   return await apiRequestAuth<IResponse>('/opc/history/liquidatives', 'POST', token, data)
 }
 
+export const getDashActifs = async (token: string): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/analysis/dash/actifs', 'GET', token)
+}
+
+export const getDashLiquidatives = async (token: string): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/analysis/dash/liquidatives', 'GET', token)
+}
+
 export const getActifNet = (lines: IAssetLine[]): number | null => {
   let val: number | null = null
   lines?.forEach((line) => {

@@ -1,8 +1,8 @@
 import { IAssetLine, IReqFindFundByRatio, IRequestHistoryLiquidationValue, IResponse } from '../type'
 import { apiRequest, apiRequestAuth, apiRequestAuthUpload } from '../apiClient'
 
-export const weekReport = async (token: string): Promise<IResponse> => {
-  return await apiRequestAuth<IResponse>('/opc/current-week', 'GET', token)
+export const weekReport = async (token: string, page: number = 0): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/opc/current-week' + (page !== null ? '?page=' + (page - 1) : ''), 'GET', token)
 }
 
 export const getFollowRules = async (): Promise<IResponse> => {

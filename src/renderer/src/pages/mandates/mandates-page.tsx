@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store/store'
 import { IAssetLine, IMandate, IWeek } from '../../type'
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { weekMandates } from '../../services/mandateService'
 import { setMandate, setMandates } from '../../store/mandateSlice'
 import { toast, ToastContainer } from 'react-toastify'
@@ -14,6 +14,7 @@ import { NumericFormat } from 'react-number-format'
 import { getActifNet, getActifSousGestion, getValeurLiquid } from '../../services/opcService'
 import { FiEye, FiMoreHorizontal, FiTrash } from 'react-icons/fi'
 import LoadMandateModal from './load-mandate-modal'
+import TableNavigationFooter from '../../components/TableNavigationFooter'
 
 function MandatesPage(): JSX.Element {
   const navigate = useNavigate()
@@ -29,21 +30,39 @@ function MandatesPage(): JSX.Element {
   const success: string | null = useAppSelector((state) => state.information.success)
 
   const [loading, setLoading] = useState(true)
+  const [total, setTotal] = useState(0)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [perPage, setPerPage] = useState(10)
+  const [numberPage, setNumberPage] = useState(0)
+  const [tableSize, setTableSize] = useState<number[]>([5, 10, 20, 50, 100])
 
   useEffect(() => {
     loadMandates()
   }, [])
 
-  const loadMandates = async (): Promise<void> => {
+  useEffect(() => {
+    if (currentPage !== undefined && currentPage !== null) {
+      loadMandates(currentPage)
+    }
+  }, [currentPage])
+
+  const loadMandates = async (page: number = 0): Promise<void> => {
     setLoading(true)
     try {
-      const res = await weekMandates(token as string);
-      dispatch(setMandates(res.data as IMandate[]))
+      const res = await weekMandates(token as string, page)
+      dispatch(setMandates(res.data.content as IMandate[]))
+      setTotal(res.data.totalElements)
+      setNumberPage(res.data.totalPages)
     } catch (e) {
       showErrorToast(getMessageErrorRequestEx(e))
     } finally {
       setLoading(false)
     }
+  }
+
+  const onHandleChangePage = (page: number): void => {
+    console.log(page)
+    setCurrentPage(page)
   }
 
   const onHandelSee = (mandate: IMandate): void => {
@@ -70,9 +89,7 @@ function MandatesPage(): JSX.Element {
 
       <div className="grid grid-cols-2 gap-4 mb-4 pb-2 border-b-2 border-app-primary">
         <div className="">
-          <h3 className="tracking-tight font-bold text-3xl text-app-title">
-            Les Mandats
-          </h3>
+          <h3 className="tracking-tight font-bold text-3xl text-app-title">Les Mandats</h3>
           <p className="tracking-tight font-light text-1xl text-app-sub-title">
             Rapports Hebdo, différents Mandats
           </p>
@@ -93,13 +110,30 @@ function MandatesPage(): JSX.Element {
           <div className="max-w-screen-2xl ">
             <div className="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
               <div className="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
-                <div className="flex items-center flex-1 space-x-4">
+                <div className="flex items-center flex-1 space-x-4 justify-between">
                   <h5>
                     <span className="text-gray-500"> Yl y a : </span>
                     <span className="dark:text-white">
                       {mandates.length + ' rapport' + (mandates.length > 1 ? 's' : '')}
                     </span>
                   </h5>
+                  <div className="flex items-center gap-2">
+                    Taille de la liste
+                    <Fragment></Fragment>{' '}
+                    <select
+                      className="select select-md select-bordered"
+                      name="page"
+                      id="page"
+                      value={perPage}
+                      onChange={(e) => setPerPage(Number(e.target.value))}
+                    >
+                      {tableSize.map((item) => (
+                        <option key={Math.random() + Date.now()} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
               <div className="overflow-x-auto">
@@ -177,7 +211,9 @@ function MandatesPage(): JSX.Element {
                           </label>
                         </td>
                         <td className="px-4 py-2">
-                          <label className="font-medium">{moment(mandate?.week?.end).format('DD, MMM YYYY')}</label>
+                          <label className="font-medium">
+                            {moment(mandate?.week?.end).format('DD, MMM YYYY')}
+                          </label>
                         </td>
                         <td className="px-4 py-2">
                           <label className="font-medium">{mandate?.risk_profile}</label>
@@ -210,76 +246,13 @@ function MandatesPage(): JSX.Element {
                   </tbody>
                 </table>
               </div>
-              <nav
-                className="flex flex-col items-start justify-between p-4 space-y-3 md:flex-row md:items-center md:space-y-0"
-                aria-label="Table navigation"
-              >
-                <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                  Affichage
-                  <span className="font-semibold text-gray-900 dark:text-white">1 - 10</span>
-                  sur
-                  <span className="font-semibold text-gray-900 dark:text-white">1000</span>
-                </span>
-                <ul className="inline-flex items-stretch -space-x-px">
-                  <li>
-                    <a
-                      href="#"
-                      className="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    >
-                      <span className="sr-only">Previous</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="flex items-center justify-center px-3 py-2 text-sm leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    >
-                      1
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="flex items-center justify-center px-3 py-2 text-sm leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    >
-                      2
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      aria-current="page"
-                      className="z-10 flex items-center justify-center px-3 py-2 text-sm leading-tight border text-primary-600 bg-primary-50 border-primary-300 hover:bg-primary-100 hover:text-primary-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
-                    >
-                      3
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="flex items-center justify-center px-3 py-2 text-sm leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    >
-                      ...
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="flex items-center justify-center px-3 py-2 text-sm leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    >
-                      100
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    >
-                      <span className="sr-only">Next</span>
-                    </a>
-                  </li>
-                </ul>
-              </nav>
+              <TableNavigationFooter
+                total={total}
+                current={currentPage}
+                perPage={perPage}
+                pages={numberPage}
+                action={onHandleChangePage}
+              />
             </div>
           </div>
         </div>

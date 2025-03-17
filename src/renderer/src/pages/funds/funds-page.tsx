@@ -256,7 +256,7 @@ function FundsPage() : JSX.Element {
                   <h5>
                     <span className="text-gray-500">Il y a :</span>
                     <span className="dark:text-white">
-                      {funds.length + ' intermédiaire' + (funds.length > 1 ? 's' : '')}{' '}
+                      {funds.length + ' fond' + (funds.length > 1 ? 's' : '')}{' '}
                     </span>
                   </h5>
                 </div>

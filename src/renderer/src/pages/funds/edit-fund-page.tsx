@@ -1,5 +1,5 @@
 import { toast, ToastContainer } from 'react-toastify'
-import { Link, useNavigate } from 'react-router'
+import { Link } from 'react-router'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store/store'
 import { IClassification, IDepository, IDistribution, IFund, IIntermediary, ITypeOpc } from '../../type'
@@ -7,12 +7,11 @@ import { useEffect, useState } from 'react'
 import moment from 'moment'
 import { createFund } from '../../services/fundService'
 import { addFund } from '../../store/fundSlice'
-import { setInformationMessage, setSuccess } from '../../store/informationSlice'
 import { getMessageErrorRequestEx } from '../../utils/errors'
 
 function EditFundPage(): JSX.Element {
-  const navigate = useNavigate()
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
 
@@ -76,7 +75,7 @@ function EditFundPage(): JSX.Element {
 
 
   return (
-    <div className="border bg-white rounded-lg dark:border-gray-50 h-full p-6 mb-4 z-20">
+    <div className="border bg-white rounded-lg dark:border-gray-50 p-6 mb-4 z-20">
       <ToastContainer />
 
       <div className="grid grid-cols-2 gap-4 mb-4">
@@ -109,7 +108,7 @@ function EditFundPage(): JSX.Element {
           />
 
           <p className="tracking-tight font-light text-1xl mt-2 mb-1 text-app-sub-title">
-            Numéro d'agrément
+            Numéro d agrément
           </p>
           <input
             type="text" value={approvalNumber}
@@ -119,7 +118,7 @@ function EditFundPage(): JSX.Element {
           />
 
           <p className="tracking-tight font-light text-1xl mt-2 mb-1 text-app-sub-title">
-            Date d'agrément
+            Date d agrément
           </p>
           <input
             type="date" value={approvalDate}
@@ -146,7 +145,7 @@ function EditFundPage(): JSX.Element {
           <div className="flex justify-between">
             <div className="w-full pr-4">
               <p className="tracking-tight font-light text-1xl mt-2 mb-1 text-app-sub-title">
-                Quel est son type d'OPC
+                Quel est son type OPC
               </p>
               <select value={typeOpcId}
                 onChange={(e) => setTypeOpcId(e.target.value)}

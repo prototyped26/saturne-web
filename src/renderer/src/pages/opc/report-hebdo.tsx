@@ -47,7 +47,7 @@ function ReportHebdo(): JSX.Element {
     }
   }, [currentPage])
 
-  const loadOpcsOfWeek = async (page?: number = 0): Promise<void> => {
+  const loadOpcsOfWeek = async (page: number = 0): Promise<void> => {
     try {
       const res = page ? await weekReport(token as string, page) : await weekReport(token as string)
       //console.log(res.data)

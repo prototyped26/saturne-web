@@ -78,7 +78,7 @@ export const getValeurLiquid = (lines: IAssetLine[]): number | null => {
       val = line.value as number
     }
   })
-  return val !== null ? Number(val.toFixed(2)) : val
+  return val !== null ? Number(Number(val).toFixed(2)) : val
 }
 
 export const getActifSousGestion = (lines: IAssetLine[]): number | null => {
@@ -88,5 +88,5 @@ export const getActifSousGestion = (lines: IAssetLine[]): number | null => {
       val = line.value as number
     }
   })
-  return val !== null ? Number(val.toFixed(2)) : val
+  return val !== null ? Number(Number(val).toFixed(2)) : val
 }

@@ -35,10 +35,11 @@ function ReportHebdo(): JSX.Element {
   const [currentPage, setCurrentPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
   const [numberPage, setNumberPage] = useState(0)
-  const [tableSize, setTableSize] = useState<number[]>([5, 10, 20, 50, 100])
+  const [tableSize, setTableSize] = useState<number[]>()
 
   useEffect(() => {
     //loadOpcsOfWeek()
+    setTableSize([5, 10, 20, 50, 100])
   }, [])
 
   useEffect(() => {
@@ -132,7 +133,7 @@ function ReportHebdo(): JSX.Element {
                       value={perPage}
                       onChange={(e) => setPerPage(Number(e.target.value))}
                     >
-                      {tableSize.map((item) => (
+                      {tableSize?.map((item) => (
                         <option key={Math.random() + Date.now()} value={item}>
                           {item}
                         </option>

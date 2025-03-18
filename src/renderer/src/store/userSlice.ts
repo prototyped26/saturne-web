@@ -5,7 +5,7 @@ import { IRole, IUser } from './../type'
 type stateType = {
   users: IUser[],
   user: IUser | null,
-  current: IUser | null | any,
+  current: IUser | null ,
   token: string | null,
   roles: IRole[]
 }
@@ -29,7 +29,7 @@ export const userSlice = createSlice({
       const { payload: { id, email, first_name, last_name, password, role_id } } = action
 
       state.users = state.users?.map((user) => {
-        user.id === id ? { ...user, email, first_name, last_name, password, role_id  } : user
+        return user.id === id ? { ...user, email, first_name, last_name, password, role_id  } : user
       })
     },
     removeElt: (state, action: PayloadAction<IUser>) => {

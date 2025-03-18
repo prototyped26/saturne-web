@@ -11,11 +11,11 @@ type Props = {
 
 function ChartActifSousGestion({ mandate, fund }: Props): JSX.Element {
 
-  const [values, setValues] = useState([])
+  const [values, setValues] = useState<string[]>([])
   const [data, setData] = useState<any>()
 
   useEffect(() => {
-    const val = [fund.toFixed(2), mandate.toFixed(2)]
+    const val: string[] = [fund.toFixed(2), mandate.toFixed(2)]
     setValues(val)
 
     const data = {
@@ -39,6 +39,10 @@ function ChartActifSousGestion({ mandate, fund }: Props): JSX.Element {
 
     setData(data)
   }, [])
+
+  useEffect(() => {
+
+  }, [values])
 
   return (
     <div className="flex w-full items-center justify-center">

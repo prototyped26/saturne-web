@@ -9,7 +9,7 @@ import { removeElt, selectedUser, setRoles, setUsers } from '../../store/userSli
 import LoadingTable from '../../components/LoadingTable'
 import NoDataList from '../../components/NoDataList'
 import ConfirmDeleteDialog from '../../components/ConfirmDeleteDialog'
-import { setInformationMessage, setSuccess } from '../../store/informationSlice'
+import { setSuccess } from '../../store/informationSlice'
 import AlertNotificationSuccess from '../../components/AlertNotificationSuccess'
 import DialogChangePassword from './DialogChangePassword'
 import { toast } from 'react-toastify'
@@ -17,6 +17,7 @@ import { toast } from 'react-toastify'
 function UsersPage(): JSX.Element {
   const navigate = useNavigate()
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
 
@@ -28,7 +29,7 @@ function UsersPage(): JSX.Element {
   const success: string | null = useAppSelector((state) => state.information.success)
 
   const [loading, setLoading] = useState(true)
-  const [selectedRole, setSelectedRole] = useState<number|string|null>(null)
+  const [selectedRole, setSelectedRole] = useState('')
   const [contentDelete, setContentDelete] = useState("")
   const [toDelete, setToDelete] = useState<IUser | null>(null)
   const [user, setUser] = useState<IUser | null>(null)
@@ -65,6 +66,7 @@ function UsersPage(): JSX.Element {
   const onHandleConfirmDelete = (user: IUser): void => {
     setToDelete(user)
     setContentDelete("L'utilisateur " + user.email + " ?")
+    // @ts-ignore Diasy UI
     document?.getElementById('modal')?.showModal()
   }
 
@@ -79,6 +81,7 @@ function UsersPage(): JSX.Element {
   const onHandleChangePass = (user: IUser): void => {
     console.log("CLICK SUR CHANGE PASS")
     setUser(user)
+    // @ts-ignore Diasy UI
     document?.getElementById('modal-password')?.showModal()
   }
 

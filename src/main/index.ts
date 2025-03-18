@@ -16,7 +16,7 @@ function createWindow(): void {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     },
-    icon: '../renderer/src/assets/icon.png'
+    icon: icon
   })
 
   mainWindow.on('ready-to-show', () => {

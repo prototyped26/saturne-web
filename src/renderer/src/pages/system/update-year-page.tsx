@@ -1,6 +1,6 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store/store'
-import { Link, useNavigate } from 'react-router'
+import { Link } from 'react-router'
 import { useEffect, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
 import { getMessageErrorRequestEx } from '../../utils/errors'
@@ -10,9 +10,9 @@ import { refreshYear } from '../../store/systemSlice'
 
 function UpdateYearPage(): JSX.Element {
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
-  const navigate = useNavigate()
 
   const token: string | null = useAppSelector((state) => state.user.token)
   const year: IYear | null = useAppSelector((state) => state.system.year)

@@ -26,6 +26,18 @@ export const getIntermediary = async (token: string, id: number): Promise<IRespo
   return await apiRequestAuth<IResponse>('/intermediaries/' + id, 'GET', token)
 }
 
+export const getIntermediaryTotalActif = async (token: string, id: number): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/intermediaries/actifs' + id, 'GET', token)
+}
+
+export const getIntermediaryFunds = async (token: string, id: number): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/intermediaries/funds' + id, 'GET', token)
+}
+
+export const getIntermediaryMandatories = async (token: string, id: number): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/intermediaries/customers' + id, 'GET', token)
+}
+
 export const createIntermediary = async (token: string, inter: IIntermediary): Promise<IResponse> => {
   return await apiRequestAuth<IResponse>('/intermediaries', 'POST', token, inter)
 }

@@ -19,7 +19,7 @@ function DashLayout(): JSX.Element {
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
 
-  const user: IUser = useAppSelector((state) => state.user.current)
+  const user: IUser | null = useAppSelector((state) => state.user.current)
   const token: string | null = useAppSelector((state) => state.user.token)
 
   useEffect(() => {

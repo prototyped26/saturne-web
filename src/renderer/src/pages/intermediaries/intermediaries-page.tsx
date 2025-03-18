@@ -12,7 +12,6 @@ import {
   getOrganizations, searchIntermediaries
 } from '../../services/intermediaryService'
 import {
-  addIntermediaries,
   removeIntermediary,
   setCategories,
   setIntermediaries, setIntermediary,
@@ -28,6 +27,7 @@ import ImportIntermediaryModal from './import-intermediary-modal'
 function IntermediariesPage(): JSX.Element {
   const navigate = useNavigate()
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
 
@@ -37,9 +37,6 @@ function IntermediariesPage(): JSX.Element {
   )
   const categories: ICategory[] = useAppSelector((state) => state.intermediary.categories)
   const organizations: IOrganization[] = useAppSelector((state) => state.intermediary.organizations)
-
-  const message: string | null = useAppSelector((state) => state.information.message)
-  const success: string | null = useAppSelector((state) => state.information.success)
 
   const initSeach: ISearchIntermediary = {
     term: null,
@@ -57,6 +54,10 @@ function IntermediariesPage(): JSX.Element {
     loadCategories(token as string)
     loadOrganizations(token as string)
     loadIntermediaries(token as string)
+
+    if (searchLoading) {
+      console.log(organizations)
+    }
   }, [])
 
   const loadIntermediaries = async (t: string): Promise<void> => {
@@ -97,6 +98,7 @@ function IntermediariesPage(): JSX.Element {
   const onHandleConfirmDelete = async (inter: IIntermediary): Promise<void> => {
     setToDelete(inter)
     setContentDelete("L'intermédiare " + inter.label + " ?")
+    // @ts-ignore Daisy UI
     document?.getElementById('modal')?.showModal()
   }
 
@@ -121,6 +123,7 @@ function IntermediariesPage(): JSX.Element {
   }
 
   const onHandleClickImport = (): void => {
+    // @ts-ignore
     document?.getElementById('modal-import-intermediary')?.showModal()
   }
 
@@ -162,7 +165,7 @@ function IntermediariesPage(): JSX.Element {
 
   return (
     <div className="border bg-white rounded-lg dark:border-gray-50 p-6 mb-4 z-20">
-      <ToastContainer key={112233}/>
+      <ToastContainer key={112233} />
       <ImportIntermediaryModal token={token as string} />
 
       <div className="grid grid-cols-2 gap-4 mb-4">
@@ -177,7 +180,9 @@ function IntermediariesPage(): JSX.Element {
             <FiPlus />
             Nouvel Intermédiaire
           </Link>
-          <button onClick={() => onHandleClickImport()} className="btn btn-md btn-outline ml-2">Importer (Excel)</button>
+          <button onClick={() => onHandleClickImport()} className="btn btn-md btn-outline ml-2">
+            Importer (Excel)
+          </button>
           <button className="btn btn-md btn-outline ml-2">Exporter</button>
         </div>
       </div>
@@ -204,7 +209,12 @@ function IntermediariesPage(): JSX.Element {
             </label>
           </div>
           <div className="flex mt-8 w-full">
-            <input onChange={(e) => onHandleTermChange(e.target.value)} type="text" placeholder="Recherche..." className="input input-bordered w-1/3" />
+            <input
+              onChange={(e) => onHandleTermChange(e.target.value)}
+              type="text"
+              placeholder="Recherche..."
+              className="input input-bordered w-1/3"
+            />
             <button onClick={() => onHandleSearch()} className="btn btn-md ml-2">
               <FiSearch size={24} />
             </button>
@@ -264,7 +274,7 @@ function IntermediariesPage(): JSX.Element {
                         Nb. Fonds
                       </th>
                       <th scope="col" className="px-4 py-3">
-                        Nb. Mandats
+                        Nb. Mandants
                       </th>
                       <th scope="col" className="px-4 py-3"></th>
                     </tr>
@@ -304,11 +314,17 @@ function IntermediariesPage(): JSX.Element {
                         <td className="px-4 py-2">
                           <label className="font-medium">{intermediaire?.approval_number}</label>
                           <br />
-                          <label className="font-light">Du {moment(intermediaire?.approval_date).format("DD MMMM YYYY")}</label>
+                          <label className="font-light">
+                            Du {moment(intermediaire?.approval_date).format('DD MMMM YYYY')}
+                          </label>
                         </td>
                         <td className="px-4 py-2">{intermediaire?.leader_name}</td>
-                        <td className="px-4 py-2"></td>
-                        <td className="px-4 py-2"></td>
+                        <td className="px-4 py-2">
+                          <button className="btn btn-sm">{intermediaire.countFund}</button>
+                        </td>
+                        <td className="px-4 py-2">
+                          <button className="btn btn-sm">{intermediaire.countMandatory}</button>{' '}
+                        </td>
 
                         <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                           <div className="flex justify-end">
@@ -330,7 +346,7 @@ function IntermediariesPage(): JSX.Element {
                                   <a onClick={() => onHandleNavToUpdate(intermediaire)}>Modifier</a>
                                 </li>
                                 <li>
-                                  <a onClick={() => onHandleNavToDetails(intermediaire)} >Détails</a>
+                                  <a onClick={() => onHandleNavToDetails(intermediaire)}>Détails</a>
                                 </li>
                               </ul>
                             </div>
@@ -347,10 +363,14 @@ function IntermediariesPage(): JSX.Element {
                   </tbody>
                 </table>
               </div>
-
             </div>
 
-            <ConfirmDeleteDialog content={contentDelete} action={onHandleDelete} success={showSuccessToast} error={showErrorToast} />
+            <ConfirmDeleteDialog
+              content={contentDelete}
+              action={onHandleDelete}
+              success={showSuccessToast}
+              error={showErrorToast}
+            />
           </div>
         </div>
       )}

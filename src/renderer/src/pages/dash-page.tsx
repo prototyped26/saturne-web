@@ -61,6 +61,10 @@ function Dash(): JSX.Element {
     loadDashLiquidatives()
   }, [])
 
+  useEffect(() => {
+
+  }, [liquidatives])
+
   const loadDashActifs = async (): Promise<void> => {
     setLoadActifs(true)
 
@@ -72,6 +76,18 @@ function Dash(): JSX.Element {
     } finally {
       setLoadActifs(false)
     }
+  }
+
+  const calculatePercentValue = (value: number): number => {
+    let res = 0
+
+    try {
+      res = (value / Number(dashActifs?.totalActifs)) * 100
+    } catch (e) {
+      console.log(e)
+    }
+
+    return Number(res.toFixed(2))
   }
 
   const loadDashLiquidatives = async (): Promise<void> => {
@@ -113,7 +129,7 @@ function Dash(): JSX.Element {
     <div className="border bg-white rounded-lg dark:border-gray-50 p-6 mb-4 z-20">
       <h3 className="tracking-tight font-bold text-3xl text-app-title">Tableau de bord</h3>
       <p className="tracking-tight font-light text-1xl text-app-sub-title">
-        Suivi de l'ensemble des données du système.
+        Suivi de l ensemble des données du système.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 gap-4 mt-6 mb-4">
@@ -141,7 +157,52 @@ function Dash(): JSX.Element {
                   </div>
                 </div>
 
-                <div className="stats shadow w-full mt-10">
+                <div className="rounded-lg shadow w-full mt-4 p2">
+                  <div className="px-4 my-2">
+                    <div className="flex justify-between">
+                      <p className="text-xs">
+                        <p>Total Actifs OPC </p>
+                        <p>{calculatePercentValue(dashActifs?.actifsFund as number)} %</p>
+                      </p>
+                      <p className="font-bold text-xs">
+                        <NumericFormat
+                          value={dashActifs?.actifsFund.toFixed(2)}
+                          displayType={'text'}
+                          thousandSeparator={' '}
+                          suffix={' XAF'}
+                        />
+                      </p>
+                    </div>
+                    <progress
+                      className="progress  w-full"
+                      value={calculatePercentValue(dashActifs?.actifsFund as number)}
+                      max="100"
+                    ></progress>
+                  </div>
+                  <div className="px-4 my-2">
+                    <div className="flex justify-between">
+                      <p className="text-xs">
+                        <p>Total Actifs Mandats </p>
+                        <p>{calculatePercentValue(dashActifs?.actifsMandate as number)} %</p>
+                      </p>
+                      <p className="font-bold text-xs">
+                        <NumericFormat
+                          value={dashActifs?.actifsMandate.toFixed(2)}
+                          displayType={'text'}
+                          thousandSeparator={' '}
+                          suffix={' XAF'}
+                        />
+                      </p>
+                    </div>
+                    <progress
+                      className="progress progress-accent w-full"
+                      value={calculatePercentValue(dashActifs?.actifsMandate as number)}
+                      max="100"
+                    ></progress>
+                  </div>
+                </div>
+
+                <div className="stats shadow w-full mt-4">
                   <div className="stat">
                     <div className="stat-title font-bold">Nombre de SGO</div>
                     <div className="stat-value"> {dashActifs?.countSgo}</div>
@@ -164,7 +225,9 @@ function Dash(): JSX.Element {
               <span className="loading loading-spinner"></span>
             </div>
           )}
-          {!loadLiquidatives && data !== null && data !== undefined && <Bar options={options} data={data} />}
+          {!loadLiquidatives && data !== null && data !== undefined && (
+            <Bar options={options} data={data} />
+          )}
         </div>
       </div>
     </div>

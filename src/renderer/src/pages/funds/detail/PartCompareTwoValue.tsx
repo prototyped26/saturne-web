@@ -10,8 +10,8 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend,
-} from 'chart.js';
+  Legend, ChartData
+} from 'chart.js'
 import { Line } from 'react-chartjs-2';
 import moment from 'moment'
 import { NumericFormat } from 'react-number-format'
@@ -38,7 +38,7 @@ type CompareItem = {
   percent: number
 }
 
-function PartCompareTwoValue({ token, fund, funds, success, error }: Props): JSX.Element {
+function PartCompareTwoValue({ token, fund, funds, error }: Props): JSX.Element {
 
   const [dateTo, setDateTo] = useState('')
   const [dateAt, setDateAt] = useState('')
@@ -48,7 +48,7 @@ function PartCompareTwoValue({ token, fund, funds, success, error }: Props): JSX
   const [evolutionsTwo, setEvolutionsTwo] = useState<TableEvol[]>([])
   const [secondLoad, setSecondLoad] = useState(false)
   const [labels, setLabels] = useState<string[]>([])
-  const [dataLine, setDataLine] = useState([])
+  const [dataLine, setDataLine] = useState({})
   const [show, setShow] = useState(false)
   const [compares, setCompares] = useState<CompareItem[]>([])
 
@@ -107,6 +107,10 @@ function PartCompareTwoValue({ token, fund, funds, success, error }: Props): JSX
       initDiagram(titles)
     }
   }, [secondLoad])
+
+  useEffect(() => {
+
+  }, [labels])
 
   const onHandleSearch = async (): Promise<void> => {
 
@@ -230,6 +234,7 @@ function PartCompareTwoValue({ token, fund, funds, success, error }: Props): JSX
     setSecondLoad(false)
   }
 
+  // @ts-ignore chart
   return (
     <div className="flex w-full gap-4">
       <div className="w-1/3 border bg-white rounded-lg dark:border-gray-50 px-6 py-3">
@@ -283,7 +288,7 @@ function PartCompareTwoValue({ token, fund, funds, success, error }: Props): JSX
       </div>
 
       <div className="w-2/3 border bg-white rounded-lg dark:border-gray-50 px-6 py-3">
-        {show && <Line width={760} height={340} data={dataLine} options={options} />}
+        {show && <Line width={760} height={340} data={dataLine as ChartData<'line'>} options={options} />}
 
         {show && (
           <div className="mt-2">

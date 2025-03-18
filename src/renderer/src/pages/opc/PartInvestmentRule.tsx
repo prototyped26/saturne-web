@@ -1,4 +1,4 @@
-import { IInvestmentRule, IInvestmentRuleType, ITypeOpc } from '../../type'
+import { IInvestmentRule, IInvestmentRuleType } from '../../type'
 import { useEffect } from 'react'
 import { NumericFormat } from 'react-number-format'
 

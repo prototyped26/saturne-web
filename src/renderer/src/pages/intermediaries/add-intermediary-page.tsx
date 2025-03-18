@@ -19,6 +19,7 @@ import { setInformationMessage, setSuccess } from '../../store/informationSlice'
 function AddIntermediaryPage(): JSX.Element {
   const navigate = useNavigate()
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
 
@@ -46,6 +47,10 @@ function AddIntermediaryPage(): JSX.Element {
   const [capital, setCapital] = useState('')
   const [loading, setLoadding] = useState(false)
 
+  useEffect(() => {
+
+  }, [selectedCat])
+
   const stepperInit = ['Général', 'Dirigéant', 'Autres']
 
   const onHandleChangeCat = (val: string): void => {
@@ -69,6 +74,8 @@ function AddIntermediaryPage(): JSX.Element {
 
     console.log(stepper)
   }
+
+
 
   const onGotoNext = (): void => {
     setCurrentStep(currentStep + 1)
@@ -174,7 +181,9 @@ function AddIntermediaryPage(): JSX.Element {
       approval_date_two: approvalDateTwo,
       contacts: contacts,
       adress: adress,
-      category_id: category?.id
+      category_id: category?.id,
+      countFund: 0,
+      countMandatory: 0
     }
 
     setLoadding(true)

@@ -30,7 +30,7 @@ export const intermediarySlice = createSlice({
     },
     refreshIntermediary: (state, action: PayloadAction<IIntermediary>) => {
       state.intermediaries = state.intermediaries?.map((inter) => {
-        inter.id === action.payload.id ? action.payload : inter
+        return  inter.id === action.payload.id ? action.payload : inter
       })
     },
     removeIntermediary: (state, action: PayloadAction<IIntermediary>) => {

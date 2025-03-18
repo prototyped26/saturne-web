@@ -84,7 +84,9 @@ export interface IIntermediary {
   category_id?: number,
   category?: ICategory
   organization_id?: number,
-  organization?: IOrganization
+  organization?: IOrganization,
+  countFund: number,
+  countMandatory: number
 }
 
 export interface ISearchIntermediary {

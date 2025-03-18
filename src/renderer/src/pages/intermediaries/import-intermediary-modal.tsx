@@ -14,12 +14,13 @@ type Props = {
 }
 
 function ImportIntermediaryModal({ token }: Props): JSX.Element {
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
 
   const [downloaded, setDownloaded] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [file, setFile] = useState<any>(null)
+  const [file, setFile] = useState<File | null>(null)
 
   const onHandleDownloadTemplate = async (e): Promise<void> => {
     e.preventDefault()
@@ -37,20 +38,26 @@ function ImportIntermediaryModal({ token }: Props): JSX.Element {
   const onHandleImport = async (): Promise<void> => {
     setLoading(true)
     try {
-      const data = new FormData()
-      data.append('file', file)
+      if (file) {
+        const data = new FormData()
+        data.append('file', file)
 
-      const res = await importIntermediaries(token, data)
+        const res = await importIntermediaries(token, data)
 
-      const list = res.data as IIntermediary[]
-      dispatch(addIntermediaries(list))
-      setFile(null)
-      toast.success("Ajout réussi de " + list.length + " d'intermédiaires.", { theme: 'colored' })
+        const list = res.data as IIntermediary[]
+        dispatch(addIntermediaries(list))
+        setFile(null)
+        toast.success("Ajout réussi de " + list.length + " d'intermédiaires.", { theme: 'colored' })
+      }
     } catch (e) {
       toast.error(getMessageErrorRequestEx(e), { theme: 'colored' })
     } finally {
       setLoading(false)
     }
+  }
+
+  const onFileChange = (e): void => {
+    setFile(e.target.files[0])
   }
 
   return (
@@ -76,7 +83,7 @@ function ImportIntermediaryModal({ token }: Props): JSX.Element {
         <div className="flex w-full py-2 justify-between">
           <input
             type="file"
-            onChange={(e) => setFile(e.target.files[0])}
+            onChange={(e) => onFileChange(e)}
             className="file-input file-input-bordered w-full max-w-xs"
           />
           {!loading && (

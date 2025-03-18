@@ -48,13 +48,16 @@ export const fundSlice = createSlice({
     },
     refreshFund: (state, action: PayloadAction<IFund>) => {
       state.funds = state.funds?.map((fund) => {
-        fund.id === action.payload.id ? action.payload : fund
+        return fund.id === action.payload.id ? action.payload : fund
       })
     },
     setFunds: (state, action: PayloadAction<IFund[]>) => {
       state.funds = action.payload
     },
     setFund: (state, action: PayloadAction<IFund>) => {
+      state.fund = action.payload
+    },
+    setCurrentFund: (state, action: PayloadAction<IFund>) => {
       state.fund = action.payload
     },
     removeFund: (state, action: PayloadAction<IFund>) => {
@@ -83,5 +86,5 @@ export const fundSlice = createSlice({
 })
 
 export const { addFunds, addFund, removeFund, refreshFund, setFund, setFunds, setClassifications,
-  setTypesOpc, setDistributions, setDepositaries, setShareholdersTypes, setShareholders } = fundSlice.actions
+  setTypesOpc, setDistributions, setDepositaries, setShareholdersTypes, setShareholders, setCurrentFund } = fundSlice.actions
 export default fundSlice.reducer

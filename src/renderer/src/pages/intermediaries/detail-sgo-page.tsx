@@ -3,7 +3,7 @@ import { AppDispatch, RootState } from '../../store/store'
 import { IHolder, IIntermediary, IOrganization } from '../../type'
 import { Link, useNavigate } from 'react-router'
 import moment from 'moment'
-import { FiEdit, FiEye, FiMoreHorizontal, FiTrash } from 'react-icons/fi'
+import { FiEdit } from 'react-icons/fi'
 import { useEffect, useState } from 'react'
 import { getHoldersOrganization } from '../../services/intermediaryService'
 import { setAllHolders } from '../../store/intermediarySlice'
@@ -15,6 +15,7 @@ import { NumericFormat } from 'react-number-format'
 
 function DetailSgoPage(): JSX.Element {
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
@@ -24,6 +25,10 @@ function DetailSgoPage(): JSX.Element {
   const holders: IHolder[] = useAppSelector((state) => state.intermediary.holders)
   const [openModal, setOpenModal] = useState(false)
   const [current, setCurrent] = useState('fonds')
+
+  useEffect(() => {
+    setCurrent('fonds')
+  }, [])
 
   useEffect(() => {
     console.log(intermediary)
@@ -42,6 +47,7 @@ function DetailSgoPage(): JSX.Element {
   }
 
   const onHoldeEditOrg = (): void => {
+    // @ts-ignore Diasy UI
     document.getElementById('modal-edit-organization').showModal()
   }
 
@@ -56,10 +62,12 @@ function DetailSgoPage(): JSX.Element {
   const onHandleUpdateHolders = (): void => {
     //setHolders(holders)
     setOpenModal(true)
+    // @ts-ignore Diasy UI
     document?.getElementById("modal-edit-holders")?.showModal()
   }
 
   const onHandleShowHistoryHolders = (): void => {
+    // @ts-ignore Diasy UI
     document?.getElementById("modal-history-holders")?.showModal()
   }
 
@@ -71,27 +79,34 @@ function DetailSgoPage(): JSX.Element {
   return (
     <div className="h-auto">
       <ToastContainer />
-      <EditOrganizationModal
-        token={token as string}
-        organization={intermediary?.organization as IOrganization}
-        error={showErrorToast}
-        success={showSuccessToast}
-      />
-      <EditHoldersModal
-        data={holders}
-        token={token as string}
-        success={showSuccessToast}
-        error={showErrorToast}
-        organization={intermediary?.organization as IOrganization}
-        open={openModal}
-        change={closeModal}
-      />
-      <HistoryHolderModal
-        token={token as string}
-        success={showSuccessToast}
-        error={showErrorToast}
-        organization={intermediary?.organization as IOrganization}
-      />
+
+      {intermediary?.organization && (
+        <div>
+          <EditOrganizationModal
+            token={token as string}
+            organization={intermediary?.organization as IOrganization}
+            error={showErrorToast}
+            success={showSuccessToast}
+          />
+          <EditHoldersModal
+            data={holders}
+            token={token as string}
+            success={showSuccessToast}
+            error={showErrorToast}
+            organization={intermediary?.organization as IOrganization}
+            open={openModal}
+            change={closeModal}
+          />
+        </div>
+      )}
+      {intermediary?.organization && (
+        <HistoryHolderModal
+          token={token as string}
+          success={showSuccessToast}
+          error={showErrorToast}
+          organization={intermediary?.organization as IOrganization}
+        />
+      )}
 
       <div className="border bg-white rounded-lg dark:border-gray-50 p-6 z-20">
         <div className="grid grid-cols-2 gap-4">
@@ -102,6 +117,9 @@ function DetailSgoPage(): JSX.Element {
                 <FiEdit />
               </button>
             </h3>
+            <h4 className="badge badge-info font-bold text-white">
+              {intermediary?.category?.label?.toUpperCase()}
+            </h4>
             <p className="tracking-tight font-light text-1xl text-app-sub-title">
               Société agrée le {moment(intermediary?.approval_date).format('DD MMMM YYYY')}
             </p>
@@ -128,7 +146,12 @@ function DetailSgoPage(): JSX.Element {
                 <div className="stat-title text-[18px]">
                   {'Total Actifs Sous Gestion'.toUpperCase()}
                 </div>
-                <div className="stat-value text-md"> 1,000,000 XAF</div>
+                {intermediary?.category?.code === 'SGO' && (
+                  <div className="stat-value text-md"> 1,000,000 XAF</div>
+                )}
+                {intermediary?.category?.code !== 'SGO' && (
+                  <div className="stat-value text-md"> NON APPLICABLE</div>
+                )}
               </div>
             </div>
 
@@ -136,14 +159,14 @@ function DetailSgoPage(): JSX.Element {
               <div className="stats shadow">
                 <div className="stat place-items-center">
                   <div className="stat-title text-[18px]">Nombre de Fonds</div>
-                  <div className="stat-value text-md"> 10</div>
+                  <div className="stat-value text-md">{intermediary?.countFund}</div>
                 </div>
               </div>
 
               <div className="stats shadow">
                 <div className="stat place-items-center">
-                  <div className="stat-title text-[18px]">Nombre de Mandats</div>
-                  <div className="stat-value text-md"> 05</div>
+                  <div className="stat-title text-[18px]">Nombre de Mandants</div>
+                  <div className="stat-value text-md">{intermediary?.countMandatory}</div>
                 </div>
               </div>
             </div>
@@ -169,54 +192,53 @@ function DetailSgoPage(): JSX.Element {
           <div className="flex gap-4 w-full border bg-white rounded-lg dark:border-gray-50">
             <table className="w-full text-xs text-left text-gray-500 dark:text-gray-400 mb-10">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-              <tr>
-                <th scope="col" className="p-4">
-                  <div className="flex items-center">
-                    <input
-                      id="checkbox-all"
-                      type="checkbox"
-                      className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                    />
-                    <label htmlFor="checkbox-all" className="sr-only">
-                      checkbox
-                    </label>
-                  </div>
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Dénomination
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Agrément
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Type OPC
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Dépositaire
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Classification
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Distribution
-                </th>
-                <th scope="col" className="px-4 py-3"></th>
-              </tr>
+                <tr>
+                  <th scope="col" className="p-4">
+                    <div className="flex items-center">
+                      <input
+                        id="checkbox-all"
+                        type="checkbox"
+                        className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                      />
+                      <label htmlFor="checkbox-all" className="sr-only">
+                        checkbox
+                      </label>
+                    </div>
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Dénomination
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Agrément
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Type OPC
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Dépositaire
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Classification
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Distribution
+                  </th>
+                  <th scope="col" className="px-4 py-3"></th>
+                </tr>
               </thead>
-              <tbody>
-
-              </tbody>
+              <tbody></tbody>
             </table>
           </div>
-
         </div>
 
         <div className="w-1/3 border bg-white rounded-lg dark:border-gray-50 p-4">
           <div className="flex justify-between">
             <h4 className="tracking-tight font-bold text-app-title">LA SOCIETE</h4>
-            <button onClick={() => onHoldeEditOrg()} className="btn btn-sm ml-2">
-              <FiEdit />
-            </button>
+            {intermediary?.organization && (
+              <button onClick={() => onHoldeEditOrg()} className="btn btn-sm ml-2">
+                <FiEdit />
+              </button>
+            )}
           </div>
 
           <div className="flex gap-2">
@@ -229,10 +251,17 @@ function DetailSgoPage(): JSX.Element {
             <div className="w-1/3 items-end flex">
               <p className="">Capital </p>
             </div>
-            <p className="font-bold"><NumericFormat value={intermediary?.organization?.capital} displayType={'text'} thousandSeparator={true}  suffix={' XAF'} /></p>
+            <p className="font-bold">
+              <NumericFormat
+                value={intermediary?.organization?.capital}
+                displayType={'text'}
+                thousandSeparator={true}
+                suffix={' XAF'}
+              />
+            </p>
           </div>
 
-          {holders.length > 0 && (
+          {holders?.length > 0 && (
             <div>
               <div className="flex justify-between mt-5">
                 <h4 className="tracking-tight font-bold text text-app-title ">ACTIONNAIRES</h4>
@@ -249,18 +278,18 @@ function DetailSgoPage(): JSX.Element {
               <div className="overflow-x-auto">
                 <table className="table">
                   <thead>
-                  <tr>
-                    <th>Nom & Prénom</th>
-                    <th>%</th>
-                  </tr>
+                    <tr>
+                      <th>Nom & Prénom</th>
+                      <th>%</th>
+                    </tr>
                   </thead>
                   <tbody>
-                  {holders.map((holder) => (
-                    <tr key={holder.id}>
-                      <td className="font-bold">{holder.first_name}</td>
-                      <td>{holder.percent} %</td>
-                    </tr>
-                  ))}
+                    {holders.map((holder) => (
+                      <tr key={holder.id}>
+                        <td className="font-bold">{holder.first_name}</td>
+                        <td>{holder.percent} %</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -268,7 +297,6 @@ function DetailSgoPage(): JSX.Element {
           )}
         </div>
       </div>
-
     </div>
   )
 }

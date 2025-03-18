@@ -35,6 +35,7 @@ import ImportFundModal from './import-fund-modal'
 function FundsPage() : JSX.Element {
   const navigate = useNavigate()
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
 
@@ -63,6 +64,10 @@ function FundsPage() : JSX.Element {
     loadAllShareholders(token as string)
     loadFunds(token as string)
   }, [])
+
+  useEffect(() => {
+
+  }, [intermediaries, typesOpc, claissifications, depositaries, distributions])
 
   useEffect(() => {
     if (success !== null) setTimeout(() => dispatch(setSuccess(null)), 5000)

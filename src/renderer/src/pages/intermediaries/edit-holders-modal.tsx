@@ -14,10 +14,11 @@ type Props = {
   success: (m) => void,
   error: (m) => void,
   open?: boolean,
-  change?: () => void
+  change: () => void
 }
 
-function EditHoldersModal({ data, token, success, error, organization, open, change }: Props): JSX.Element {
+function EditHoldersModal({ data, token, error, organization, open, change }: Props): JSX.Element {
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
 
@@ -26,7 +27,7 @@ function EditHoldersModal({ data, token, success, error, organization, open, cha
 
   useEffect(() => {
     if (open) {
-      setHolders(data)
+      setHolders(data as IHolder[])
       //console.log(data)
       setTimeout(() => {
         initValue()
@@ -125,7 +126,7 @@ function EditHoldersModal({ data, token, success, error, organization, open, cha
 
   const initValue = (): void => {
     const list: IHolder[] = []
-    data.forEach((holder) => {
+    data?.forEach((holder) => {
       const h: IHolder = {
         ligne: Date.now() + Math.random(),
         shares: holder.shares,
@@ -174,7 +175,7 @@ function EditHoldersModal({ data, token, success, error, organization, open, cha
           {/* if there is a button in form, it will close the modal */}
           <button onClick={closeModal} className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
         </form>
-        <h3 className="font-bold text-lg ">Mettre à jour la liste d'actionnaires</h3>
+        <h3 className="font-bold text-lg ">Mettre à jour la liste d actionnaires</h3>
 
         <table className="table">
           <thead>

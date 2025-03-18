@@ -11,14 +11,15 @@ import LoadingTable from '../../components/LoadingTable'
 import NoDataList from '../../components/NoDataList'
 import moment from 'moment/moment'
 import { NumericFormat } from 'react-number-format'
-import { getActifNet, getActifSousGestion, getValeurLiquid } from '../../services/opcService'
-import { FiEye, FiMoreHorizontal, FiTrash } from 'react-icons/fi'
+import { getActifNet} from '../../services/opcService'
+import { FiEye, FiTrash } from 'react-icons/fi'
 import LoadMandateModal from './load-mandate-modal'
 import TableNavigationFooter from '../../components/TableNavigationFooter'
 
 function MandatesPage(): JSX.Element {
   const navigate = useNavigate()
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
 
@@ -26,18 +27,16 @@ function MandatesPage(): JSX.Element {
   const mandates: IMandate[] = useAppSelector((state) => state.mandate.mandates)
   const currentWeek: IWeek | null = useAppSelector((state) => state.system.currentWeek)
 
-  const message: string | null = useAppSelector((state) => state.information.message)
-  const success: string | null = useAppSelector((state) => state.information.success)
-
   const [loading, setLoading] = useState(true)
   const [total, setTotal] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
   const [numberPage, setNumberPage] = useState(0)
-  const [tableSize, setTableSize] = useState<number[]>([5, 10, 20, 50, 100])
+  const [tableSize, setTableSize] = useState<number[]>([])
 
   useEffect(() => {
     loadMandates()
+    setTableSize([5, 10, 20, 50, 100])
   }, [])
 
   useEffect(() => {

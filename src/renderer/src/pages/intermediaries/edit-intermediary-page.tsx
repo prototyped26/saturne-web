@@ -1,8 +1,8 @@
 import { toast, ToastContainer } from 'react-toastify'
-import { Link, useNavigate } from 'react-router'
+import { Link } from 'react-router'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store/store'
-import { ICategory, IHolder, IIntermediary } from '../../type'
+import { ICategory, IIntermediary } from '../../type'
 import { useEffect, useState } from 'react'
 import cn from 'classnames'
 import {
@@ -14,11 +14,12 @@ import moment from 'moment'
 
 function EditIntermediaryPage(): JSX.Element {
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
 
   const token: string | null = useAppSelector((state) => state.user.token)
-  const intermediary: IIntermediary = useAppSelector((state) => state.intermediary.intermediary)
+  const intermediary: IIntermediary | null = useAppSelector((state) => state.intermediary.intermediary)
   const categories: ICategory[] = useAppSelector((state) => state.intermediary.categories)
 
   const [selectedCat, setSelectedCat] = useState('')
@@ -98,7 +99,9 @@ function EditIntermediaryPage(): JSX.Element {
       approval_date_two: approvalDateTwo,
       contacts: contacts,
       adress: adress,
-      category_id: category?.id
+      category_id: category?.id,
+      countFund: 0,
+      countMandatory: 0
     }
 
     setLoadding(true)
@@ -130,7 +133,7 @@ function EditIntermediaryPage(): JSX.Element {
         <div className="">
           <h3 className="tracking-tight font-bold text-3xl text-app-title">{label}</h3>
           <p className="tracking-tight font-light text-1xl text-app-sub-title">
-            Vous pouvez modifier les informations de l'intermédiaire via les formulaires.
+            Vous pouvez modifier les informations de l&#39;intermédiaire via les formulaires.
           </p>
         </div>
         <div className="flex  justify-end ">
@@ -143,7 +146,7 @@ function EditIntermediaryPage(): JSX.Element {
       <div className="grid grid-cols-1 flex gap-4 mb-4 items-center justify-center ">
         <div className="w-3/4 mx-auto px-4">
           <p className="tracking-tight font-light text-1xl mt-2 mb-1 text-app-sub-title">
-            Choisir le type d'intermédiaire
+            Choisir le type d&#39;intermédiaire
           </p>
           <select
             value={selectedCat}
@@ -202,7 +205,7 @@ function EditIntermediaryPage(): JSX.Element {
               </select>
 
               <p className="tracking-tight font-light text-1xl mt-2 mb-1 text-app-sub-title">
-                Numéro d'Agrément
+                Numéro d&#39;Agrément
               </p>
               <input
                 type="text"
@@ -213,7 +216,7 @@ function EditIntermediaryPage(): JSX.Element {
               />
 
               <p className="tracking-tight font-light text-1xl mt-2 mb-1 text-app-sub-title">
-                Date d'Agrément
+                Date d&#39;Agrément
               </p>
               <input
                 type="date"
@@ -255,7 +258,7 @@ function EditIntermediaryPage(): JSX.Element {
               </select>
 
               <p className="tracking-tight font-light text-1xl mt-2 mb-1 text-app-sub-title">
-                Son Numéro d'Agrément
+                Son Numéro d&#39;Agrément
               </p>
               <input
                 type="text"

@@ -18,6 +18,7 @@ import GlobalLoadingDialog from '../../components/GlobalLoadingDialog'
 function YearsPage(): JSX.Element {
   const navigate = useNavigate()
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
 
@@ -54,6 +55,7 @@ function YearsPage(): JSX.Element {
   const onHandleConfirmDelete = (year: IYear): void => {
     setToDelete(year)
     setContentDelete("l'année " + year.label + " ?")
+    // @ts-ignore DaisyUI
     document?.getElementById('modal')?.showModal()
   }
 
@@ -76,6 +78,7 @@ function YearsPage(): JSX.Element {
   }
 
   const onHandleChangeActive = async (y: IYear): Promise<void> => {
+    // @ts-ignore DaisyUI
     document?.getElementById('modal-loading')?.showModal()
     setLoadingActive(true)
     if (y.active) {

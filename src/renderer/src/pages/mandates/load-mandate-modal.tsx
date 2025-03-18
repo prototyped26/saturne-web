@@ -21,26 +21,32 @@ function LoadMandateModal({ token, currentWeek, success, error, reload }: Props)
   const weeks: IWeek[] = useAppSelector((state) => state.system.weeks)
 
   const [loading, setLoading] = useState(false)
-  const [file, setFile] = useState<any>(null)
+  const [file, setFile] = useState<File | null>(null)
   const [selectedWeek, setSelectedWeek] = useState('')
 
   const onHandleImport = async (): Promise<void> => {
     setLoading(true)
     try {
-      const data = new FormData()
-      data.append('file', file)
+      if (file) {
+        const data = new FormData()
+        data.append('file', file )
 
-      const weekId: number = selectedWeek.length === 0 ? currentWeek.id as number : Number(selectedWeek)
+        const weekId: number = selectedWeek.length === 0 ? currentWeek.id as number : Number(selectedWeek)
 
-      await loadWeekMandateReport(token, data, weekId)
-      reload()
-      success("Rapport chargé avec succès ! ")
+        await loadWeekMandateReport(token, data, weekId)
+        reload()
+        success("Rapport chargé avec succès ! ")
+      }
       document?.getElementById("close-btn-up-mandate")?.click()
     } catch (e) {
       error(getMessageErrorRequestEx(e))
     } finally {
       setLoading(false)
     }
+  }
+
+  const onFileChange = (e): void => {
+    setFile(e.target.files[0])
   }
 
   return (
@@ -68,7 +74,7 @@ function LoadMandateModal({ token, currentWeek, success, error, reload }: Props)
         <div className="flex w-full py-2 justify-between">
           <input
             type="file"
-            onChange={(e) => setFile(e.target.files[0])}
+            onChange={(e) => onFileChange(e)}
             className="file-input file-input-bordered w-full max-w-xs"
           />
           {!loading && (

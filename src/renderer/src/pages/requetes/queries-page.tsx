@@ -22,10 +22,9 @@ import {
   getTypesOpc
 } from '../../services/fundService'
 import {
-  setClassifications,
+  setClassifications, setCurrentFund,
   setDepositaries,
   setDistributions,
-  setFund,
   setFunds, setShareholders,
   setTypesOpc
 } from '../../store/fundSlice'
@@ -33,10 +32,8 @@ import { toast, ToastContainer } from 'react-toastify'
 import { getMessageErrorRequestEx } from '../../utils/errors'
 import { getCategories, getIntermediaries } from '../../services/intermediaryService'
 import { setCategories, setIntermediaries } from '../../store/intermediarySlice'
-import { FiEye, FiMoreHorizontal, FiSearch, FiTrash } from 'react-icons/fi'
+import { FiEye, FiSearch } from 'react-icons/fi'
 import moment from 'moment'
-import ConfirmDeleteDialog from '../../components/ConfirmDeleteDialog'
-import { useNavigate } from 'react-router'
 import {
   getFollowFundGrouped, getFundByFollowInstructions,
   getlastReportOfFund,
@@ -50,13 +47,14 @@ import PartHistoryValueLiquidation from '../funds/detail/PartHistoryValueLiquida
 import PartSubcriptions from '../funds/detail/PartSubcriptions'
 import PartShareholders from '../funds/detail/PartShareholders'
 import BadgeRiskString from '../../components/BadgeRiskString'
+import { useNavigate} from 'react-router'
 
 function QueriesPage(): JSX.Element {
-  const navigate = useNavigate()
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
 
   const token: string | null = useAppSelector((state) => state.user.token)
   const intermediaries: IIntermediary[] = useAppSelector((state) => state.intermediary.intermediaries)
@@ -112,6 +110,10 @@ function QueriesPage(): JSX.Element {
       setFund(res as IFund)
     }
   }, [selectedFund])
+
+  useEffect(() => {
+
+  }, [showList, loadSharesholders, distributions, depositaries, claissifications])
 
   const loadFunds = async (t: string): Promise<void> => {
     try {
@@ -246,10 +248,6 @@ function QueriesPage(): JSX.Element {
     }
   }
 
-  const onHandleTermChange = (val: string): void => {
-
-  }
-
   const showSuccessToast = (msg: string): void => {
     toast.success(msg, { theme: 'colored'})
   }
@@ -356,7 +354,7 @@ function QueriesPage(): JSX.Element {
   }
 
   const onHandleNavToDetails = (fund: IFund): void => {
-    dispatch(setFund(fund))
+    dispatch(setCurrentFund(fund))
     navigate('/dash/funds/details')
   }
 

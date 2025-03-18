@@ -14,7 +14,7 @@ const closeModal = (): void => {
 
 }
 
-function HistoryHolderModal({token, success, error, organization}: Props): JSX.Element {
+function HistoryHolderModal({token, error, organization}: Props): JSX.Element {
 
   const [list, setList] = useState<IHolderGrouped[]>([])
 

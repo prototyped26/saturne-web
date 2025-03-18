@@ -1,4 +1,3 @@
-import { toast, ToastContainer } from 'react-toastify'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '../../store/store'
 import { useState } from 'react'
@@ -16,12 +15,13 @@ type Props = {
 }
 
 function ImportFundModal({ token, action, error }: Props): JSX.Element {
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
 
   const [downloaded, setDownloaded] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [file, setFile] = useState<any>(null)
+  const [file, setFile] = useState<File | null>(null)
 
   const onHandleDownloadTemplate = async (e): Promise<void> => {
     e.preventDefault()
@@ -39,21 +39,27 @@ function ImportFundModal({ token, action, error }: Props): JSX.Element {
   const onHandleImportFund = async (): Promise<void> => {
     setLoading(true)
     try {
-      const data = new FormData()
-      data.append('file', file)
+      if (file) {
+        const data = new FormData()
+        data.append('file', file)
 
-      const res = await importFunds(token, data)
+        const res = await importFunds(token, data)
 
-      const list = res.data as IFund[]
-      dispatch(addFunds(list))
-      setFile(null)
-      action("Ajout réussi de " + list.length + " fonds.")
+        const list = res.data as IFund[]
+        dispatch(addFunds(list))
+        setFile(null)
+        action("Ajout réussi de " + list.length + " fonds.")
+      }
       //toast.success("Ajout réussi de " + list.length + " fonds.", { theme: 'colored' })
     } catch (e) {
       error(getMessageErrorRequestEx(e))
     } finally {
       setLoading(false)
     }
+  }
+
+  const onFileChange = (e): void => {
+    setFile(e.target.files[0])
   }
 
   return (
@@ -79,7 +85,7 @@ function ImportFundModal({ token, action, error }: Props): JSX.Element {
         <div className="flex w-full py-2 justify-between">
           <input
             type="file"
-            onChange={(e) => setFile(e.target.files[0])}
+            onChange={(e) => onFileChange(e)}
             className="file-input file-input-bordered w-full max-w-xs"
           />
           {!loading && (

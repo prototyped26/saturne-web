@@ -42,7 +42,7 @@ export const systemSlice = createSlice({
     },
     refreshYear: (state, action: PayloadAction<IYear>) => {
       state.years = state.years?.map((y) => {
-        y.id === action.payload.id ? action.payload : y
+        return y.id === action.payload.id ? action.payload : y
       })
     },
     removeYear: (state, action: PayloadAction<IYear>) => {

@@ -10,11 +10,12 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend, ChartData
 } from 'chart.js'
 import { Line } from 'react-chartjs-2'
 import moment from 'moment/moment'
 import ValueIndicateFluctuation from './ValueIndicateFluctuation'
+import { NumericFormat } from 'react-number-format'
 
 type Props = {
   fund: IFund,
@@ -32,7 +33,7 @@ function HistoryLiquidationDiagram({ fund, token }: Props): JSX.Element {
   const [index, setIndex] = useState(1)
   const [labels, setLabels] = useState<string[]>([])
   const [values, setValues] = useState<number[]>([])
-  const [dataLine, setDataLine] = useState([])
+  const [dataLine, setDataLine] = useState({})
   const [show, setShow] = useState(false)
   const [liquidations, setLiquidations] = useState<IHistoryLiquidationValue[]>([])
   const [dateTo, setDateTo] = useState('')
@@ -68,6 +69,10 @@ function HistoryLiquidationDiagram({ fund, token }: Props): JSX.Element {
   useEffect(() => {
     if (liquidations.length > 0) initChart()
   }, [liquidations])
+
+  useEffect(() => {
+
+  }, [labels, values])
 
   const loadHistory = async (): Promise<void> => {
     try {
@@ -168,7 +173,7 @@ function HistoryLiquidationDiagram({ fund, token }: Props): JSX.Element {
         </div>
 
         <div className="row flex items-center justify-center w-full">
-          {show && <Line width={760} data={dataLine} options={options} />}
+          {show && <Line width={760} data={dataLine as ChartData<'line'>} options={options} />}
         </div>
 
       </div>

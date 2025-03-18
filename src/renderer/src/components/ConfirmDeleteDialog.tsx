@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { getMessageErrorRequestEx } from '../utils/errors'
-import { toast, ToastContainer } from 'react-toastify'
 
 type Props = {
   content: string,
@@ -16,7 +15,7 @@ function ConfirmDeleteDialog({ content, action, success, error }: Props): JSX.El
   const onHandleDelete = async (): Promise<void> => {
     setLoading(true)
     try {
-      const res = await action()
+      await action()
       success("Action effectuée avec success !")
       setTimeout(() => document?.getElementById('non-btn-del')?.click(), 200)
     } catch (e) {

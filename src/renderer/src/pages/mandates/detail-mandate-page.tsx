@@ -1,19 +1,17 @@
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '../../store/store'
+import { TypedUseSelectorHook, useSelector } from 'react-redux'
 import { IMandate, Iopcvm, ITypeOpc } from '../../type'
 import { ToastContainer } from 'react-toastify'
 import moment from 'moment'
 import { Link } from 'react-router'
 import { NumericFormat } from 'react-number-format'
 import PartDetailOpcvm from '../opc/PartDetailOpcvm'
+import { RootState } from '../../store/store'
 
 function DetailMandatePage(): JSX.Element {
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
-  const useAppDispatch = () => useDispatch<AppDispatch>()
 
   const mandate: IMandate | null = useAppSelector((state) => state.mandate.mandate)
   const typesOpcs: ITypeOpc[] = useAppSelector((state) => state.opc.opcvmTypes)
-  const token: string | null = useAppSelector((state) => state.user.token)
 
   return (
     <div className="h-full">

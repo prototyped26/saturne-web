@@ -27,7 +27,7 @@ export const getIntermediary = async (token: string, id: number): Promise<IRespo
 }
 
 export const getIntermediaryTotalActif = async (token: string, id: number): Promise<IResponse> => {
-  return await apiRequestAuth<IResponse>('/intermediaries/actifs' + id, 'GET', token)
+  return await apiRequestAuth<IResponse>('/intermediaries/actifs/' + id, 'GET', token)
 }
 
 export const getIntermediaryFunds = async (token: string, id: number): Promise<IResponse> => {

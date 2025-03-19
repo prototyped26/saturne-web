@@ -77,11 +77,28 @@ function ImportFundModal({ token, action, error }: Props): JSX.Element {
         <p>
           {downloaded && <span className="loading loading-spinner"></span>}
           {!downloaded && (
-            <a href="" onClick={(e) => onHandleDownloadTemplate(e)}>
+            <a href="" className="italic" onClick={(e) => onHandleDownloadTemplate(e)}>
               Template Excel (Télécharger le fichier template ici.)
             </a>
           )}
         </p>
+        <div role="alert" className="alert">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            className="h-6 w-6 shrink-0 stroke-info "
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          <span className="underline">Attention : </span>
+          <span className="">Avant cette action, il est impératif d'enregistrer les SGO. De plus, dans la première colonne (A), veillez à saisir le nom complet de la société, tel qu'il figure dans le système. </span>
+        </div>
         <div className="flex w-full py-2 justify-between">
           <input
             type="file"
@@ -89,7 +106,8 @@ function ImportFundModal({ token, action, error }: Props): JSX.Element {
             className="file-input file-input-bordered w-full max-w-xs"
           />
           {!loading && (
-            <button id="non-btn" onClick={() => onHandleImportFund()} className="btn btn-md bg-app-primary ml-2 text-white">
+            <button id="non-btn" onClick={() => onHandleImportFund()}
+                    className="btn btn-md bg-app-primary ml-2 text-white">
               IMPORTER
             </button>
           )}

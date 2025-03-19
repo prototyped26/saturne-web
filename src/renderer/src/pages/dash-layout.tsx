@@ -164,13 +164,14 @@ function DashLayout(): JSX.Element {
                 </NavLink>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                >
+                <NavLink  to="/dash/configurations"
+                          className={({ isActive }) => isActive
+                              ? 'active flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group'
+                              : 'flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group'
+                          }>
                   <FiTool />
                   <span className="ml-3">Options Fonds, OPC</span>
-                </a>
+                </NavLink>
               </li>
               <li>
                 <NavLink

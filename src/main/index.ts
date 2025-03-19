@@ -2,7 +2,11 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import installExtension, {REACT_DEVELOPER_TOOLS} from 'electron-devtools-installer'
+import * as path from 'node:path'
+//import installExtension, {REACT_DEVELOPER_TOOLS} from 'electron-devtools-installer'
+import log from 'electron-log/main'
+
+const exec = require('child_process').exec
 
 function createWindow(): void {
   // Create the browser window.
@@ -35,10 +39,18 @@ function createWindow(): void {
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'), { hash: '/'})
   }
 }
 
+function execute(command, callback): void {
+  exec(command, (error, stdout, stderr) => {
+    console.log(error)
+    log.error(error)
+    console.log(stderr)
+    callback(stdout)
+  })
+}
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -56,6 +68,17 @@ app.whenReady().then(() => {
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
 
+  log.initialize()
+  log.transports.console.format = '{h}:{i}:{s} {text}'
+
+  // call the Command function
+  const serverLocate: string = path.join(__dirname, '../../resources/server/saturne-0.0.1-SNAPSHOT.jar').replace("app.asar", "app.asar.unpacked")
+  console.log(serverLocate)
+  execute('java -jar ' + serverLocate, (output) => {
+    console.log(output)
+    log.info(output)
+  })
+
   createWindow()
 
   app.on('activate', function () {
@@ -64,9 +87,9 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 
-  installExtension(REACT_DEVELOPER_TOOLS)
+  /*installExtension(REACT_DEVELOPER_TOOLS)
     .then((name) => console.log(`Added Extension:  ${name}`))
-    .catch((err) => console.log('An error occurred: ', err))
+    .catch((err) => console.log('An error occurred: ', err))*/
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common

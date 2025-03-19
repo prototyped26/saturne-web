@@ -2,7 +2,7 @@ import './assets/main.css'
 
 import ReactDOM from 'react-dom/client'
 import App from './App'
-import { BrowserRouter, Route, Routes } from 'react-router'
+import { HashRouter, Route, Routes } from 'react-router'
 import LoginPage from './pages/login-page'
 import DashPage from './pages/dash-page'
 import DashLayout from './pages/dash-layout'
@@ -28,10 +28,11 @@ import MandatesPage from './pages/mandates/mandates-page'
 import DetailMandatePage from './pages/mandates/detail-mandate-page'
 import DocumentsPage from './pages/documents/documents-page'
 import QueriesPage from './pages/requetes/queries-page'
+import ConfigPage from './pages/configurations/config-page'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <Provider store={store}>
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/login" element={<LoginPage />} />
@@ -58,9 +59,10 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           <Route path="system/years" element={<YearsPage />} />
           <Route path="system/years/new" element={<AddYearPage />} />
           <Route path="system/years/edit" element={<UpdateYearPage />} />
+          <Route path="configurations" element={<ConfigPage />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   </Provider>
   /**
    * <React.StrictMode>

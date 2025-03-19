@@ -166,7 +166,7 @@ function IntermediariesPage(): JSX.Element {
   return (
     <div className="border bg-white rounded-lg dark:border-gray-50 p-6 mb-4 z-20">
       <ToastContainer key={112233} />
-      <ImportIntermediaryModal token={token as string} />
+      <ImportIntermediaryModal token={token as string} onSuccess={showSuccessToast} onError={showErrorToast} />
 
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="">

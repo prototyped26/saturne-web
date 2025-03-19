@@ -72,6 +72,13 @@ function Dash(): JSX.Element {
       const res = await getDashActifs(token as string)
       setDashActifs(res.data as IDashActifs)
     } catch (e) {
+      const noData: IDashActifs = {
+        actifsMandate: 0,
+        totalActifs: 0,
+        countSgo: 0,
+        actifsFund: 0
+      }
+      setDashActifs(noData)
       console.log(getMessageErrorRequestEx(e))
     } finally {
       setLoadActifs(false)

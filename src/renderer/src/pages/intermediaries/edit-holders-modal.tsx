@@ -50,11 +50,12 @@ function EditHoldersModal({ data, token, error, organization, open, change }: Pr
       shares: 0,
       value: value,
       percent: 0,
-      ligne: Date.now()
+      ligne: Date.now() * Math.random(),
+      organization_id: organization?.id as number
     }
     const arr: IHolder[] = []
     arr.push(h)
-    console.log(arr)
+    //console.log(arr)
     setHolders([...holders, ...arr])
   }
 
@@ -70,7 +71,7 @@ function EditHoldersModal({ data, token, error, organization, open, change }: Pr
   const onChangeHolderShares = (hold: IHolder, val): void => {
     const value = Number(val)
     let h
-    if (hold.id !== null) {
+    if (hold.id !== undefined && hold.id !== null) {
       h = holders.find((holder) => holder.id === hold.id)
     } else {
       h = holders.find((holder) => holder.ligne === hold.ligne)
@@ -81,10 +82,14 @@ function EditHoldersModal({ data, token, error, organization, open, change }: Pr
       h.capital = h.value as number * (h.shares as number)
       h.percent = Number(((h.capital / Number(organization?.capital)) * 100).toFixed(2))
       let arr
-      if (hold.id !== null) {
-        arr = holders.map((holder) => holder?.id === hold.id ? h : holder )
+      if (hold.id !== undefined && hold.id !== null) {
+        arr = holders.map((holder) => {
+          return holder?.id === hold.id ? h : holder
+        })
       } else {
-        arr = holders.map((holder) => holder?.ligne === hold.ligne ? h : holder )
+        arr = holders.map((holder) => {
+          return holder?.ligne === hold.ligne ? h : holder
+        })
       }
       setHolders(arr)
     }
@@ -135,7 +140,7 @@ function EditHoldersModal({ data, token, error, organization, open, change }: Pr
         capital: Number(holder.value) * Number(holder.shares),
         first_name: holder.first_name,
         id: holder.id,
-        organization_id: organization?.id
+        organization_id: organization?.id as number
       }
       list.push(h)
     })
@@ -159,7 +164,7 @@ function EditHoldersModal({ data, token, error, organization, open, change }: Pr
       const res = await createHolders(token, data)
       dispatch(setAllHolders(res.data as IHolder[]))
       setHolders([])
-      document?.getElementById("cls-btn-modal-up-holders")?.click()
+      document?.getElementById("close-modal-holders")?.click()
     } catch (e) {
       error(getMessageErrorRequestEx(e))
     } finally {
@@ -173,7 +178,7 @@ function EditHoldersModal({ data, token, error, organization, open, change }: Pr
       <div className="modal-box  w-11/12 max-w-5xl">
         <form method="dialog">
           {/* if there is a button in form, it will close the modal */}
-          <button onClick={closeModal} className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+          <button id="close-modal-holders" onClick={closeModal} className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
         </form>
         <h3 className="font-bold text-lg ">Mettre à jour la liste d actionnaires</h3>
 
@@ -252,11 +257,7 @@ function EditHoldersModal({ data, token, error, organization, open, change }: Pr
         </table>
 
         <div className="flex justify-end mt-4">
-          <form method="dialog">
-            <button onClick={closeModal} id="cls-btn-modal-up-holders" className="btn btn-sm">
-              Fermer
-            </button>
-          </form>
+
           {!loading && (
             <button onClick={() => onHandleUpdate()} className="btn btn-sm bg-app-primary ml-2 text-white">
               mettre à jour

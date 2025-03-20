@@ -47,11 +47,11 @@ export interface ICategory {
 }
 
 export interface IOrganization {
-  id?: number,
+  id?: number | null,
   label?: string,
   header?: string,
-  capital?: string,
-  status?: string
+  capital?: double,
+  status?: string | null
 }
 
 export interface IHolder {

@@ -1,19 +1,22 @@
 import { useEffect, useState } from 'react'
 import { IOrganization } from '../../type'
 import { getMessageErrorRequestEx } from '../../utils/errors'
-import { updateOrganization } from '../../services/intermediaryService'
+import { createOrganization, updateOrganization } from '../../services/intermediaryService'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '../../store/store'
 import { refreshOrganization } from '../../store/intermediarySlice'
+import { NumericFormat } from 'react-number-format'
 
 type Props = {
   token: string
   organization: IOrganization | null,
+  onAddOrganization: (org: IOrganization) => void,
   success: (m) => void,
   error: (m) => void
 }
 
-function EditOrganizationModal({ token, organization, success, error }: Props): JSX.Element {
+function EditOrganizationModal({ token, organization, success, error, onAddOrganization }: Props): JSX.Element {
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
 
@@ -37,8 +40,16 @@ function EditOrganizationModal({ token, organization, success, error }: Props): 
     setLoadding(true)
 
     try {
-      const res = await updateOrganization(token, organization?.id as number, org)
-      dispatch(refreshOrganization(res.data as IOrganization))
+      console.log(organization?.id)
+      if (organization?.id !== null) {
+        const res = await updateOrganization(token, organization?.id as number, org)
+        dispatch(refreshOrganization(res.data as IOrganization))
+      } else {
+        const res = await createOrganization(token, org)
+        const organization = res.data as IOrganization
+        onAddOrganization(organization)
+        dispatch(refreshOrganization(organization))
+      }
       success("Mise à jour effectuée !")
       document?.getElementById('cls-btn-modal-up-org')?.click()
     } catch (e) {
@@ -56,15 +67,32 @@ function EditOrganizationModal({ token, organization, success, error }: Props): 
           <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
         </form>
         <h3 className="font-bold text-lg ">Mettre à jour la société</h3>
-
+        <div className="flex gap-2">
+          <p className="tracking-tight font-light text-1xl mt-2 mb-1 text-app-sub-title">
+            Désignation :
+          </p>
+          <p className=" font-bold text-1xl mt-2 mb-1">
+            {organization?.label}
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <p className="tracking-tight font-light text-1xl mt-2 mb-1 text-app-sub-title">
+            Siège Social :
+          </p>
+          <p className=" font-bold text-1xl mt-2 mb-1">
+            {organization?.header}
+          </p>
+        </div>
         <p className="tracking-tight font-light text-1xl mt-2 mb-1 text-app-sub-title">
           Capital de la socité (F. CFA)
         </p>
-        <input
-          type="number" value={capital}
-          placeholder="... CFA"
-          className="input input-bordered w-full "
-          onChange={(e) => setCapital(e.target.value)}
+        <NumericFormat
+          thousandSeparator={' '}
+          value={capital}
+          onValueChange={(values) => setCapital(values.value)}
+          suffix={' XAF'}
+          displayType={'input'}
+          className="input input-bordered w-full"
         />
 
         <p className="tracking-tight font-light text-1xl mt-2 mb-1 text-app-sub-title">
@@ -90,7 +118,10 @@ function EditOrganizationModal({ token, organization, success, error }: Props): 
             </button>
           </form>
           {!loading && (
-            <button onClick={() => onHandleUpdateOrg()} className="btn btn-sm bg-app-primary ml-2 text-white">
+            <button
+              onClick={() => onHandleUpdateOrg()}
+              className="btn btn-sm bg-app-primary ml-2 text-white"
+            >
               mettre à jour
             </button>
           )}

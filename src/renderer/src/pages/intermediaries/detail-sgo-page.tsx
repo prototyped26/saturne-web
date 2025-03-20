@@ -5,7 +5,11 @@ import { Link, useNavigate } from 'react-router'
 import moment from 'moment'
 import { FiEdit } from 'react-icons/fi'
 import { useEffect, useState } from 'react'
-import { getHoldersOrganization, getIntermediaryTotalActif } from '../../services/intermediaryService'
+import {
+  getHoldersOrganization,
+  getIntermediaryTotalActif,
+  updateIntermediary
+} from '../../services/intermediaryService'
 import { setAllHolders } from '../../store/intermediarySlice'
 import { toast, ToastContainer } from 'react-toastify'
 import EditOrganizationModal from './edit-organization-modal'
@@ -13,6 +17,7 @@ import EditHoldersModal from './edit-holders-modal'
 import HistoryHolderModal from './history-holder-modal'
 import { NumericFormat } from 'react-number-format'
 import { getMessageErrorRequestEx } from '../../utils/errors'
+import NoDataList from '../../components/NoDataList'
 
 function DetailSgoPage(): JSX.Element {
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
@@ -24,9 +29,11 @@ function DetailSgoPage(): JSX.Element {
   const token: string | null = useAppSelector((state) => state.user.token)
   const intermediary: IIntermediary | null = useAppSelector((state) => state.intermediary.intermediary)
   const holders: IHolder[] = useAppSelector((state) => state.intermediary.holders)
+
   const [openModal, setOpenModal] = useState(false)
   const [current, setCurrent] = useState('fonds')
   const [totalActifs, setTotalActifs] = useState(0)
+  const [organization, setOrganization] = useState<IOrganization | null>(null)
 
   useEffect(() => {
     setCurrent('fonds')
@@ -35,7 +42,19 @@ function DetailSgoPage(): JSX.Element {
   useEffect(() => {
     console.log(intermediary)
     if (intermediary !== null) {
-      if (intermediary?.organization !== null) loadHolders()
+      if (intermediary?.organization !== null) {
+        loadHolders()
+        setOrganization(intermediary?.organization as IOrganization)
+      } {
+        const org: IOrganization = {
+          label: intermediary?.label,
+          capital: 0,
+          header: intermediary?.head,
+          status: '',
+          id: null
+        }
+        setOrganization(org)
+      }
       loadTotalActifs()
     }
   }, [intermediary])
@@ -53,6 +72,21 @@ function DetailSgoPage(): JSX.Element {
     try {
       const res = await getIntermediaryTotalActif(token as string, intermediary?.id as number)
       setTotalActifs(res.data as number)
+    } catch (e) {
+      showErrorToast(getMessageErrorRequestEx(e))
+    }
+  }
+
+  const updateIntermediaryWithOrg = async (org: IOrganization): Promise<void> => {
+    try {
+      const interAtt = intermediary as IIntermediary
+      const inter: IIntermediary = {
+        ...interAtt,
+        organization_id: org.id as number,
+        category_id: interAtt?.category?.id as number
+      }
+
+      await updateIntermediary(token as string, intermediary?.id as number, inter)
     } catch (e) {
       showErrorToast(getMessageErrorRequestEx(e))
     }
@@ -92,14 +126,18 @@ function DetailSgoPage(): JSX.Element {
     <div className="h-auto">
       <ToastContainer />
 
+      {organization && (
+        <EditOrganizationModal
+          token={token as string}
+          organization={organization as IOrganization}
+          onAddOrganization={updateIntermediaryWithOrg}
+          error={showErrorToast}
+          success={showSuccessToast}
+        />
+      )}
+
       {intermediary?.organization && (
         <div>
-          <EditOrganizationModal
-            token={token as string}
-            organization={intermediary?.organization as IOrganization}
-            error={showErrorToast}
-            success={showSuccessToast}
-          />
           <EditHoldersModal
             data={holders}
             token={token as string}
@@ -121,7 +159,7 @@ function DetailSgoPage(): JSX.Element {
       )}
 
       <div className="border bg-white rounded-lg dark:border-gray-50 p-6 z-20">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="flex justify-between gap-4">
           <div className="">
             <h3 className="tracking-tight font-bold text-2xl text-app-title">
               {intermediary?.label}
@@ -133,12 +171,15 @@ function DetailSgoPage(): JSX.Element {
               <h4 className="tracking-tight font-bold text-xl text-app-title">
                 {intermediary?.approval_number}
               </h4>
+              <p className="tracking-tight font-light text-1xl text-app-sub-title">
+                Date agrément :{' '}
+                <label className="font-bold">
+                  {moment(intermediary?.approval_date).format('DD MMMM YYYY')}
+                </label>
+              </p>
               <h4 className="badge badge-info font-bold text-white mt-1">
                 {intermediary?.category?.label?.toUpperCase()}
               </h4>
-              <p className="tracking-tight font-light text-1xl text-app-sub-title">
-                Date agrément : <label className="font-bold">{moment(intermediary?.approval_date).format('DD MMMM YYYY')}</label>
-              </p>
             </div>
             <p className="tracking-tight font-light text-1xl text-app-sub-title">
               {intermediary?.adress}
@@ -259,7 +300,7 @@ function DetailSgoPage(): JSX.Element {
           <div className="w-1/3 border bg-white rounded-lg dark:border-gray-50 p-4">
             <div className="flex justify-between">
               <h4 className="tracking-tight font-bold text-app-title">LA SOCIETE</h4>
-              {intermediary?.organization && (
+              {organization && (
                 <button onClick={() => onHoldeEditOrg()} className="btn btn-sm ml-2">
                   <FiEdit />
                 </button>
@@ -280,13 +321,13 @@ function DetailSgoPage(): JSX.Element {
                 <NumericFormat
                   value={intermediary?.organization?.capital}
                   displayType={'text'}
-                  thousandSeparator={true}
+                  thousandSeparator={' '}
                   suffix={' XAF'}
                 />
               </p>
             </div>
 
-            {holders?.length > 0 && (
+            {intermediary?.organization && (
               <div>
                 <div className="flex justify-between mt-5">
                   <h4 className="tracking-tight font-bold text text-app-title ">ACTIONNAIRES</h4>
@@ -294,35 +335,42 @@ function DetailSgoPage(): JSX.Element {
                     <button onClick={onHandleUpdateHolders} className="btn btn-sm ">
                       <FiEdit />
                     </button>
-                    <button onClick={onHandleShowHistoryHolders} className="btn btn-sm">
-                      historique
-                    </button>
+                    {holders?.length > 0 && (
+                      <button onClick={onHandleShowHistoryHolders} className="btn btn-sm">
+                        historique
+                      </button>
+                    )}
                   </div>
                 </div>
 
-                <div className="overflow-x-auto">
-                  <table className="table">
-                    <thead>
-                    <tr>
-                      <th>Nom & Prénom</th>
-                      <th>%</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {holders.map((holder) => (
-                      <tr key={holder.id}>
-                        <td className="font-bold">{holder.first_name}</td>
-                        <td>{holder.percent} %</td>
-                      </tr>
-                    ))}
-                    </tbody>
-                  </table>
-                </div>
+                {holders?.length > 0 && (
+                  <div className="overflow-x-auto">
+                    <table className="table">
+                      <thead>
+                        <tr>
+                          <th>Nom & Prénom</th>
+                          <th>%</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {holders.map((holder) => (
+                          <tr key={holder.id}>
+                            <td className="font-bold">{holder.first_name}</td>
+                            <td>{holder.percent} %</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {holders?.length === 0 && (
+                  <NoDataList message={"Aucun actionnaire n'a été enregistré à ce jour.."} />
+                )}
               </div>
             )}
           </div>
         )}
-
       </div>
     </div>
   )

@@ -1,4 +1,9 @@
-function NoDataList(): JSX.Element {
+
+type Props = {
+  message?: string
+}
+
+function NoDataList({ message = 'Aucune donnée disponible pour cette option.' }: Props): JSX.Element {
   return (
     <div className="grid py-2">
       <div role="alert" className="alert">
@@ -15,7 +20,7 @@ function NoDataList(): JSX.Element {
             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
           ></path>
         </svg>
-        <span>Aucune donnée disponible pour cette option.</span>
+        <span>{message}</span>
       </div>
     </div>
   )

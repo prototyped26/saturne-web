@@ -30,6 +30,10 @@ export const getFund = async (token: string, id: number): Promise<IResponse> => 
   return await apiRequestAuth<IResponse>('/funds/' + id, 'GET', token)
 }
 
+export const getFundsBySgo = async (token: string, id: number): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/funds/sgo/' + id, 'GET', token)
+}
+
 export const createFund = async (token: string, data: IFund): Promise<IResponse> => {
   return await apiRequestAuth<IResponse>('/funds', 'POST', token, data)
 }

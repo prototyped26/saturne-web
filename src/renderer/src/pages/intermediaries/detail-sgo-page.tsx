@@ -18,6 +18,7 @@ import HistoryHolderModal from './history-holder-modal'
 import { NumericFormat } from 'react-number-format'
 import { getMessageErrorRequestEx } from '../../utils/errors'
 import NoDataList from '../../components/NoDataList'
+import FundsSgoList from './funds-sgo-list'
 
 function DetailSgoPage(): JSX.Element {
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
@@ -254,46 +255,8 @@ function DetailSgoPage(): JSX.Element {
             </button>
           </div>
 
-          <div className="flex gap-4 w-full border bg-white rounded-lg dark:border-gray-50">
-            <table className="w-full text-xs text-left text-gray-500 dark:text-gray-400 mb-10">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                  <th scope="col" className="p-4">
-                    <div className="flex items-center">
-                      <input
-                        id="checkbox-all"
-                        type="checkbox"
-                        className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                      />
-                      <label htmlFor="checkbox-all" className="sr-only">
-                        checkbox
-                      </label>
-                    </div>
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Dénomination
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Agrément
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Type OPC
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Dépositaire
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Classification
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Distribution
-                  </th>
-                  <th scope="col" className="px-4 py-3"></th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+          <FundsSgoList intermediary={intermediary as IIntermediary} token={token as string} />
+
         </div>
 
         {intermediary?.category?.code === 'SGO' && (

@@ -1,9 +1,9 @@
 {
   "name": "saturne",
-  "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "version": "1.0.1",
+  "description": "Plateforme de gestion collective de la COSUMAF",
   "main": "./out/main/index.js",
-  "author": "example.com",
+  "author": "ZERITEC",
   "homepage": "https://electron-vite.org",
   "scripts": {
     "format": "prettier --write .",

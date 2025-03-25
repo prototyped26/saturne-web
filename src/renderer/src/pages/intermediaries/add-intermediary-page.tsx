@@ -203,14 +203,14 @@ function AddIntermediaryPage(): JSX.Element {
         const resOrg = await createOrganization(token as string, org)
         const organization: IOrganization = resOrg.data as IOrganization
         intermediary.id = inter.id
-        intermediary.organization_id = organization.id
+        intermediary.organization_id = organization?.id as number
         intermediary.category_id = category.id
         const resUpInter = await updateIntermediary(token as string, inter.id as number, intermediary)
         dispatch(refreshIntermediary(resUpInter.data as IIntermediary))
 
         if (holders.length > 0) {
           for (const holder of holders) {
-            holder.organization_id = organization.id
+            holder.organization_id = organization?.id as number
              await createHolder(token as string, holder)
           }
         }

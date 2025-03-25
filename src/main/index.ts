@@ -6,8 +6,6 @@ import * as path from 'node:path'
 //import installExtension, {REACT_DEVELOPER_TOOLS} from 'electron-devtools-installer'
 import log from 'electron-log/main'
 
-const exec = require('child_process').exec
-
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -43,14 +41,6 @@ function createWindow(): void {
   }
 }
 
-function execute(command, callback): void {
-  exec(command, (error, stdout, stderr) => {
-    console.log(error)
-    log.error(error)
-    console.log(stderr)
-    callback(stdout)
-  })
-}
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -70,14 +60,6 @@ app.whenReady().then(() => {
 
   log.initialize()
   log.transports.console.format = '{h}:{i}:{s} {text}'
-
-  // call the Command function
-  const serverLocate: string = path.join(__dirname, '../../resources/server/saturne-0.0.1-SNAPSHOT.jar').replace("app.asar", "app.asar.unpacked")
-  console.log(serverLocate)
-  execute('java -jar ' + serverLocate, (output) => {
-    console.log(output)
-    log.info(output)
-  })
 
   createWindow()
 

@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios'
-axios.defaults.baseURL =  'http://localhost:9000/api'
+axios.defaults.baseURL = 'http://localhost:9000/api'
+//axios.defaults.baseURL = 'http://51.210.102.81:9000/api'
 const ax = axios
 export const apiClient = ax.create({
   headers: {

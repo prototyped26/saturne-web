@@ -49,6 +49,7 @@ function ImportFundModal({ token, action, error }: Props): JSX.Element {
         dispatch(addFunds(list))
         setFile(null)
         action("Ajout réussi de " + list.length + " fonds.")
+        document?.getElementById("close-modal-up-fund")?.click()
       }
       //toast.success("Ajout réussi de " + list.length + " fonds.", { theme: 'colored' })
     } catch (e) {
@@ -67,7 +68,7 @@ function ImportFundModal({ token, action, error }: Props): JSX.Element {
       <div className="modal-box">
         <form id="form-modal-fund" method="dialog">
           {/* if there is a button in form, it will close the modal */}
-          <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+          <button id="close-modal-up-fund" className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
         </form>
         <h3 className="font-bold text-lg ">Importation en masse des fonds</h3>
         <p className="py-4">
@@ -97,7 +98,7 @@ function ImportFundModal({ token, action, error }: Props): JSX.Element {
             ></path>
           </svg>
           <span className="underline">Attention : </span>
-          <span className="">Avant cette action, il est impératif d'enregistrer les SGO. De plus, dans la première colonne (A), veillez à saisir le nom complet de la société, tel qu'il figure dans le système. </span>
+          <span className="">Avant cette action, il est impératif d'enregistrer les SGO. De plus, dans la deuxième colonne (B), veillez à saisir le nom complet de la société, tel qu'il figure dans le système. </span>
         </div>
         <div className="flex w-full py-2 justify-between">
           <input

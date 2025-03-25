@@ -24,7 +24,7 @@ function App(): JSX.Element {
     setMessage('Initialisation du serveur...')
     setTimeout(() => {
       loadData()
-    }, 40000)
+    }, 1000)
   }, [])
 
   const loadData = async (): Promise<void> => {

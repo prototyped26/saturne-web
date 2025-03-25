@@ -12,7 +12,7 @@ type Props = {
   currentWeek: IWeek,
   success: (m) => void,
   error: (m) => void,
-  reload: () => void
+  reload: (page: number) => void
 }
 
 function LoadReportModal({ token, success, error, currentWeek, reload }: Props): JSX.Element {
@@ -37,7 +37,7 @@ function LoadReportModal({ token, success, error, currentWeek, reload }: Props):
         const res = await loadWeekReport(token, data, weekId)
         const opc = res.data as IOpc
         await analyzeReport(opc?.id as number)
-        reload()
+        reload(1)
         success("Rapport chargé avec succès ! ")
       }
       document?.getElementById("close-btn-up-report")?.click()

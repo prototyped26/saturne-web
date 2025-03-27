@@ -1,4 +1,4 @@
-import { IAssetLineType, IFollowFund, IFollowRule, IInvestmentRuleType, IOpc, IOpcvmType } from '../type'
+import { IAssetLineType, IFollowFund, IFollowRule, IInvestmentRuleType, IOpc, IOpcvmType, IReportSGO } from '../type'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 
@@ -9,7 +9,9 @@ type StateType = {
   follows: IFollowFund[],
   opcvmTypes: IOpcvmType[],
   assetsTypes: IAssetLineType[],
-  investmentsTypes: IInvestmentRuleType[]
+  investmentsTypes: IInvestmentRuleType[],
+  reportsSgo: IReportSGO[],
+  reportSgo: IReportSGO | null
 }
 
 const initialState: StateType = {
@@ -19,7 +21,9 @@ const initialState: StateType = {
   follows: [],
   opcvmTypes: [],
   assetsTypes: [],
-  investmentsTypes: []
+  investmentsTypes: [],
+  reportsSgo: [],
+  reportSgo: null
 }
 
 export const opcSlice = createSlice({
@@ -39,11 +43,25 @@ export const opcSlice = createSlice({
     setOpcs: (state, action: PayloadAction<IOpc[]>) => {
       state.opcs = action.payload
     },
+    setReportSgo: (state, action: PayloadAction<IReportSGO>) => {
+      state.reportSgo = action.payload
+    },
+    setReportsSgo: (state, action: PayloadAction<IReportSGO[]>) => {
+      state.reportsSgo = action.payload
+    },
     setFollowsRules: (state, action: PayloadAction<IFollowRule[]>) => {
       state.followsRules = action.payload
     },
     setFollows: (state, action: PayloadAction<IFollowFund[]>) => {
       state.follows = action.payload
+    },
+    removeOpc: (state, action: PayloadAction<IOpc>) => {
+      const arr = state.opcs.filter((opc) => opc.id !== action.payload.id)
+      state.opcs = arr
+    },
+    removeReportSgo: (state, action: PayloadAction<IReportSGO>) => {
+      const arr = state.reportsSgo.filter((sgo) => sgo.id !== action.payload.id)
+      state.reportsSgo = arr
     },
     setOpcvmTypes: (state, action: PayloadAction<IOpcvmType[]>) => {
       state.opcvmTypes = action.payload
@@ -57,6 +75,7 @@ export const opcSlice = createSlice({
   }
 })
 
-export const { addOpcs, addOpc, setOpc, setOpcs, setFollowsRules, setFollows, setOpcvmTypes, setAssetLineTypes, setInvestmentRuleTypes } = opcSlice.actions
+export const { addOpcs, removeOpc, addOpc, setOpc, setOpcs, setFollowsRules, setFollows,
+  setOpcvmTypes, setAssetLineTypes, setInvestmentRuleTypes, removeReportSgo, setReportsSgo, setReportSgo } = opcSlice.actions
 export default opcSlice.reducer
 

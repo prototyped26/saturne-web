@@ -1,10 +1,9 @@
-import { IWeek, IYear } from '../../type'
+import { IPeriodicity, IWeek } from '../../type'
 import { TypedUseSelectorHook, useSelector } from 'react-redux'
 import { RootState } from '../../store/store'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getMessageErrorRequestEx } from '../../utils/errors'
 import { loadWeekMandateReport } from '../../services/mandateService'
-import moment from 'moment/moment'
 
 type Props = {
   token: string,
@@ -17,12 +16,15 @@ type Props = {
 function LoadMandateModal({ token, currentWeek, success, error, reload }: Props): JSX.Element {
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
 
-  const currentYear: IYear | null = useAppSelector((state) => state.system.currentYear)
-  const weeks: IWeek[] = useAppSelector((state) => state.system.weeks)
+  const periodicities: IPeriodicity[] = useAppSelector((state) => state.system.periodicities)
 
   const [loading, setLoading] = useState(false)
   const [file, setFile] = useState<File | null>(null)
-  const [selectedWeek, setSelectedWeek] = useState('')
+  const [selectedPeriod, setSelectedPeriod] = useState('')
+
+  useEffect(() => {
+    console.log(currentWeek)
+  }, [])
 
   const onHandleImport = async (): Promise<void> => {
     setLoading(true)
@@ -31,9 +33,9 @@ function LoadMandateModal({ token, currentWeek, success, error, reload }: Props)
         const data = new FormData()
         data.append('file', file )
 
-        const weekId: number = selectedWeek.length === 0 ? currentWeek.id as number : Number(selectedWeek)
+        const periodId: number = Number(selectedPeriod)
 
-        await loadWeekMandateReport(token, data, weekId)
+        await loadWeekMandateReport(token, data, periodId)
         reload()
         success("Rapport chargé avec succès ! ")
       }
@@ -61,13 +63,18 @@ function LoadMandateModal({ token, currentWeek, success, error, reload }: Props)
           Le fichier doit être conforme aux exigéances du comité.
         </p>
 
-        <p className="py-4">
-          Choisir une Période dans la liste des Semaines de l&#39;année <b>{currentYear?.label}</b>
-        </p>
-        <select className="select select-bordered mb-2" value={selectedWeek} onChange={(e) => setSelectedWeek(e.target.value)}>
+        <p className="py-2">Choisir une Périodicité du rapport</p>
+        <select
+          className="select select-bordered mb-2 w-2/3"
+          value={selectedPeriod}
+          onChange={(e) => setSelectedPeriod(e.target.value)}
+        >
           <option></option>
-          {weeks.map((week) => (
-            <option key={(week?.id) as number + Math.random()} value={week.id}> {week.label} {' : Du ' + moment(week.start).format('DD MMM YYYY') + ' au ' + moment(week.end).format('DD MMM YYYY')}</option>
+          {periodicities.map((periodicity) => (
+            <option key={(periodicity?.id as number) + Math.random()} value={periodicity.id}>
+              {' '}
+              {periodicity.label}
+            </option>
           ))}
         </select>
 
@@ -96,7 +103,7 @@ function LoadMandateModal({ token, currentWeek, success, error, reload }: Props)
             </button>
           </form>
         </div>
-    </div>
+      </div>
     </dialog>
   )
 }

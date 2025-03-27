@@ -45,7 +45,7 @@ function PartDetailOpcvm({ typesOpcs, opcvms }: Props): JSX.Element {
                           <td className="text-xs">{opcvm.label}</td>
                           <td>{opcvm.number ? opcvm.number : 0}</td>
                           <td>{opcvm.cours ? opcvm.cours.toFixed(2) : 0}</td>
-                          <td><NumericFormat value={Number(opcvm?.value?.toFixed(2))} displayType={'text'} thousandSeparator={true}  suffix={' XAF'} /></td>
+                          <td><NumericFormat value={Number(opcvm?.value?.toFixed(2))} displayType={'text'} thousandSeparator={' '}  suffix={' XAF'} /></td>
                           <td>{opcvm.percent ? Number(Number((opcvm.percent as number) * 100).toFixed(2)) + ' %' : 0 + ' %'} </td>
                         </tr>
                       )

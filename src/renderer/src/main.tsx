@@ -29,6 +29,7 @@ import DetailMandatePage from './pages/mandates/detail-mandate-page'
 import DocumentsPage from './pages/documents/documents-page'
 import QueriesPage from './pages/requetes/queries-page'
 import ConfigPage from './pages/configurations/config-page'
+import DetailReportSgo from './pages/opc/detail-report-sgo'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <Provider store={store}>
@@ -41,6 +42,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           <Route path="main" element={<DashPage />} />
           <Route path="reports" element={<ReportHebdo />} />
           <Route path="reports/details" element={<DetailOpcPage />} />
+          <Route path="reports/sgo" element={<DetailReportSgo />} />
           <Route path="mandates" element={<MandatesPage />} />
           <Route path="mandates/details" element={<DetailMandatePage />} />
           <Route path="intermediaries" element={<IntermediariesPage />} />

@@ -1,10 +1,9 @@
 import { useState } from 'react'
-import { IIntermediary, IOpc, IWeek, IYear } from '../../type'
+import { IIntermediary, IOpc, IPeriodicity, IWeek } from '../../type'
 import { getMessageErrorRequestEx } from '../../utils/errors'
-import { generateReportAnalyze, loadWeekReport } from '../../services/opcService'
+import { generateReportAnalyze, loadReportOpc, loadReportSgo } from '../../services/opcService'
 import { TypedUseSelectorHook, useSelector } from 'react-redux'
 import { RootState } from '../../store/store'
-import moment from 'moment'
 
 type Props = {
   token: string,
@@ -18,25 +17,32 @@ type Props = {
 function LoadReportModal({ token, success, error, currentWeek, reload }: Props): JSX.Element {
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
 
-  const currentYear: IYear | null = useAppSelector((state) => state.system.currentYear)
-  const weeks: IWeek[] = useAppSelector((state) => state.system.weeks)
+  const periodicities: IPeriodicity[] = useAppSelector((state) => state.system.periodicities)
 
   const [loading, setLoading] = useState(false)
   const [file, setFile] = useState<File | null>(null)
-  const [selectedWeek, setSelectedWeek] = useState('')
+  const [selectedPeriod, setSelectedPeriod] = useState('')
+  const [selectedType, setSelectedType] = useState('')
 
   const onHandleImport = async (): Promise<void> => {
+    console.log(currentWeek)
     setLoading(true)
     try {
       if (file) {
         const data = new FormData()
         data.append('file', file)
 
-        const weekId: number = selectedWeek.length === 0 ? currentWeek.id as number : Number(selectedWeek)
+        const periodId: number = Number(selectedPeriod)
 
-        const res = await loadWeekReport(token, data, weekId)
-        const opc = res.data as IOpc
-        await analyzeReport(opc?.id as number)
+        if (selectedType === "opc") {
+          const res = await loadReportOpc(token, data, periodId)
+          const opc = res.data as IOpc
+          await analyzeReport(opc?.id as number)
+        }
+
+        if (selectedType === "sgo") {
+          await loadReportSgo(token, data, periodId)
+        }
         reload(1)
         success("Rapport chargé avec succès ! ")
       }
@@ -65,36 +71,58 @@ function LoadReportModal({ token, success, error, currentWeek, reload }: Props):
           <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
         </form>
         <h3 className="font-bold text-lg ">Charger un repport hebdo.</h3>
-        <p className="py-4">
-          Le fichier doit être conforme aux exigéances du comité.
-        </p>
+        <p className="py-4">Le fichier doit être conforme aux exigéances du comité.</p>
 
-        <p className="py-4">
-          Choisir une Période dans la liste des Semaines de l&#39;année <b>{currentYear?.label}</b>
-        </p>
-        <select className="select select-bordered mb-2" value={selectedWeek} onChange={(e) => setSelectedWeek(e.target.value)}>
+        <p className="py-2">Choix du type de rapport à charger</p>
+        <select
+          className="select select-bordered mb-2 w-2/3"
+          value={selectedType}
+          onChange={(e) => setSelectedType(e.target.value)}
+        >
           <option></option>
-          {weeks.map((week) => (
-            <option key={(week?.id) as number + Math.random()} value={week.id}> {week.label} {' : Du ' + moment(week.start).format('DD MMM YYYY') + ' au ' + moment(week.end).format('DD MMM YYYY')}</option>
+          <option value="opc">Rapport OPC</option>
+          <option value="sgo">Rapport SGO</option>
+        </select>
+
+        <p className="py-2">Choisir une Périodicité du rapport</p>
+        <select
+          className="select select-bordered mb-2 w-2/3"
+          value={selectedPeriod}
+          onChange={(e) => setSelectedPeriod(e.target.value)}
+        >
+          <option></option>
+          {periodicities.map((periodicity) => (
+            <option key={(periodicity?.id as number) + Math.random()} value={periodicity.id}>
+              {' '}
+              {periodicity.label}
+            </option>
           ))}
         </select>
 
         <div className="flex w-full py-2 justify-between">
-          <input
-            type="file"
-            onChange={(e) => onFileChange(e)}
-            className="file-input file-input-bordered w-full max-w-xs"
-          />
-          {!loading && (
-            <button id="non-btn" onClick={() => onHandleImport()} className="btn btn-md bg-app-primary ml-2 text-white">
-              Charger
-            </button>
-          )}
-          {loading && (
-            <button id="non-btn" className="btn btn-md btn-disabled ml-2 text-white">
-              <span className="loading loading-spinner"></span>
-              Traitement
-            </button>
+          {selectedType.length > 0 && selectedPeriod.length > 0 && (
+            <div>
+              <input
+                type="file"
+                onChange={(e) => onFileChange(e)}
+                className="file-input file-input-bordered w-full max-w-xs"
+              />
+              {!loading && (
+                <button
+                  id="non-btn"
+                  onClick={() => onHandleImport()}
+                  className="btn btn-md bg-app-primary mt-2 text-white"
+                >
+                  Charger
+                </button>
+              )}
+              {loading && (
+                <button id="non-btn" className="btn btn-md btn-disabled mt-2 text-white">
+                  <span className="loading loading-spinner"></span>
+                  Traitement
+                </button>
+              )}
+            </div>
           )}
         </div>
         <div className="flex justify-end">

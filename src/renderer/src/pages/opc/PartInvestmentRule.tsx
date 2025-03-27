@@ -35,7 +35,7 @@ function PartInvestmentRule({ rules, types }: Props): JSX.Element {
                   rule?.investmentRuleType?.id === type.id && (
                     <tr className={rule?.label?.toLowerCase().includes('total') ? 'font-bold' : ''} key={Number(rule.id) + Math.random()}>
                       <td>{rule.label}</td>
-                      <td><NumericFormat value={Number(rule?.value?.toFixed(2))} displayType={'text'} thousandSeparator={true}  suffix={' XAF'} /> </td>
+                      <td><NumericFormat value={Number(rule?.value?.toFixed(2))} displayType={'text'} thousandSeparator={' '}  suffix={' XAF'} /> </td>
                       <td>{rule.percent ? Number(Number((rule.percent as number) * 100).toFixed(2)) + ' %' : 0 + ' %'}</td>
                     </tr>
                   )

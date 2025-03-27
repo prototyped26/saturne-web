@@ -1,8 +1,12 @@
-import { IAssetLine, IReqFindFundByRatio, IRequestHistoryLiquidationValue, IResponse } from '../type'
+import { IAssetLine, IReportComponent, IReqFindFundByRatio, IRequestHistoryLiquidationValue, IResponse } from '../type'
 import { apiRequest, apiRequestAuth, apiRequestAuthUpload } from '../apiClient'
 
 export const weekReport = async (token: string, page: number = 0): Promise<IResponse> => {
   return await apiRequestAuth<IResponse>('/opc/current-week' + (page !== null ? '?page=' + (page - 1) : ''), 'GET', token)
+}
+
+export const listReportSGO = async (token: string, page: number = 0): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/reports' + (page !== null ? '?page=' + (page - 1) : ''), 'GET', token)
 }
 
 export const getFollowRules = async (): Promise<IResponse> => {
@@ -21,8 +25,20 @@ export const getInvestmentRuleTypes = async (): Promise<IResponse> => {
   return await apiRequest<IResponse>('/opc/investment-rule-types', 'GET')
 }
 
-export const loadWeekReport = async (token: string, file: FormData, weekId: number | null): Promise<IResponse> => {
-  return await apiRequestAuthUpload<IResponse>('/opc/load/week/' + weekId, 'POST', token, file)
+export const loadReportOpc = async (token: string, file: FormData, periodicityId: number | null): Promise<IResponse> => {
+  return await apiRequestAuthUpload<IResponse>('/opc/load/' + periodicityId, 'POST', token, file)
+}
+
+export const loadReportSgo = async (token: string, file: FormData, periodicityId: number | null): Promise<IResponse> => {
+  return await apiRequestAuthUpload<IResponse>('/reports/load/' + periodicityId + "/0", 'POST', token, file)
+}
+
+export const deleteReportOpc = async (token: string, id: number | null): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/opc/' + id, 'DELETE', token)
+}
+
+export const deleteReportSGO = async (token: string, id: number | null): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/reports/' + id, 'DELETE', token)
 }
 
 export const getFollowFundGrouped = async (token: string): Promise<IResponse> => {
@@ -90,3 +106,45 @@ export const getActifSousGestion = (lines: IAssetLine[]): number | null => {
   })
   return val !== null ? Number(Number(val).toFixed(2)) : val
 }
+
+export const getTotalPassifReportSGO = (components: IReportComponent[]): number => {
+  let val = 0
+  components.forEach((component) => {
+    if (component?.label?.toUpperCase().includes("TOTAL PASSIF")) {
+      val = component?.value
+    }
+  })
+  return val
+}
+
+export const getTotalActifReportSGO = (components: IReportComponent[]): number => {
+  let val = 0
+  components.forEach((component) => {
+    if (component?.label?.toUpperCase().includes("TOTAL ACTIF")) {
+      val = component?.value
+    }
+  })
+  return val
+}
+
+export const getResultatNetReportSGO = (components: IReportComponent[]): number => {
+  let val = 0
+  components.forEach((component) => {
+    if (component?.label?.toUpperCase().includes("RESULTAT NET")) {
+      val = component?.value
+    }
+  })
+  return val
+}
+
+export const getCapitalSocialReportSGO = (components: IReportComponent[]): number => {
+  let val = 0
+  components.forEach((component) => {
+    if (component?.label?.toUpperCase().includes("CAPITAL SOCIAL")) {
+      val = component?.value
+    }
+  })
+  return val
+}
+
+

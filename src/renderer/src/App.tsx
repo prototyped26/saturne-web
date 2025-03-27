@@ -2,9 +2,24 @@ import { Link, useNavigate } from 'react-router'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from './store/store'
 import { useEffect, useState } from 'react'
-import { getCurrentInformation } from './services/systemService'
-import { IAssetLineType, IFollowRule, IInvestmentRuleType, IOpcvmType, ISysInfo, IWeek, IYear } from './type'
-import { setCurrentWeek, setCurrentYear, setWeeks } from './store/systemSlice'
+import { getCurrentInformation, getPeriodicities, getTypesComponentsReport } from './services/systemService'
+import {
+  IAssetLineType,
+  IFollowRule,
+  IInvestmentRuleType,
+  IOpcvmType, IPeriodicity,
+  ISysInfo,
+  ITypeComponentReport,
+  IWeek,
+  IYear
+} from './type'
+import {
+  setCurrentWeek,
+  setCurrentYear,
+  setPeriodicities,
+  setTypesComponentsReport,
+  setWeeks
+} from './store/systemSlice'
 import { getAssetLinesTypes, getFollowRules, getInvestmentRuleTypes, getOpcvmTypes } from './services/opcService'
 import { setAssetLineTypes, setFollowsRules, setInvestmentRuleTypes, setOpcvmTypes } from './store/opcSlice'
 import { getMessageErrorRequestEx } from './utils/errors'
@@ -33,6 +48,8 @@ function App(): JSX.Element {
     loadFollowsRules()
     loadOpcvmTypes()
     loadAssetLineTypes()
+    loadTypesComponents()
+    loadPeriodicities()
     loadInvestmentRuleTypes()
   }
 
@@ -52,6 +69,16 @@ function App(): JSX.Element {
   const loadOpcvmTypes = async (): Promise<void> => {
     const res = await getOpcvmTypes()
     dispatch(setOpcvmTypes(res.data as IOpcvmType[]))
+  }
+
+  const loadTypesComponents = async (): Promise<void> => {
+    const res = await getTypesComponentsReport()
+    dispatch(setTypesComponentsReport(res.data as ITypeComponentReport[]))
+  }
+
+  const loadPeriodicities = async (): Promise<void> => {
+    const res = await getPeriodicities()
+    dispatch(setPeriodicities(res.data as IPeriodicity[]))
   }
 
   const loadInvestmentRuleTypes = async (): Promise<void> => {

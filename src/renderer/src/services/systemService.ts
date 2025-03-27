@@ -13,6 +13,14 @@ export const getCurrentInformation = async (): Promise<IResponse> => {
   return await apiRequest<IResponse>('/system/informations', 'GET')
 }
 
+export const getPeriodicities = async (): Promise<IResponse> => {
+  return await apiRequest<IResponse>('/system/periodicities', 'GET')
+}
+
+export const getTypesComponentsReport = async (): Promise<IResponse> => {
+  return await apiRequest<IResponse>('/system/types-components', 'GET')
+}
+
 export const createYear = async (token: string | null, data: IYear): Promise<IResponse> => {
   return await apiRequestAuth<IResponse>('/system/years', 'POST', token, data)
 }

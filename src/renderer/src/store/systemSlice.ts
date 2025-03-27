@@ -1,4 +1,4 @@
-import { IWeek, IYear } from '../type'
+import { IPeriodicity, ITypeComponentReport, IWeek, IYear } from '../type'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 
@@ -8,7 +8,9 @@ type StateType = {
   weeks: IWeek[],
   week: IWeek | null,
   currentWeek: IWeek | null,
-  currentYear: IYear | null
+  currentYear: IYear | null,
+  periodicities: IPeriodicity[],
+  typesComponents: ITypeComponentReport[]
 }
 
 const initialeState: StateType = {
@@ -17,7 +19,9 @@ const initialeState: StateType = {
   weeks: [],
   week: null,
   currentWeek: null,
-  currentYear: null
+  currentYear: null,
+  periodicities: [],
+  typesComponents: []
 }
 
 export const systemSlice = createSlice({
@@ -58,8 +62,14 @@ export const systemSlice = createSlice({
     setWeeks: (state, action: PayloadAction<IWeek[]>) => {
       state.weeks = action.payload
     },
+    setPeriodicities: (state, action: PayloadAction<IPeriodicity[]>) => {
+      state.periodicities = action.payload
+    },
+    setTypesComponentsReport: (state, action: PayloadAction<ITypeComponentReport[]>) => {
+      state.typesComponents = action.payload
+    }
   }
 })
 
-export const { setCurrentYear, addYear, refreshYear, removeYear, addYears, setCurrentWeek, setWeek, setYear,setWeeks, setYears } = systemSlice.actions
+export const { setCurrentYear, addYear, refreshYear, removeYear, addYears, setCurrentWeek, setWeek, setYear,setWeeks, setYears, setPeriodicities, setTypesComponentsReport } = systemSlice.actions
 export default systemSlice.reducer

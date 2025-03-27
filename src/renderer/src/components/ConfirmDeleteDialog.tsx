@@ -41,7 +41,7 @@ function ConfirmDeleteDialog({ content, action, success, error }: Props): JSX.El
             <button id="non-btn-del" className="btn btn-sm">NON</button>
           </form>
           {loading && (
-            <button className="btn btn-sm text-white text-base btn-error ml-2">
+            <button className="btn btn-sm text-white text-base btn-error ml-2 disabled">
               <span className="loading loading-spinner"></span>
             </button>
           )}

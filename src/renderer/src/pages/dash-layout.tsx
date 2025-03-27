@@ -78,7 +78,7 @@ function DashLayout(): JSX.Element {
                   }
                 >
                   <FiFileText />
-                  <span className="ml-3">Rapports Hebdo.</span>
+                  <span className="ml-3">Rapports</span>
                 </NavLink>
               </li>
               <li>

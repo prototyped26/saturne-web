@@ -175,6 +175,7 @@ export interface IAssetLineType {
 export interface IOpc {
   id?: number,
   created_at?: string,
+  date?: string,
   estimated_at?: string,
   fundId?: number,
   fund?: IFund,
@@ -380,6 +381,7 @@ export interface IMandate {
   strategy?: string,
   risk_profile?: string,
   created_at?: string,
+  date?: string,
   opcvms?: Iopcvm[],
   assetLines?: IAssetLine[],
   week?: IWeek,
@@ -420,4 +422,36 @@ export interface IDashActifs {
 export interface IDashLiquidative {
   label: string,
   value: number
+}
+
+export interface IPeriodicity {
+  id: number,
+  label: string,
+  code: string
+}
+
+export interface ITypeComponentReport {
+  id: number,
+  label: string,
+  code: string
+}
+
+export interface IReportComponent {
+  id: number,
+  created_at: string,
+  label: string,
+  value: number,
+  value_1: number,
+  value_2: number,
+  type: ITypeComponentReport
+}
+
+export interface IReportSGO {
+  id: number,
+  created_at: string,
+  date: string,
+  intermediary: IIntermediary,
+  intermediary_check?: IIntermediary,
+  periodicity: IPeriodicity,
+  components: IReportComponent[]
 }

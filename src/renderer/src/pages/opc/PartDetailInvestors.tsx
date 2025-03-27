@@ -26,7 +26,7 @@ function PartDetailInvestors({ investors }: Props): JSX.Element {
                 <td>{investor.label}</td>
                 <td></td>
                 <td></td>
-                <td><NumericFormat value={Number(investor?.value?.toFixed(2))} displayType={'text'} thousandSeparator={true}  suffix={' XAF'} /> </td>
+                <td><NumericFormat value={Number(investor?.value?.toFixed(2))} displayType={'text'} thousandSeparator={' '}  suffix={' XAF'} /> </td>
                 <td>{investor.percent ? Number(Number((investor.percent as number) * 100).toFixed(2)) + ' %' : 0 + ' %'}</td>
               </tr>
             ))}

@@ -1,8 +1,8 @@
 import { IResponse } from '../type'
 import { apiRequestAuth, apiRequestAuthUpload } from '../apiClient'
 
-export const loadWeekMandateReport = async (token: string, file: FormData, weekId: number | null): Promise<IResponse> => {
-  return await apiRequestAuthUpload<IResponse>('/mandates/load/week/' + weekId, 'POST', token, file)
+export const loadWeekMandateReport = async (token: string, file: FormData, periodicityId: number | null): Promise<IResponse> => {
+  return await apiRequestAuthUpload<IResponse>('/mandates/load/' + periodicityId, 'POST', token, file)
 }
 
 export const weekMandates = async (token: string, page: number = 0): Promise<IResponse> => {

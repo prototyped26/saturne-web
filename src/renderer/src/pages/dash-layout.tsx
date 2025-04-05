@@ -192,7 +192,7 @@ function DashLayout(): JSX.Element {
       </aside>
 
       <div
-        className="flex flex-row items-center bg-app-gray justify-between fixed left-70 right-0  z-50 bg-white w-full border-gray-300 dark:border-gray-600 h-20 mb-2">
+        className="flex flex-row items-center bg-app-header justify-between fixed left-70 right-0  z-50 bg-white w-full border-gray-300 dark:border-gray-600 h-20 mb-2">
         <div className="flex mt-2 ml-4 justify-center items-center">
           <div>
             <img src={imageLogo} height="54" width="52" />
@@ -203,7 +203,7 @@ function DashLayout(): JSX.Element {
         </div>
 
         <div className="flex flex-row items-center text-white">
-          <label className="badge badge-app-secondary font-bold ml-4">
+          <label className="badge badge-app-secondary-2 font-bold ml-4">
             {' '}
             {user?.role?.label.toUpperCase()}{' '}
           </label>
@@ -236,4 +236,3 @@ function DashLayout(): JSX.Element {
 }
 
 export default DashLayout
-

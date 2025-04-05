@@ -8,3 +8,7 @@ export const loadWeekMandateReport = async (token: string, file: FormData, perio
 export const weekMandates = async (token: string, page: number = 0): Promise<IResponse> => {
   return await apiRequestAuth<IResponse>('/mandates/current-week' + (page === 0 ? '?page=' + page : '?page=' + (page - 1)), 'GET', token)
 }
+
+export const deleteMandate = async (token: string, id: number): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/mandates/' + id, 'DELETE', token)
+}

@@ -23,7 +23,7 @@ function ReportHebdo(): JSX.Element {
   const [currentPage, setCurrentPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
   const [numberPage, setNumberPage] = useState(0)
-  const [tableSize, setTableSize] = useState<number[]>()
+  const [tableSize, setTableSize] = useState<number[]>([5, 10, 20, 50, 100])
   const [loading, setLoading] = useState(true)
   const [current, setCurrent] = useState("opc")
 
@@ -34,10 +34,19 @@ function ReportHebdo(): JSX.Element {
 
   useEffect(() => {
     if (currentPage !== undefined && currentPage !== null) {
-      if (current === "opc") loadOpcsOfWeek(currentPage)
-      if (current === "sgo") loadReportSgo(currentPage)
+      resetLoad()
     }
   }, [currentPage])
+
+  const reloadPage = (page: number): void => {
+    setCurrentPage(page)
+    resetLoad()
+  }
+
+  const resetLoad = (): void => {
+      if (current === "opc") loadOpcsOfWeek(currentPage)
+      if (current === "sgo") loadReportSgo(currentPage)
+  }
 
   const loadOpcsOfWeek = async (page: number = 0): Promise<void> => {
     try {
@@ -138,7 +147,7 @@ function ReportHebdo(): JSX.Element {
         success={showSuccessToast}
         error={showErrorToast}
         currentWeek={currentWeek as IWeek}
-        reload={loadOpcsOfWeek}
+        reload={reloadPage}
       />
     </div>
   )

@@ -8,6 +8,11 @@
   background-color: #595959;
 }
 
+
+ .bg-app-header {
+   background-color: #25889F;
+ }
+
 .bg-app-gray-second {
   background-color: #dad8d9;
 }
@@ -63,6 +68,17 @@
   border-color: transparent;
   --tw-bg-opacity: 1;
   background-color:  #1A8E8E;
+  --tw-text-opacity: 1;
+  color: white;
+  border-radius: 5px !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
+.badge-app-secondary-2 {
+  border-color: transparent;
+  --tw-bg-opacity: 1;
+  background-color: #092b2b;
   --tw-text-opacity: 1;
   color: white;
   border-radius: 5px !important;

@@ -1,20 +1,21 @@
 import { useNavigate } from 'react-router'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store/store'
-import { IAssetLine, IMandate, IWeek } from '../../type'
+import { IAssetLine, IMandate, IOpc, IWeek } from '../../type'
 import { Fragment, useEffect, useState } from 'react'
-import { weekMandates } from '../../services/mandateService'
-import { setMandate, setMandates } from '../../store/mandateSlice'
+import { deleteMandate, weekMandates } from '../../services/mandateService'
+import { removeMandate, setMandate, setMandates } from '../../store/mandateSlice'
 import { toast, ToastContainer } from 'react-toastify'
 import { getMessageErrorRequestEx } from '../../utils/errors'
 import LoadingTable from '../../components/LoadingTable'
 import NoDataList from '../../components/NoDataList'
 import moment from 'moment/moment'
 import { NumericFormat } from 'react-number-format'
-import { getActifNet} from '../../services/opcService'
+import { getActifNet } from '../../services/opcService'
 import { FiEye, FiTrash } from 'react-icons/fi'
 import LoadMandateModal from './load-mandate-modal'
 import TableNavigationFooter from '../../components/TableNavigationFooter'
+import ConfirmDeleteDialog from '../../components/ConfirmDeleteDialog'
 
 function MandatesPage(): JSX.Element {
   const navigate = useNavigate()
@@ -33,6 +34,9 @@ function MandatesPage(): JSX.Element {
   const [perPage, setPerPage] = useState(10)
   const [numberPage, setNumberPage] = useState(0)
   const [tableSize, setTableSize] = useState<number[]>([])
+
+  const [contentDelete, setContentDelete] = useState("")
+  const [toDelete, setToDelete] = useState<IMandate | null>(null)
 
   useEffect(() => {
     loadMandates()
@@ -80,6 +84,18 @@ function MandatesPage(): JSX.Element {
   const onHandleUpReport = async (): Promise<void> => {
     // @ts-ignore show is function off DiasyUI
     document?.getElementById("modal-load-report-mandate")?.showModal()
+  }
+
+  const onHandleConfirmDelete = (mandate: IMandate): void => {
+    setToDelete(mandate)
+    setContentDelete("Le mandat " + mandate?.customer?.label + " du " + moment(mandate.date).format("DD/MM/YYYY") + " ?")
+    // @ts-ignore Diasy UI
+    document?.getElementById('modal')?.showModal()
+  }
+
+  const onHandleDelete = async (): Promise<void> => {
+    await deleteMandate(token as string, toDelete?.id as number)
+    dispatch(removeMandate(toDelete as IOpc))
   }
 
   return (
@@ -235,7 +251,7 @@ function MandatesPage(): JSX.Element {
                             <button onClick={() => onHandelSee(mandate)} className="btn btn-sm">
                               <FiEye />
                             </button>
-                            <button className="btn btn-sm btn-error ml-2 font-bold text-white">
+                            <button className="btn btn-sm btn-error ml-2 font-bold text-white" onClick={() => onHandleConfirmDelete(mandate)}>
                               <FiTrash />
                             </button>
                           </div>
@@ -263,6 +279,13 @@ function MandatesPage(): JSX.Element {
         success={showSuccessToast}
         error={showErrorToast}
         reload={loadMandates}
+      />
+
+      <ConfirmDeleteDialog
+        content={contentDelete}
+        action={onHandleDelete}
+        success={showSuccessToast}
+        error={showErrorToast}
       />
     </div>
   )

@@ -455,3 +455,12 @@ export interface IReportSGO {
   periodicity: IPeriodicity,
   components: IReportComponent[]
 }
+
+export interface IFileElement {
+  ligne: number,
+  file: File,
+  observation: string,
+  loading: boolean,
+  type: string,
+  success: boolean
+}

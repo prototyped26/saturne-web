@@ -168,12 +168,6 @@ function LoadReportModal({ token, success, error, currentWeek, reload }: Props):
                     onChange={(e) => onFileChange(e)}
                     className="file-input file-input-bordered w-full max-w-xs"
                   />
-                  {loading && (
-                    <button id="non-btn" className="btn btn-md btn-disabled mt-2 text-white">
-                      <span className="loading loading-spinner"></span>
-                      Traitement
-                    </button>
-                  )}
                 </div>
               )}
             </div>

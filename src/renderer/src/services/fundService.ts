@@ -1,9 +1,13 @@
-import { IAssetLine, IFund, IOpc, IOperation, IResponse, IShareholder } from '../type'
+import { IAssetLine, IFund, IOpc, IOperation, IResponse, ISearchFund, IShareholder } from '../type'
 import { apiRequestAuth, apiRequestAuthUpload } from '../apiClient'
 import { getActifNet, getValeurLiquid } from './opcService'
 
 export const getFunds = async (token: string): Promise<IResponse> => {
   return await apiRequestAuth<IResponse>('/funds', 'GET', token)
+}
+
+export const searchFunds = async (token: string, page: number = 0, data: ISearchFund): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/funds/search' + (page !== null ? '?page=' + (page - 1) : ''), 'POST', token, data)
 }
 
 export const getClassifications = async (token: string): Promise<IResponse> => {

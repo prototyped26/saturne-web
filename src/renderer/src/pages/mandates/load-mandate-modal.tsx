@@ -11,7 +11,7 @@ type Props = {
   currentWeek: IWeek,
   success: (m) => void,
   error: (m) => void,
-  reload: () => void
+  reload: (page: number) => void
 }
 
 function LoadMandateModal({ token, currentWeek, success, error, reload }: Props): JSX.Element {

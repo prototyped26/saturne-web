@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store/store'
-import { IClassification, IDepository, IDistribution, IFund, IIntermediary, ITypeOpc } from '../../type'
+import { IClassification, IDepository, IDistribution, IFund, IIntermediary, ISearchFund, ITypeOpc } from '../../type'
 import { useEffect, useState } from 'react'
 import { getSgos } from '../../services/intermediaryService'
 import { setIntermediaries } from '../../store/intermediarySlice'
@@ -12,8 +12,8 @@ import {
   getClassifications,
   getDepositaries,
   getDistributions,
-  getFunds,
-  getTypesOpc
+  getTypesOpc,
+  searchFunds
 } from '../../services/fundService'
 import {
   removeFund,
@@ -31,6 +31,7 @@ import ConfirmDeleteDialog from '../../components/ConfirmDeleteDialog'
 import AlertNotificationSuccess from '../../components/AlertNotificationSuccess'
 import { setSuccess } from '../../store/informationSlice'
 import ImportFundModal from './import-fund-modal'
+import TableNavigationFooter from '@renderer/components/TableNavigationFooter'
 
 function FundsPage() : JSX.Element {
   const navigate = useNavigate()
@@ -55,7 +56,15 @@ function FundsPage() : JSX.Element {
   const [toDelete, setToDelete] = useState<IFund | null>(null)
   const [search, setSearch] = useState('')
 
+  const [total, setTotal] = useState(0)
+  const [perPage, setPerPage] = useState(20)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [numberPage, setNumberPage] = useState(0)
+  //const [tableSize, setTableSize] = useState<number[]>([5, 10, 20, 50, 100])
+  const [searchOptions, setSearchOptions] = useState<ISearchFund>({intermediary_id: null, term: null})
+
   useEffect(() => {
+    setPerPage(20)
     loadClassifications(token as string)
     loadSgos(token as string)
     loadTypesOpc(token as string)
@@ -73,10 +82,17 @@ function FundsPage() : JSX.Element {
     if (success !== null) setTimeout(() => dispatch(setSuccess(null)), 5000)
   })
 
-  const loadFunds = async (t: string): Promise<void> => {
+  useEffect(() => {
+    loadFunds(token as string, currentPage)
+  }, [searchOptions])
+
+  const loadFunds = async (t: string, page: number = 0): Promise<void> => {
+    setLoading(true)
     try {
-      const res = await getFunds(t)
-      dispatch(setFunds(res.data))
+      const res = await searchFunds(t, page, searchOptions)
+      dispatch(setFunds(res.data.content as IFund[]))
+      setTotal(res.data.totalElements)
+      setNumberPage(res.data.totalPages)
     } catch (e) {
       toast.error(getMessageErrorRequestEx(e), {
         theme: 'colored'
@@ -198,6 +214,8 @@ function FundsPage() : JSX.Element {
     if (search?.length === 0) setSearch('')
 
     //setSearchLoading(true)
+    const res = searchOptions
+    setSearchOptions({ intermediary_id: res.intermediary_id, term: search })
 
     try {
       //const res = await searchIntermediaries(token as string, search)
@@ -207,6 +225,22 @@ function FundsPage() : JSX.Element {
     } finally {
       //setSearchLoading(false)
     }
+  }
+
+  const setSelectedIntermediary = (val: string): void => {
+    const res = searchOptions
+    if (val.length > 0) {
+      setSearchOptions({ intermediary_id: Number.parseInt(val), term: res.term })
+    } else {
+      setSearchOptions({ intermediary_id: null, term: res.term })
+    }
+  }
+
+  const onHandleChangePage = (page: number): void => {
+    //console.log(page)
+    setCurrentPage(page)
+    const res = searchOptions
+    setSearchOptions({ intermediary_id: res.intermediary_id, term: res.term })
   }
 
   return (
@@ -235,6 +269,24 @@ function FundsPage() : JSX.Element {
 
       <div className="grid grid-cols-1 gap-4 mb-4">
         <div className="border-b-2 border-app-primary flex items-center pb-4">
+        <div className="flex mr-2 w-1/3">
+            <label className="form-control w-full max-w-xs">
+              <div className="label">
+                <span className="label-text">Tri par SGO</span>
+              </div>
+              <select
+                onChange={(e) => setSelectedIntermediary(e.target.value)}
+                className="select select-bordered"
+              >
+                <option value="">Tous</option>
+                {intermediaries.map((sgo) => (
+                  <option key={sgo.id} value={sgo.id}>
+                    {sgo.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
           <div className="flex mt-8 w-full">
             <input onChange={(e) => onHandleTermChange(e.target.value)} type="text" placeholder="Recherche..."
                    className="input input-bordered w-1/3" />
@@ -387,76 +439,13 @@ function FundsPage() : JSX.Element {
                   </tbody>
                 </table>
               </div>
-              <nav
-                className="flex flex-col items-start justify-between p-4 space-y-3 md:flex-row md:items-center md:space-y-0"
-                aria-label="Table navigation"
-              >
-                <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                  Affichage
-                  <span className="font-semibold text-gray-900 dark:text-white">1 - 10</span>
-                  sur
-                  <span className="font-semibold text-gray-900 dark:text-white">1000</span>
-                </span>
-                <ul className="inline-flex items-stretch -space-x-px">
-                  <li>
-                    <a
-                      href="#"
-                      className="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    >
-                      <span className="sr-only">Previous</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="flex items-center justify-center px-3 py-2 text-sm leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    >
-                      1
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="flex items-center justify-center px-3 py-2 text-sm leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    >
-                      2
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      aria-current="page"
-                      className="z-10 flex items-center justify-center px-3 py-2 text-sm leading-tight border text-primary-600 bg-primary-50 border-primary-300 hover:bg-primary-100 hover:text-primary-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
-                    >
-                      3
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="flex items-center justify-center px-3 py-2 text-sm leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    >
-                      ...
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="flex items-center justify-center px-3 py-2 text-sm leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    >
-                      100
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    >
-                      <span className="sr-only">Next</span>
-                    </a>
-                  </li>
-                </ul>
-              </nav>
+              <TableNavigationFooter
+                total={total}
+                current={currentPage}
+                perPage={perPage}
+                pages={numberPage}
+                action={onHandleChangePage}
+              />
             </div>
 
             <ConfirmDeleteDialog

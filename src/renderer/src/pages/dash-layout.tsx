@@ -51,7 +51,7 @@ function DashLayout(): JSX.Element {
         id="drawer-navigation"
       >
         <div className="overflow-y-auto py-6 h-full bg-app-gray-second dark:bg-gray-800 ">
-          <p className="border-t-8 border-app-secondary mt-12">{''}</p>
+          <p className=" mt-14">{''}</p>
           <div className="px-3">
             <p className="text-black font-bold border-b border-gray-500 pb-2 mt-1 mb-1">Menu Principal</p>
             <ul className="space-y-2">

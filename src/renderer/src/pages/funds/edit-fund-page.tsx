@@ -5,8 +5,8 @@ import { AppDispatch, RootState } from '../../store/store'
 import { IClassification, IDepository, IDistribution, IFund, IIntermediary, ITypeOpc } from '../../type'
 import { useEffect, useState } from 'react'
 import moment from 'moment'
-import { createFund } from '../../services/fundService'
-import { addFund } from '../../store/fundSlice'
+import { updateFund } from '../../services/fundService'
+import { refreshFund } from '../../store/fundSlice'
 import { getMessageErrorRequestEx } from '../../utils/errors'
 
 function EditFundPage(): JSX.Element {
@@ -63,8 +63,8 @@ function EditFundPage(): JSX.Element {
     setLoading(true)
 
     try {
-      const res = await createFund(token as string, f)
-      dispatch(addFund(res.data))
+      const res = await updateFund(token as string, fund?.id as number, f)
+      dispatch(refreshFund(res.data))
       toast.success('Mise à jour du fond effectuée avec succès !', { theme: 'colored' })
     } catch (e) {
       toast.error(getMessageErrorRequestEx(e), { theme: 'colored' })

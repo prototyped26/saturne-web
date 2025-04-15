@@ -464,3 +464,8 @@ export interface IFileElement {
   type: string,
   success: boolean
 }
+
+export interface ISearchFund {
+  intermediary_id: number | null,
+  term: string | null
+}

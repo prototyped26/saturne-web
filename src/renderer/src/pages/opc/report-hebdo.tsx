@@ -2,13 +2,16 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store/store'
 import { toast, ToastContainer } from 'react-toastify'
 import { useEffect, useState } from 'react'
-import { IOpc, IReportSGO, IWeek } from '../../type'
-import { listReportSGO, weekReport } from '../../services/opcService'
+import { IIntermediary, IOpc, IReportSGO, ISearchOpc, IWeek } from '../../type'
+import { listReportDepositaries, listReportSGO, weekReport } from '../../services/opcService'
 import { setOpcs, setReportsSgo } from '../../store/opcSlice'
 import { getMessageErrorRequestEx } from '../../utils/errors'
 import LoadReportModal from './load-report-modal'
 import SectionOpcReport from './section/SectionOpcReport'
 import SectionSgoReport from './section/SectionSgoReport'
+import { getIntermediaries } from '@renderer/services/intermediaryService'
+import { setIntermediaries } from '@renderer/store/intermediarySlice'
+import SectionDepositaryReport from './section/SectionDepositaryReport'
 
 function ReportHebdo(): JSX.Element {
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
@@ -26,9 +29,11 @@ function ReportHebdo(): JSX.Element {
   const [tableSize, setTableSize] = useState<number[]>([5, 10, 20, 50, 100])
   const [loading, setLoading] = useState(true)
   const [current, setCurrent] = useState("opc")
+  const [depositaires, setDepositaires] = useState<IIntermediary[]>([])
 
   useEffect(() => {
     //loadOpcsOfWeek()
+    loadDepositaries()
     setTableSize([5, 10, 20, 50, 100])
   }, [])
 
@@ -46,11 +51,17 @@ function ReportHebdo(): JSX.Element {
   const resetLoad = (): void => {
       if (current === "opc") loadOpcsOfWeek(currentPage)
       if (current === "sgo") loadReportSgo(currentPage)
+      if (current === "depositaire") loadReportDepositaries(currentPage)
   }
 
   const loadOpcsOfWeek = async (page: number = 0): Promise<void> => {
+    const data: ISearchOpc = {
+      date: null,
+      periodicity_id: null,
+      term: null
+    }
     try {
-      const res = page ? await weekReport(token as string, page) : await weekReport(token as string)
+      const res = await weekReport(token as string, page, data)
       //console.log(res.data)
       dispatch(setOpcs(res.data.content as IOpc[]))
       setTotal(res.data.totalElements)
@@ -76,7 +87,40 @@ function ReportHebdo(): JSX.Element {
     }
   }
 
-  const onHandleChangePartDetail = (step: 'opc' | 'sgo' ): void => {
+  const loadReportDepositaries = async (page: number = 0): Promise<void> => {
+    try {
+      const res = page ? await listReportDepositaries(token as string, page) : await listReportDepositaries(token as string)
+      //console.log(res.data)
+      dispatch(setReportsSgo(res.data.content as IReportSGO[]))
+      setTotal(res.data.totalElements)
+      setNumberPage(res.data.totalPages)
+    } catch (e) {
+      toast.error(getMessageErrorRequestEx(e), { theme: 'colored' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadDepositaries = async (): Promise<void> => {
+     try {
+      const res = await getIntermediaries(token as string)
+      dispatch(setIntermediaries(res.data))
+      const list: IIntermediary[] = res.data
+      const dep: IIntermediary[] = []
+      list.forEach((intermediary) => {
+      if (intermediary.category?.label?.toLowerCase().includes("positaire")) {
+        dep.push(intermediary)
+      }
+      })
+      setDepositaires(dep)
+    } catch (e) {
+    toast.error(getMessageErrorRequestEx(e), { theme: 'colored' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const onHandleChangePartDetail = (step: 'opc' | 'sgo' | 'depositaire'): void => {
     setCurrentPage(0)
     setCurrent(step)
   }
@@ -130,15 +174,26 @@ function ReportHebdo(): JSX.Element {
           className={current === 'sgo' ? 'btn btn-sm bg-app-primary text-white' : 'btn btn-sm'}
         >Rapports SGO
         </button>
+        <button
+          onClick={() => onHandleChangePartDetail('depositaire')}
+          className={current === 'depositaire' ? 'btn btn-sm bg-app-primary text-white' : 'btn btn-sm'}
+        >Rapports Dépositaires
+        </button>
       </div>
 
       {current === "opc" && (
         <SectionOpcReport token={token as string} loading={loading} total={total} currentPage={currentPage} perPage={perPage} setPerPage={setPerPage}
-                          numberPage={numberPage} tableSize={tableSize as number[]} changePage={onHandleChangePage} showSuccess={showSuccessToast} showError={showErrorToast} />
+                          numberPage={numberPage} tableSize={tableSize as number[]} changePage={onHandleChangePage} showSuccess={showSuccessToast} 
+                          showError={showErrorToast} setLoading={setLoading} setTotal={setTotal} setNumberPage={setNumberPage} />
       )}
 
       {current === "sgo" && (
         <SectionSgoReport token={token as string} loading={loading} total={total} currentPage={currentPage} perPage={perPage} setPerPage={setPerPage}
+                          numberPage={numberPage} tableSize={tableSize as number[]} changePage={onHandleChangePage} showSuccess={showSuccessToast} showError={showErrorToast} />
+      )}
+
+      {current === "depositaire" && (
+        <SectionDepositaryReport token={token as string} loading={loading} total={total} currentPage={currentPage} perPage={perPage} setPerPage={setPerPage}
                           numberPage={numberPage} tableSize={tableSize as number[]} changePage={onHandleChangePage} showSuccess={showSuccessToast} showError={showErrorToast} />
       )}
 
@@ -148,6 +203,7 @@ function ReportHebdo(): JSX.Element {
         error={showErrorToast}
         currentWeek={currentWeek as IWeek}
         reload={reloadPage}
+        depositaires={depositaires}
       />
     </div>
   )

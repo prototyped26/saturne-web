@@ -1,12 +1,16 @@
-import { IAssetLine, IReportComponent, IReqFindFundByRatio, IRequestHistoryLiquidationValue, IResponse } from '../type'
+import { IAssetLine, IReportComponent, IReqFindFundByRatio, IRequestHistoryLiquidationValue, IResponse, ISearchOpc } from '../type'
 import { apiRequest, apiRequestAuth, apiRequestAuthUpload } from '../apiClient'
 
-export const weekReport = async (token: string, page: number = 0): Promise<IResponse> => {
-  return await apiRequestAuth<IResponse>('/opc/current-week' + (page !== null ? '?page=' + (page - 1) : ''), 'GET', token)
+export const weekReport = async (token: string, page: number = 0, data?: ISearchOpc): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/opc/current-week' + (page !== null ? '?page=' + (page - 1) : ''), 'POST', token, data)
 }
 
 export const listReportSGO = async (token: string, page: number = 0): Promise<IResponse> => {
   return await apiRequestAuth<IResponse>('/reports' + (page !== null ? '?page=' + (page - 1) : ''), 'GET', token)
+}
+
+export const listReportDepositaries = async (token: string, page: number = 0): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/reports/depositaries' + (page !== null ? '?page=' + (page - 1) : ''), 'GET', token)
 }
 
 export const getFollowRules = async (): Promise<IResponse> => {
@@ -29,8 +33,8 @@ export const loadReportOpc = async (token: string, file: FormData, periodicityId
   return await apiRequestAuthUpload<IResponse>('/opc/load/' + periodicityId, 'POST', token, file)
 }
 
-export const loadReportSgo = async (token: string, file: FormData, periodicityId: number | null): Promise<IResponse> => {
-  return await apiRequestAuthUpload<IResponse>('/reports/load/' + periodicityId + "/0", 'POST', token, file)
+export const loadReportSgo = async (token: string, file: FormData, periodicityId: number | null, depositary: number = 0): Promise<IResponse> => {
+  return await apiRequestAuthUpload<IResponse>('/reports/load/' + periodicityId + "/" + depositary, 'POST', token, file)
 }
 
 export const deleteReportOpc = async (token: string, id: number | null): Promise<IResponse> => {

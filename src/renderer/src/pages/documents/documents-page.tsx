@@ -1,8 +1,8 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store/store'
-import { IDocument } from '../../type'
+import { IDocument, IFolder } from '../../type'
 import { useEffect, useState } from 'react'
-import { downloadDocument, getDocuments } from '../../services/documentService'
+import { downloadDocument, getDocuments, getFolders } from '../../services/documentService'
 import { setDocuments } from '../../store/documentSlice'
 import { FiDownload } from 'react-icons/fi'
 import LoadingTable from '../../components/LoadingTable'
@@ -11,6 +11,9 @@ import moment from 'moment'
 import { toast, ToastContainer } from 'react-toastify'
 import { getMessageErrorRequestEx } from '../../utils/errors'
 import fileDownload from 'js-file-download'
+import { FaFile, FaFolder, FaTrash } from 'react-icons/fa6'
+import ModalCreateFolder from './ModalCreateFolder'
+import ModalUploadDocument from './ModalUploadDocument'
 
 function DocumentsPage(): JSX.Element {
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
@@ -20,17 +23,44 @@ function DocumentsPage(): JSX.Element {
 
   const token: string | null = useAppSelector((state) => state.user.token)
   const documents: IDocument[] = useAppSelector((state) => state.document.documents)
+  
+  const [folders, setFolders] = useState<IFolder[]>([])
+  const [parent, setParent] = useState<IFolder | null>(null)
 
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadDocuments(token)
+   resetFolders()
   }, [])
+
+  const resetFolders = async (): Promise<void> => {
+    loadDocuments(token)
+    loadFolders()
+  }
+
+  const showSuccessToast = (msg: string): void => {
+    toast.success(msg, { theme: 'colored'})
+  }
+
+  const showErrorToast = (msg: string): void => {
+    toast.error(msg, { theme: 'colored'})
+  }
 
   const loadDocuments = async (t: string | null): Promise<void> => {
     try {
       const res = await getDocuments(t as string)
       dispatch(setDocuments(res.data as IDocument[]))
+    } catch (e) {
+      console.log(e)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadFolders = async (): Promise<void> => {
+    try {
+      const res = await getFolders(token as string)
+      setFolders(res.data)
     } catch (e) {
       console.log(e)
     } finally {
@@ -47,6 +77,20 @@ function DocumentsPage(): JSX.Element {
     }
   }
 
+  const onHandleUpFolder = async (): Promise<void> => {
+    // @ts-ignore daisyUI
+    document?.getElementById("modal-create-folder")?.showModal()
+  }
+
+  const onHandleUpReport = async (): Promise<void> => {
+    // @ts-ignore daisyUI
+    document?.getElementById("modal-load-document")?.showModal()
+  }
+
+  const onChangeDir = (e): void => {
+    e.preventDefault()
+  }
+
   return (
     <div className="border bg-white rounded-lg dark:border-gray-50 h-full p-6 mb-4 z-20">
       <ToastContainer />
@@ -59,8 +103,13 @@ function DocumentsPage(): JSX.Element {
             Liste des documents
           </p>
         </div>
-        <div className="flex  justify-end ">
-
+        <div className="flex gap-3 justify-end ">
+          <button onClick={() => onHandleUpFolder()} className="btn btn-md btn-outline ml-2">
+            <FaFolder /> Nouveau dossier
+          </button>
+          <button onClick={() => onHandleUpReport()} className="btn btn-md btn-outline ml-2">
+            <FaFile /> Charger un document
+          </button>
         </div>
       </div>
 
@@ -100,6 +149,9 @@ function DocumentsPage(): JSX.Element {
                       </div>
                     </th>
                     <th scope="col" className="px-4 py-3">
+                      
+                    </th>
+                    <th scope="col" className="px-4 py-3">
                       Document
                     </th>
                     <th scope="col" className="px-4 py-3">
@@ -112,6 +164,48 @@ function DocumentsPage(): JSX.Element {
                   </tr>
                   </thead>
                   <tbody>
+                  {folders.map((folder) => (
+                     <tr
+                        key={Math.random() * Date.now()}
+                        className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                      <td className="w-4 px-4 py-3">
+                        <div className="flex items-center">
+                          <input
+                            id="checkbox-table-search-1"
+                            type="checkbox"
+                            className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                          />
+                          <label htmlFor="checkbox-table-search-1" className="sr-only">
+                            checkbox
+                          </label>
+                        </div>
+                      </td>
+                      <th
+                        className="w-4 px-4 py-2 font-medium"
+                      >
+                        <FaFolder size={16} />
+                      </th>
+                      <td
+                        scope="row"
+                        className="flex items-center px-4 py-2 font-bold text-gray-900 whitespace-nowrap dark:text-white"
+                      >
+                        <a href="#" onClick={onChangeDir}> {folder?.label.toUpperCase()}</a>
+                       
+                      </td>
+                      <td className="px-4 py-2">
+                        
+                      </td>
+                      <td className="px-4 py-2">{moment(folder?.created_at).format('DD MMM YYYY')}</td>
+                      <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <div className="flex justify-end">
+                          <button className="btn btn-sm">
+                            <FaTrash />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                   {documents.map((document) => (
                     <tr
                       key={document.id}
@@ -130,11 +224,16 @@ function DocumentsPage(): JSX.Element {
                         </div>
                       </td>
                       <th
+                        className="w-4 px-4 py-2 font-medium"
+                      >
+                        <FaFile />
+                      </th>
+                      <td
                         scope="row"
                         className="flex items-center px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                       >
                         {document?.label}
-                      </th>
+                      </td>
                       <td className="px-4 py-2">
                           <span className="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
                             {document?.type}
@@ -155,11 +254,12 @@ function DocumentsPage(): JSX.Element {
               </div>
 
             </div>
-
           </div>
         </div>
       )}
 
+      <ModalCreateFolder token={token as string} error={showErrorToast} parent={parent} success={showSuccessToast} reload={resetFolders} />
+      <ModalUploadDocument token={token as string} error={showErrorToast} parent={parent} success={showSuccessToast} reload={resetFolders} />
     </div>
   )
 }

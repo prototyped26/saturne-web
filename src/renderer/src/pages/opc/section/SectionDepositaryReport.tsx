@@ -1,18 +1,23 @@
-import LoadingTable from '../../../components/LoadingTable'
-import NoDataList from '../../../components/NoDataList'
-import { Fragment, useState } from 'react'
-import moment from 'moment/moment'
-import { NumericFormat } from 'react-number-format'
-import { deleteReportOpc, getActifNet, getActifSousGestion, getValeurLiquid, weekReport } from '../../../services/opcService'
-import { IAssetLine, IOpc, IPeriodicity, ISearchOpc } from '../../../type'
-import { FiEye, FiSearch, FiTrash } from 'react-icons/fi'
-import TableNavigationFooter from '../../../components/TableNavigationFooter'
-import ConfirmDeleteDialog from '../../../components/ConfirmDeleteDialog'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../../store/store'
-import { removeOpc, setOpc, setOpcs } from '../../../store/opcSlice'
+import { IReportSGO } from '../../../type'
+import { Fragment, useState } from 'react'
+import { removeReportSgo, setReportSgo } from '../../../store/opcSlice'
+import moment from 'moment'
+import {
+  deleteReportSGO,
+  getCapitalSocialReportSGO, getResultatNetReportSGO,
+  getTotalActifReportSGO,
+  getTotalPassifReportSGO
+} from '../../../services/opcService'
+import LoadingTable from '../../../components/LoadingTable'
+import NoDataList from '../../../components/NoDataList'
+import { FiEye, FiTrash } from 'react-icons/fi'
+import TableNavigationFooter from '../../../components/TableNavigationFooter'
+import ConfirmDeleteDialog from '../../../components/ConfirmDeleteDialog'
+import { NumericFormat } from 'react-number-format'
 import { useNavigate } from 'react-router'
-import { getMessageErrorRequestEx } from '@renderer/utils/errors'
+import { FaTriangleExclamation } from 'react-icons/fa6'
 
 type Props = {
   token: string,
@@ -25,141 +30,48 @@ type Props = {
   tableSize: number[],
   changePage: (page: number) => void,
   showSuccess: (t: string) => void,
-  showError: (t: string) => void,
-  setLoading: (v: boolean) => void,
-  setTotal: (page: number) => void,
-  setNumberPage: (page: number) => void,
+  showError: (t: string) => void
 }
 
-function SectionOpcReport({ token, loading, total, currentPage, perPage, setPerPage, numberPage, tableSize, changePage, showError, showSuccess, setLoading, setTotal, setNumberPage } : Props ): JSX.Element {
+function SectionSgoReport({ token, loading, total, currentPage, perPage, setPerPage, numberPage, tableSize, changePage, showError, showSuccess } : Props): JSX.Element {
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
   const navigate = useNavigate()
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const useAppDispatch = () => useDispatch<AppDispatch>()
   const dispatch = useAppDispatch()
 
-  const opcs: IOpc[] = useAppSelector((state) => state.opc.opcs)
-  const periodicities: IPeriodicity[] = useAppSelector((state) => state.system.periodicities)
+  const reports: IReportSGO[] = useAppSelector((state) => state.opc.reportsSgo)
 
   const [contentDelete, setContentDelete] = useState("")
-  const [toDelete, setToDelete] = useState<IOpc | null>(null)
-  const [search, setSearch] = useState<ISearchOpc>({ periodicity_id: null, date: null, term: null })
-  const [labelPeriod, setLabelPeriod] = useState("")
+  const [toDelete, setToDelete] = useState<IReportSGO | null>(null)
 
-
-  const onHandleDetail = (opc: IOpc): void => {
-    dispatch(setOpc(opc))
-    navigate('details')
+  const onHandleDetail = (report: IReportSGO): void => {
+    dispatch(setReportSgo(report))
+    navigate("sgo")
   }
 
-  const loadOpcsOfWeek = async (): Promise<void> => {
-      try {
-        const res =  await weekReport(token as string, currentPage, search)
-        //console.log(res.data)
-        dispatch(setOpcs(res.data.content as IOpc[]))
-        setTotal(res.data.totalElements)
-        setNumberPage(res.data.totalPages)
-      } catch (e) {
-        showError(getMessageErrorRequestEx(e))
-      } finally {
-        setLoading(false)
-      }
-    }
-
-  const onHandleConfirmDelete = (opc: IOpc): void => {
-    setToDelete(opc)
-    setContentDelete("Le rapport " + opc?.fund?.label + " du " + moment(opc.date).format("DD/MM/YYYY") + " ?")
+  const onHandleConfirmDelete = (report: IReportSGO): void => {
+    setToDelete(report)
+    setContentDelete("Le rapport du dépositaire " + report?.intermediary?.label + " du " + moment(report.date).format("DD/MM/YYYY") + " ?")
     // @ts-ignore Diasy UI
     document?.getElementById('modal')?.showModal()
   }
 
   const onHandleDelete = async (): Promise<void> => {
-    await deleteReportOpc(token as string, toDelete?.id as number)
-    dispatch(removeOpc(toDelete as IOpc))
-  }
-
-  const onHandleChangePeriodicity = (val): void => {
-    const data = search
-    setLabelPeriod(val)
-    if (val.length > 0) {
-      setSearch({ periodicity_id: Number.parseInt(val), date: data.date, term: data.term })
-    } else {
-      setSearch({ periodicity_id: null, date: data.date, term: data.term })
-    }
-  }
-
-  const onHandleChangeTerm = (val): void => {
-    const data = search
-    if (val.length > 0) {
-      setSearch({ periodicity_id: search.periodicity_id, date: data.date, term: val })
-    } else {
-      setSearch({ periodicity_id: search.periodicity_id, date: data.date, term: null })
-    }
-  }
-
-  const onHandleChangeDate = (val): void => {
-    const data = search
-    if (val.length > 0) {
-      setSearch({ periodicity_id: search.periodicity_id, date: val, term: data.term })
-    } else {
-      setSearch({ periodicity_id: search.periodicity_id, date: null, term: data.term })
-    }
-  }
-
-  const onHandleSearch = async (): Promise<void> => {
-    loadOpcsOfWeek()
+    await deleteReportSGO(token as string, toDelete?.id as number)
+    dispatch(removeReportSgo(toDelete as IReportSGO))
   }
 
   return (
     <div>
-
-      <div className="flex shadow-md ">
-        <div className="flex mb-4 p-2 gap-2">
-          <label className="form-control w-full max-w-xs">
-            <div className="label">
-              <span className="label-text">Tri par période</span>
-            </div>
-            <select
-              value={labelPeriod}
-              className="select select-bordered select-md"
-              onChange={(e) => onHandleChangePeriodicity(e.target.value)}
-            >
-              <option value="">Tous</option>
-              {periodicities.map((period) => (
-                <option key={period.id * Math.random()} value={period.id}>
-                  {period.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="form-control w-[60rem] max-w-xs">
-            <div className="label">
-              <span className="label-text">Fond</span>
-            </div>
-            <input type="text" onChange={(e) => onHandleChangeTerm(e.target.value)} className="input input-bordered w-full" placeholder="Nom du fond / N° agré..." />
-          </label>
-          <label className="form-control w-48 max-w-xs">
-            <div className="label">
-              <span className="label-text">Date du rapport</span>
-            </div>
-            <input type="date" onChange={(e) => onHandleChangeDate(e.target.value)} className="input input-bordered w-full" />
-          </label>
-          <button onClick={() => onHandleSearch()} className="btn btn-md ml-2 mt-9">
-            <FiSearch size={24} />
-          </button>
-        </div>
-      </div>
-
       {loading && <LoadingTable />}
 
-      {!loading && opcs.length === 0 && <NoDataList />}
+      {!loading && reports.length === 0 && <NoDataList />}
 
-      {!loading && opcs.length > 0 && (
+      {!loading && reports.length > 0 && (
         <div className="grid">
           <div className="max-w-screen-2xl ">
             <div className="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
-
-              
               <div className="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
                 <div className="flex items-center flex-1 space-x-4 justify-between">
                   <h5>
@@ -198,25 +110,31 @@ function SectionOpcReport({ token, loading, total, currentPage, perPage, setPerP
                         Reçu le
                       </th>
                       <th scope="col" className="px-4 py-3">
-                        De la SGO
+                        Dépositaire
                       </th>
                       <th scope="col" className="px-4 py-3">
-                        Fond
+                        SGO
                       </th>
                       <th scope="col" className="px-4 py-3">
-                        Actif Net
+                        Total Actif
                       </th>
                       <th scope="col" className="px-4 py-3">
-                        Valeur Liquid.
+                        Total Passif
                       </th>
                       <th scope="col" className="px-4 py-3">
-                        Actifs S.G.
+                        Résultat Net
+                      </th>
+                      <th scope="col" className="px-4 py-3">
+                        Capital Social
+                      </th>
+                      <th scope="col" className="px-4 py-3">
+                        Alerte
                       </th>
                       <th scope="col" className="px-4 py-3"></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {opcs.map((opc) => (
+                    {reports.map((opc) => (
                       <tr
                         key={opc.id}
                         className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -235,38 +153,48 @@ function SectionOpcReport({ token, loading, total, currentPage, perPage, setPerP
                         </th>
                         <td className="px-4 py-2">
                           <label className="font-medium">
-                            {opc?.fund?.intermediary?.label?.toUpperCase()}
+                            {opc?.intermediary?.label?.toUpperCase()}
                           </label>
                         </td>
                         <td className="px-4 py-2">
-                          <label className="font-medium">{opc?.fund?.label?.toUpperCase()}</label>
+                          <label className="font-medium">
+                            {opc?.intermediary_check?.label?.toUpperCase()}
+                          </label>
                         </td>
                         <td className="px-4 py-2">
-                          {' '}
                           <NumericFormat
-                            value={getActifNet(opc?.assetLines as IAssetLine[])?.toFixed(2)}
-                            displayType={'text'}
-                            thousandSeparator={' '}
-                            suffix={' XAF'}
-                          />{' '}
-                        </td>
-                        <td className="px-4 py-2">
-                          {' '}
-                          <NumericFormat
-                            value={getValeurLiquid(opc?.assetLines as IAssetLine[])}
+                            value={ getTotalActifReportSGO(opc?.components)?.toFixed(2)}
                             displayType={'text'}
                             thousandSeparator={' '}
                             suffix={' XAF'}
                           />
                         </td>
                         <td className="px-4 py-2">
-                          {' '}
                           <NumericFormat
-                            value={getActifSousGestion(opc?.assetLines as IAssetLine[])}
+                            value={ getTotalPassifReportSGO(opc?.components)?.toFixed(2)}
                             displayType={'text'}
                             thousandSeparator={' '}
                             suffix={' XAF'}
                           />
+                        </td>
+                        <td className="px-4 py-2">
+                          <NumericFormat
+                            value={ getResultatNetReportSGO(opc?.components)?.toFixed(2)}
+                            displayType={'text'}
+                            thousandSeparator={' '}
+                            suffix={' XAF'}
+                          />
+                        </td>
+                        <td className="px-4 py-2">
+                          <NumericFormat
+                            value={ getCapitalSocialReportSGO(opc?.components)?.toFixed(2)}
+                            displayType={'text'}
+                            thousandSeparator={' '}
+                            suffix={' XAF'}
+                          />
+                        </td>
+                        <td className="px-4 py-2 justify-center">
+                          <FaTriangleExclamation size={18} color="red" />
                         </td>
 
                         <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
@@ -309,4 +237,4 @@ function SectionOpcReport({ token, loading, total, currentPage, perPage, setPerP
   )
 }
 
-export default SectionOpcReport
+export default SectionSgoReport

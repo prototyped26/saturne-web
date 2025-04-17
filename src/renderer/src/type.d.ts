@@ -469,3 +469,16 @@ export interface ISearchFund {
   intermediary_id: number | null,
   term: string | null
 }
+
+export interface ISearchOpc {
+  periodicity_id: number | null,
+  term: string | null,
+  date: string | null
+}
+
+export interface IFolder {
+  id?: number,
+  label: string,
+  path: string,
+  created_at: string
+}

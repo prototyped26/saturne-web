@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react'
-import { IFileElement, IIntermediary, IOpc, IPeriodicity, IWeek } from '../../type'
+import { useEffect, useRef, useState } from 'react'
+import { IDepository, IFileElement, IIntermediary, IOpc, IPeriodicity, IWeek } from '../../type'
 import { getMessageErrorRequestEx } from '../../utils/errors'
 import { generateReportAnalyze, loadReportOpc, loadReportSgo } from '../../services/opcService'
 import { TypedUseSelectorHook, useSelector } from 'react-redux'
@@ -10,12 +10,13 @@ type Props = {
   token: string,
   sgo?: IIntermediary[],
   currentWeek: IWeek,
+  depositaires: IDepository[],
   success: (m) => void,
   error: (m) => void,
   reload: (page: number) => void
 }
 
-function LoadReportModal({ token, success, error, currentWeek, reload }: Props): JSX.Element {
+function LoadReportModal({ token, success, error, currentWeek, reload, depositaires }: Props): JSX.Element {
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
 
   const periodicities: IPeriodicity[] = useAppSelector((state) => state.system.periodicities)
@@ -26,9 +27,22 @@ function LoadReportModal({ token, success, error, currentWeek, reload }: Props):
   const [files, setFiles] = useState<IFileElement[]>([])
   const [selectedPeriod, setSelectedPeriod] = useState('')
   const [selectedType, setSelectedType] = useState('')
+  const [others, setOthers] = useState<string[]>([])
+  const [selectedDepositary, setSelectedDepositary] = useState("")
+  const [isDepositary, setIsDepositary] = useState(false)
+  const [reportType, setReportType] = useState("")
+
+  useEffect(() => {
+    setOthers(["Patrimoine (Contexte Financier)", "porteurs de parts", "souscriptions/rachats", "acquisitions", "cessions"])
+  }, [])
+
+  useEffect(() => {
+    //console.log(selectedType)
+    if (selectedType.toLowerCase().includes("positaire")) setIsDepositary(true)
+    else setIsDepositary(false)
+  }, [selectedType])
 
   const onHandleImport = async (): Promise<void> => {
-    console.log(currentWeek)
     setLoading(true)
 
     for (const f of files) {
@@ -46,7 +60,11 @@ function LoadReportModal({ token, success, error, currentWeek, reload }: Props):
             await analyzeReport(opc?.id as number)
           }
           if (f.type === 'sgo') {
-            await loadReportSgo(token, data, periodId)
+            await loadReportSgo(token, data, periodId, 0)
+          }
+          if (f.type === 'depositaire') {
+            if (selectedDepositary.length > 0) await loadReportSgo(token, data, periodId, Number.parseInt(selectedDepositary))
+            else error(getMessageErrorRequestEx("Veuillez selectionner le dépositaire."))
           }
           f.success = true
         } catch (e) {
@@ -119,7 +137,6 @@ function LoadReportModal({ token, success, error, currentWeek, reload }: Props):
     setFiles([])
   }
 
-  // @ts-ignore hello
   return (
     <dialog id="modal-load-report-opc" className="modal">
       <div className="modal-box max-w-3xl">
@@ -141,7 +158,21 @@ function LoadReportModal({ token, success, error, currentWeek, reload }: Props):
               <option></option>
               <option value="opc">Rapport OPC</option>
               <option value="sgo">Rapport SGO</option>
+              <option value="depositaire">Rapport Dépositaire</option>
             </select>
+
+            {isDepositary && (<div>
+              <p className="py-2">Quel est le dépositaire ?</p>
+              <select
+                className="select select-bordered mb-2 w-2/3"
+                value={selectedDepositary}
+                onChange={(e) => setSelectedDepositary(e.target.value)}
+              >
+                <option></option>
+                {depositaires.map((deposiraty) =>  <option key={Math.random() * Date.now()} value={deposiraty?.id}>{deposiraty.label}</option>)}
+              </select>
+            </div>
+            )}
 
             <p className="py-2">Choisir une Périodicité du rapport</p>
             <select
@@ -152,14 +183,22 @@ function LoadReportModal({ token, success, error, currentWeek, reload }: Props):
               <option></option>
               {periodicities.map((periodicity) => (
                 <option key={(periodicity?.id as number) + Math.random()} value={periodicity.id}>
-                  {' '}
                   {periodicity.label}
                 </option>
               ))}
             </select>
 
+            <p className="py-2">Choix du type de rapport</p>
+            <select
+              value={reportType}
+              onChange={(e) => setReportType(e.target.value)}
+              className="select select-bordered mb-2 w-2/3">
+              <option value=""></option>
+              {others.map((other) => <option key={Math.random() * Date.now()} value={other}>{other}</option>)}
+            </select>
+
             <div className="flex w-full py-2 justify-between">
-              {selectedType.length > 0 && selectedPeriod.length > 0 && (
+              {selectedType.length > 0 && selectedPeriod.length > 0 && reportType.length > 0 && (
                 <div>
                   <input
                     type="file"

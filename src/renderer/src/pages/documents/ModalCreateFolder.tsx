@@ -22,7 +22,9 @@ function ModalCreateFolder({ token, parent, success, error, reload }: Props): JS
             return
         }
         const data: IFolder = {
-            label: label
+            label: label,
+            created_at: "",
+            path: "",
         }
         setLoading(true)
         try {

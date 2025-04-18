@@ -22,7 +22,7 @@
 }
 
 .bg-app-secondary {
-  background-color: #1A8E8E;
+  background-color: #25889F;
 }
 
 .border-app-primary {
@@ -32,7 +32,7 @@
 
 .border-app-secondary {
   --tw-border-opacity: 1;
-  border-color: #1A8E8E;
+  border-color: #25889F;
 }
 
 .text-app-primary {
@@ -42,7 +42,7 @@
 
 .text-app-secondary {
   --tw-text-opacity: 1;
-  color: #1A8E8E;
+  color: #25889F;
 }
 
 .text-app-title {
@@ -67,7 +67,7 @@
 .badge-app-secondary {
   border-color: transparent;
   --tw-bg-opacity: 1;
-  background-color:  #1A8E8E;
+  background-color:  #25889F;
   --tw-text-opacity: 1;
   color: white;
   border-radius: 5px !important;
@@ -87,7 +87,7 @@
 }
 
 a.active {
-  background-color: #1A8E8E;
+  background-color: #25889F;
   color: white;
   font-weight: bold;
 }

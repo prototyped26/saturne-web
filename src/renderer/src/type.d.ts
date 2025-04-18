@@ -480,5 +480,6 @@ export interface IFolder {
   id?: number,
   label: string,
   path: string,
-  created_at: string
+  created_at: string,
+  subFolders: IFolder[]
 }

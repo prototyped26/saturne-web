@@ -16,7 +16,7 @@ type Props = {
   reload: (page: number) => void
 }
 
-function LoadReportModal({ token, success, error, currentWeek, reload, depositaires }: Props): JSX.Element {
+function LoadReportModal({ token, success, error, reload, depositaires }: Props): JSX.Element {
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
 
   const periodicities: IPeriodicity[] = useAppSelector((state) => state.system.periodicities)

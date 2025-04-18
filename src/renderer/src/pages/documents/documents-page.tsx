@@ -11,7 +11,7 @@ import moment from 'moment'
 import { toast, ToastContainer } from 'react-toastify'
 import { getMessageErrorRequestEx } from '../../utils/errors'
 import fileDownload from 'js-file-download'
-import { FaFile, FaFolder, FaTrash } from 'react-icons/fa6'
+import { FaArrowLeft, FaFile, FaFolder, FaTrash } from 'react-icons/fa6'
 import ModalCreateFolder from './ModalCreateFolder'
 import ModalUploadDocument from './ModalUploadDocument'
 
@@ -25,7 +25,10 @@ function DocumentsPage(): JSX.Element {
   const documents: IDocument[] = useAppSelector((state) => state.document.documents)
   
   const [folders, setFolders] = useState<IFolder[]>([])
-  const [parent, setParent] = useState<IFolder | null>(null)
+  const [filterDocuments, setFilterDocuments] = useState<IDocument[]>([])
+  const [racine, setRacine] = useState<IFolder[]>([])
+  const [currentFolder, setCurrentFolder] = useState<IFolder | null>(null)
+  const [term, setTerm] = useState("")
 
   const [loading, setLoading] = useState(true)
 
@@ -33,8 +36,21 @@ function DocumentsPage(): JSX.Element {
    resetFolders()
   }, [])
 
+  useEffect(() => {
+    loadDocuments()
+    loadFolders()
+  }, [currentFolder])
+
+  useEffect(() => {
+    updateFilter()
+  }, [term])
+
+  useEffect(() => {
+    updateFilter()
+  }, [documents])
+
   const resetFolders = async (): Promise<void> => {
-    loadDocuments(token)
+    loadDocuments()
     loadFolders()
   }
 
@@ -46,9 +62,9 @@ function DocumentsPage(): JSX.Element {
     toast.error(msg, { theme: 'colored'})
   }
 
-  const loadDocuments = async (t: string | null): Promise<void> => {
+  const loadDocuments = async (): Promise<void> => {
     try {
-      const res = await getDocuments(t as string)
+      const res = await getDocuments(token as string, currentFolder !== null && currentFolder !== undefined ? (currentFolder.id as number) : 0)
       dispatch(setDocuments(res.data as IDocument[]))
     } catch (e) {
       console.log(e)
@@ -59,7 +75,10 @@ function DocumentsPage(): JSX.Element {
 
   const loadFolders = async (): Promise<void> => {
     try {
-      const res = await getFolders(token as string)
+      const res = await getFolders(
+        token as string,
+        currentFolder !== null && currentFolder !== undefined ? (currentFolder.id as number) : 0
+      )
       setFolders(res.data)
     } catch (e) {
       console.log(e)
@@ -87,14 +106,35 @@ function DocumentsPage(): JSX.Element {
     document?.getElementById("modal-load-document")?.showModal()
   }
 
-  const onChangeDir = (e): void => {
+  const updateFilter = (): void => {
+    if (term.length === 0) {
+      setFilterDocuments(documents)
+    } else {
+      setFilterDocuments(documents.filter((document) => document.label && document.label?.includes(term)))
+    }
+  }
+
+  const onChangeDir = (e, folder: IFolder): void => {
     e.preventDefault()
+    setRacine([...racine, folder])
+    setCurrentFolder(folder)
+  }
+
+  const onHandleBackFolder = (): void => {
+    const last = racine[racine.length - 1]
+    setRacine(racine.filter((r) => r.id !== last.id))
+    try {
+      const l = racine[racine.length - 2]
+      setCurrentFolder(l)
+    } catch (e) {
+      setCurrentFolder(null)
+    }
   }
 
   return (
     <div className="border bg-white rounded-lg dark:border-gray-50 h-full p-6 mb-4 z-20">
       <ToastContainer />
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-2 gap-4 mb-4 pb-2 border-b-2 border-app-primary">
         <div className="">
           <h3 className="tracking-tight font-bold text-3xl text-app-title">
             Documents
@@ -113,11 +153,38 @@ function DocumentsPage(): JSX.Element {
         </div>
       </div>
 
+      <div className="px-2 flex gap-4">
+        {racine.length > 0 && (
+          <div className="mt-2">
+            <button onClick={onHandleBackFolder} ><FaArrowLeft size={16} /></button>
+          </div>
+        )}
+        <div>
+          <div className="breadcrumbs text-sm">
+            <ul>
+              <li>
+                <a><FaFolder size={16} className="mr-2" /> documents </a>
+              </li>
+              {racine.map((folder) => (
+                <li key={Math.random() * Date.now()}>
+                  <a><FaFolder size={16} className="mr-2"  /> {folder.label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div className="px-2">
+        <p className="py-2">Recherche</p>
+        <input type="text" value={term} placeholder="Saisir le nom du fichier..." onChange={(e) => setTerm(e.target.value)} className="input input-md input-bordered w-full" />
+      </div>
+
       {loading && <LoadingTable />}
 
       {!loading && documents.length === 0 && <NoDataList />}
 
-      {!loading && documents.length > 0 && (
+      {!loading && (
         <div className="grid">
           <div className="max-w-screen-2xl ">
             <div className="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
@@ -190,7 +257,7 @@ function DocumentsPage(): JSX.Element {
                         scope="row"
                         className="flex items-center px-4 py-2 font-bold text-gray-900 whitespace-nowrap dark:text-white"
                       >
-                        <a href="#" onClick={onChangeDir}> {folder?.label.toUpperCase()}</a>
+                        <a href="#" onClick={(e) => onChangeDir(e, folder)}> {folder?.label.toUpperCase()}</a>
                        
                       </td>
                       <td className="px-4 py-2">
@@ -206,7 +273,7 @@ function DocumentsPage(): JSX.Element {
                       </td>
                     </tr>
                   ))}
-                  {documents.map((document) => (
+                  {filterDocuments.map((document) => (
                     <tr
                       key={document.id}
                       className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -258,8 +325,8 @@ function DocumentsPage(): JSX.Element {
         </div>
       )}
 
-      <ModalCreateFolder token={token as string} error={showErrorToast} parent={parent} success={showSuccessToast} reload={resetFolders} />
-      <ModalUploadDocument token={token as string} error={showErrorToast} parent={parent} success={showSuccessToast} reload={resetFolders} />
+      <ModalCreateFolder token={token as string} error={showErrorToast} parent={currentFolder} success={showSuccessToast} reload={resetFolders} />
+      <ModalUploadDocument token={token as string} error={showErrorToast} parent={currentFolder} success={showSuccessToast} reload={resetFolders} />
     </div>
   )
 }

@@ -203,7 +203,7 @@ function DetailSgoPage(): JSX.Element {
             <div className="stats shadow">
               <div className="stat place-items-center">
                 <div className="stat-title text-[18px]">
-                  {'Total Actifs Sous Gestion'.toUpperCase()}
+                  {'Total Actifs gérés'.toUpperCase()}
                 </div>
                 {intermediary?.category?.code === 'SGO' && (
                   <div className="stat-value text-md">

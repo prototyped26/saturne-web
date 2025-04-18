@@ -578,7 +578,7 @@ function QueriesPage(): JSX.Element {
         </div>
       </div>
 
-      {selectedOpration.length === 0 && funds.length > 0 && (
+      {/* {selectedOpration.length === 0 && funds.length > 0 && (
         <div className="grid">
           <div className="max-w-screen-2xl ">
             <div className="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
@@ -690,7 +690,7 @@ function QueriesPage(): JSX.Element {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {selectedOpration === 'composition' && (
         <div className="grid">

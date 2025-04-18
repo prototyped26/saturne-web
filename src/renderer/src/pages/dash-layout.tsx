@@ -1,4 +1,4 @@
-import { FiBell, FiFileText, FiFolder, FiGrid, FiLogOut, FiSettings, FiTool, FiUser, FiUsers } from 'react-icons/fi'
+import { FiBell, FiFileText, FiFolder, FiGrid, FiLogOut, FiSettings, FiUser, FiUsers } from 'react-icons/fi'
 import { LuBriefcaseBusiness, LuForklift } from 'react-icons/lu'
 import { SlWallet } from 'react-icons/sl'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router'
@@ -11,6 +11,7 @@ import { getShareholdersTypes } from '../services/fundService'
 import { setShareholdersTypes } from '../store/fundSlice'
 import { toast } from 'react-toastify'
 import { getMessageErrorRequestEx } from '../utils/errors'
+import { FaReceipt } from 'react-icons/fa6'
 
 function DashLayout(): JSX.Element {
   const navigate = useNavigate()
@@ -79,6 +80,19 @@ function DashLayout(): JSX.Element {
                 >
                   <FiFileText />
                   <span className="ml-3">Rapports</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/dash/factures"
+                  className={({ isActive }) =>
+                    isActive
+                      ? 'active flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group'
+                      : 'flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group'
+                  }
+                >
+                  <FaReceipt />
+                  <span className="ml-3">Factures</span>
                 </NavLink>
               </li>
               <li>
@@ -163,7 +177,7 @@ function DashLayout(): JSX.Element {
                   <span className="ml-3">Utilisateurs</span>
                 </NavLink>
               </li>
-              <li>
+             {/*  <li>
                 <NavLink  to="/dash/configurations"
                           className={({ isActive }) => isActive
                               ? 'active flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group'
@@ -172,7 +186,7 @@ function DashLayout(): JSX.Element {
                   <FiTool />
                   <span className="ml-3">Options Fonds, OPC</span>
                 </NavLink>
-              </li>
+              </li> */}
               <li>
                 <NavLink
                   to="/dash/system/years"

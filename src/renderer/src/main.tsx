@@ -30,6 +30,7 @@ import DocumentsPage from './pages/documents/documents-page'
 import QueriesPage from './pages/requetes/queries-page'
 import ConfigPage from './pages/configurations/config-page'
 import DetailReportSgo from './pages/opc/detail-report-sgo'
+import FacturesPage from './pages/factures/factures-page'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <Provider store={store}>
@@ -61,6 +62,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           <Route path="system/years" element={<YearsPage />} />
           <Route path="system/years/new" element={<AddYearPage />} />
           <Route path="system/years/edit" element={<UpdateYearPage />} />
+          <Route path="factures" element={<FacturesPage />} />
           <Route path="configurations" element={<ConfigPage />} />
         </Route>
       </Routes>

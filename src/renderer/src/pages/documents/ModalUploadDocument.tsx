@@ -15,24 +15,31 @@ function ModalUploadDocument({ token, success, error, reload, parent}: Props): J
   const inputRef = useRef<HTMLInputElement>(null)
 
   const [loading, setLoading] = useState(false)
-  const [file, setFile] = useState<File>([])
+  const [file, setFile] = useState<File | null>(null)
 
 
   const onHandleImport = async (): Promise<void> => {
-    setLoading(true)
+    if (file) {
+      setLoading(true)
 
-    const data = new FormData()
-    data.append('file', file)
-    try {
-      await loadDocuments(token, data, parent !== null ? (parent?.id as number) : 0)
-      success('Rapport chargé avec succès ! ')
-      reload(1)
-    } catch (e) {
-      error(getMessageErrorRequestEx(e))
-    } finally {
-      setLoading(false)
+      const data = new FormData()
+      data.append('file', file)
+      try {
+        await loadDocuments(token, data, parent !== null ? (parent?.id as number) : 0)
+        success('Rapport chargé avec succès ! ')
+        reload(1)
+        document?.getElementById('close-modal')?.click()
+      } catch (e) {
+        error(getMessageErrorRequestEx(e))
+      } finally {
+        setLoading(false)
+      }
     }
-    document?.getElementById('close-modal')?.click()
+   
+  }
+
+  const onFileChange = (e): void => {
+    setFile(e.target.files[0])
   }
 
   const onCloseModal = (): void => {
@@ -53,7 +60,7 @@ function ModalUploadDocument({ token, success, error, reload, parent}: Props): J
             <input
                 type="file"
                 ref={inputRef}
-                onChange={(e) => setFile(e.target.files[0])}
+                onChange={(e) => onFileChange(e)}
                 className="file-input file-input-bordered w-full max-w-xs"
                 />
              {!loading && (

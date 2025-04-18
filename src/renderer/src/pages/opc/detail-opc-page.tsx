@@ -30,7 +30,7 @@ function DetailOpcPage(): JSX.Element {
         <div className="flex justify-between gap-4">
           <div className="">
             <h3 className="tracking-tight font-bold text-2xl text-app-title">Détail OPCVM</h3>
-            <p className="tracking-tight font-light text-1xl text-app-sub-title border-b-2">
+            <p className="tracking-tight font-light text-1xl text-app-sub-title border-b-2 border-app-secondary">
               au {moment(opc?.created_at).format('DD MMMM YYYY')}
             </p>
             <div className="flex justify-between gap-14 mt-2">

@@ -73,8 +73,8 @@ export const getHistoryLiquidationValue = async (token: string, data: IRequestHi
   return await apiRequestAuth<IResponse>('/opc/history/liquidatives', 'POST', token, data)
 }
 
-export const getDashActifs = async (token: string): Promise<IResponse> => {
-  return await apiRequestAuth<IResponse>('/analysis/dash/actifs', 'GET', token)
+export const getDashActifs = async (token: string, sgo: number = 0): Promise<IResponse> => {
+  return await apiRequestAuth<IResponse>('/analysis/dash/actifs/' + sgo, 'GET', token)
 }
 
 export const getDashLiquidatives = async (token: string): Promise<IResponse> => {

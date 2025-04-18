@@ -74,7 +74,19 @@ function FundsSgoList({ intermediary, token }: Props): JSX.Element {
               <th scope="col" className="px-4 py-3"></th>
             </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+              {funds.map((fund) => (
+                <tr key={Math.random() * Date.now()}>
+                  <th></th>
+                  <td>{fund.label}</td>
+                  <td>{fund.approval_number}</td>
+                  <td>{fund.typeOpc?.label}</td>
+                  <td>{fund.depositary?.label}</td>
+                  <td>{fund.classification?.label}</td>
+                  <td>{fund.distribution?.label}</td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </div>
       )}

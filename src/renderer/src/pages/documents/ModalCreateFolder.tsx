@@ -42,48 +42,37 @@ function ModalCreateFolder({ token, parent, success, error, reload }: Props): JS
 
     return(
        <dialog id="modal-create-folder" className="modal">
-        <div className="modal-box max-w-3xl">
+        <div className="modal-box ">
             <form method="dialog">
                 {/* if there is a button in form, it will close the modal */}
                 <button id="close-modal" className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
             </form>
         <h3 className="font-bold text-lg ">Ajouter un dossier</h3>
-        <p className="py-4">Le fichier doit être conforme aux exigéances du comité.</p>
+        <p className="py-4">Veuillez saisir un nom de dossier</p>
 
-        <div className="flex w-full">
-        <div className="w-1/2">
-            <p className="py-2">Choix du type de rapport à charger</p>
-            <input type="text" value={label} onChange={(e) => setLabel(e.target.value)} className="input input-md input-bordered" />
+        <div className="flex w-full gap-4 mb-4">
+            <input type="text" value={label} onChange={(e) => setLabel(e.target.value)} className="input input-md input-bordered w-2/3" />
 
             <div>
                 {!loading && (
-                 <button
+                    <button
                     id="non-btn"
                     onClick={() => onHandleCreate()}
-                    className="btn btn-md bg-app-primary mt-2 text-white"
+                    className="btn btn-md bg-app-primary text-white"
                     >
                 Créer le dossier
                 </button>
                 )}
                 {loading && (
-                <button id="non-btn" className="btn btn-md btn-disabled mt-2 text-white">
+                <button id="non-btn" className="btn btn-md btn-disabled text-white">
                     <span className="loading loading-spinner"></span>
                     Traitement...
                 </button>
                 )}
             </div>
-
-           
-        </div>
         </div>
 
-        <div className="flex justify-end">
-            <form method="dialog">
-            <button id="close-btn-up-report"  className="btn btn-sm">
-                Fermer
-            </button>
-            </form>
-        </div>
+       
         </div>
     </dialog>
     )

@@ -1,6 +1,6 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store/store'
-import { IHolder, IIntermediary, IOrganization } from '../../type'
+import { IDashActifs, IHolder, IIntermediary, IOrganization } from '../../type'
 import { Link, useNavigate } from 'react-router'
 import moment from 'moment'
 import { FiEdit } from 'react-icons/fi'
@@ -19,6 +19,7 @@ import { NumericFormat } from 'react-number-format'
 import { getMessageErrorRequestEx } from '../../utils/errors'
 import NoDataList from '../../components/NoDataList'
 import FundsSgoList from './funds-sgo-list'
+import { getDashActifs } from '@renderer/services/opcService'
 
 function DetailSgoPage(): JSX.Element {
   const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
@@ -35,9 +36,11 @@ function DetailSgoPage(): JSX.Element {
   const [current, setCurrent] = useState('fonds')
   const [totalActifs, setTotalActifs] = useState(0)
   const [organization, setOrganization] = useState<IOrganization | null>(null)
+  const [dashActifs, setDashActifs] = useState<IDashActifs | null>(null)
 
   useEffect(() => {
     setCurrent('fonds')
+    loadDashActifs()
   }, [])
 
   useEffect(() => {
@@ -62,6 +65,23 @@ function DetailSgoPage(): JSX.Element {
 
   const onHandleClickEdit = (): void => {
     navigate("/dash/intermediaries/update")
+  }
+
+  const loadDashActifs = async (): Promise<void> => {
+    try {
+      const res = await getDashActifs(token as string, intermediary?.id as number)
+      setDashActifs(res.data as IDashActifs)
+    } catch (e) {
+
+    setDashActifs({
+        ...dashActifs,
+        actifsFund: 0,
+        actifsMandate: 0,
+        countSgo: 0,
+        totalActifs: 0
+      })
+      console.log(getMessageErrorRequestEx(e))
+    }
   }
 
   const loadHolders = async (): Promise<void> => {
@@ -91,6 +111,18 @@ function DetailSgoPage(): JSX.Element {
     } catch (e) {
       showErrorToast(getMessageErrorRequestEx(e))
     }
+  }
+
+  const calculatePercentValue = (value: number): number => {
+    let res = 0
+
+    try {
+      res = (value / Number(dashActifs?.totalActifs)) * 100
+    } catch (e) {
+      console.log(e)
+    }
+
+    return Number(res.toFixed(2))
   }
 
   const onHoldeEditOrg = (): void => {
@@ -199,29 +231,60 @@ function DetailSgoPage(): JSX.Element {
 
       <div className="flex w-full my-4 gap-4">
         <div className="w-2/3  rounded-lg  ">
-          <div className="h-28 flex gap-4 justify-between w-full">
-            <div className="stats shadow">
-              <div className="stat place-items-center">
-                <div className="stat-title text-[18px]">
-                  {'Total Actifs gérés'.toUpperCase()}
-                </div>
-                {intermediary?.category?.code === 'SGO' && (
-                  <div className="stat-value text-md">
-                    <NumericFormat
-                      value={totalActifs.toFixed(2)}
-                      displayType={'text'}
-                      thousandSeparator={' '}
-                      suffix={' XAF'}
-                    />
+          <div className=" flex gap-4 justify-between w-full">
+            <div className="w-full">
+              <div className="stats shadow w-full">
+                <div className="stat">
+                  <div className="stat-title text-[18px]">
+                    {'Total Actifs gérés'.toUpperCase()}
                   </div>
-                )}
-                {intermediary?.category?.code !== 'SGO' && (
-                  <div className="stat-value text-md"> NON APPLICABLE</div>
-                )}
+                  {intermediary?.category?.code === 'SGO' && (
+                    <div className="stat-value text-[28px]">
+                      <NumericFormat
+                        value={totalActifs.toFixed(2)}
+                        displayType={'text'}
+                        thousandSeparator={' '}
+                        suffix={' XAF'}
+                      />
+                    </div>
+                  )}
+                  {intermediary?.category?.code !== 'SGO' && (
+                    <div className="stat-value text-md"> NON APPLICABLE</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="rounded-lg shadow w-full mt-4 p2">
+                <div className="px-4 my-2">
+                  <div className="flex justify-between">
+                    <p className="text-md">
+                      <p>Total Actifs OPC </p>
+                    </p>
+                    <p>{calculatePercentValue(dashActifs?.actifsFund as number)} %</p>
+                  </div>
+                  <progress
+                    className="progress  w-full"
+                    value={calculatePercentValue(dashActifs?.actifsFund as number)}
+                    max="100"
+                  ></progress>
+                </div>
+                <div className="px-4 my-2">
+                  <div className="flex justify-between">
+                    <p className="text-md">
+                      <p>Total Actifs Mandats </p>
+                    </p>
+                    <p>{calculatePercentValue(dashActifs?.actifsMandate as number)} %</p>
+                  </div>
+                  <progress
+                    className="progress progress-accent w-full"
+                    value={calculatePercentValue(dashActifs?.actifsMandate as number)}
+                    max="100"
+                  ></progress>
+                </div>
               </div>
             </div>
 
-            <div className="flex gap-4">
+            <div className="h-28 flex gap-4">
               <div className="stats shadow">
                 <div className="stat place-items-center">
                   <div className="stat-title text-[18px]">Nombre de Fonds</div>

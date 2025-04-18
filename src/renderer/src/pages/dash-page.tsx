@@ -69,7 +69,7 @@ function Dash(): JSX.Element {
     setLoadActifs(true)
 
     try {
-      const res = await getDashActifs(token as string)
+      const res = await getDashActifs(token as string, 0)
       setDashActifs(res.data as IDashActifs)
     } catch (e) {
       const noData: IDashActifs = {

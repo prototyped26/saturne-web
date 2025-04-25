@@ -414,6 +414,7 @@ export interface IFundWithFollowRule {
 
 export interface IDashActifs {
   countSgo: number,
+  countMandate: number,
   totalActifs: number,
   actifsFund: number,
   actifsMandate: number
@@ -476,10 +477,17 @@ export interface ISearchOpc {
   date: string | null
 }
 
+export interface ISearchMandate {
+  periodicity_id: number | null,
+  term: string | null,
+  date: string | null
+}
+
+
 export interface IFolder {
   id?: number,
   label: string,
   path: string,
   created_at: string,
-  subFolders: IFolder[]
+  subFolders?: IFolder[]
 }

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../store/store'
-import { IAssetLine, IMandate, IOpc, IWeek } from '../../type'
+import { IAssetLine, IMandate, IOpc, IPeriodicity, ISearchMandate, IWeek } from '../../type'
 import { Fragment, useEffect, useState } from 'react'
 import { deleteMandate, weekMandates } from '../../services/mandateService'
 import { removeMandate, setMandate, setMandates } from '../../store/mandateSlice'
@@ -12,7 +12,7 @@ import NoDataList from '../../components/NoDataList'
 import moment from 'moment/moment'
 import { NumericFormat } from 'react-number-format'
 import { getActifNet } from '../../services/opcService'
-import { FiEye, FiTrash } from 'react-icons/fi'
+import { FiEye, FiSearch, FiTrash } from 'react-icons/fi'
 import LoadMandateModal from './load-mandate-modal'
 import TableNavigationFooter from '../../components/TableNavigationFooter'
 import ConfirmDeleteDialog from '../../components/ConfirmDeleteDialog'
@@ -27,6 +27,7 @@ function MandatesPage(): JSX.Element {
   const token: string | null = useAppSelector((state) => state.user.token)
   const mandates: IMandate[] = useAppSelector((state) => state.mandate.mandates)
   const currentWeek: IWeek | null = useAppSelector((state) => state.system.currentWeek)
+  const periodicities: IPeriodicity[] = useAppSelector((state) => state.system.periodicities)
 
   const [loading, setLoading] = useState(true)
   const [total, setTotal] = useState(0)
@@ -37,13 +38,17 @@ function MandatesPage(): JSX.Element {
 
   const [contentDelete, setContentDelete] = useState("")
   const [toDelete, setToDelete] = useState<IMandate | null>(null)
+  const [search, setSearch] = useState<ISearchMandate>({periodicity_id: null, date: null, term: null })
+  const [labelPeriod, setLabelPeriod] = useState("")
 
   useEffect(() => {
-    loadMandates()
+    //loadMandates()
     setTableSize([5, 10, 20, 50, 100])
   }, [])
 
   useEffect(() => {
+    console.log("LA VALEUR " + currentPage);
+    if (currentPage === 0) setCurrentPage(1)
     if (currentPage !== undefined && currentPage !== null) {
       loadMandates(currentPage)
     }
@@ -52,7 +57,7 @@ function MandatesPage(): JSX.Element {
   const loadMandates = async (page: number = 0): Promise<void> => {
     setLoading(true)
     try {
-      const res = await weekMandates(token as string, page)
+      const res = await weekMandates(token as string, page, search)
       dispatch(setMandates(res.data.content as IMandate[]))
       setTotal(res.data.totalElements)
       setNumberPage(res.data.totalPages)
@@ -98,6 +103,39 @@ function MandatesPage(): JSX.Element {
     dispatch(removeMandate(toDelete as IOpc))
   }
 
+  const onHandleChangePeriodicity = (val): void => {
+    const data = search
+    setLabelPeriod(val)
+    if (val.length > 0) {
+      setSearch({ periodicity_id: Number.parseInt(val), date: data.date, term: data.term })
+    } else {
+      setSearch({ periodicity_id: null, date: data.date, term: data.term })
+    }
+  }
+
+  const onHandleChangeTerm = (val): void => {
+    const data = search
+    if (val.length > 0) {
+      setSearch({ periodicity_id: search.periodicity_id, date: data.date, term: val })
+    } else {
+      setSearch({ periodicity_id: search.periodicity_id, date: data.date, term: null })
+    }
+  }
+
+  const onHandleChangeDate = (val): void => {
+    const data = search
+    if (val.length > 0) {
+      setSearch({ periodicity_id: search.periodicity_id, date: val, term: data.term })
+    } else {
+      setSearch({ periodicity_id: search.periodicity_id, date: null, term: data.term })
+    }
+  }
+
+  const onHandleSearch = (): void => {
+    console.log("click sur le bouton")
+    setCurrentPage(0)
+  }
+
   return (
     <div className="border bg-white rounded-lg dark:border-gray-50 p-6 mb-4 z-20">
       <ToastContainer key={Math.random() * Date.now()} />
@@ -112,6 +150,43 @@ function MandatesPage(): JSX.Element {
         <div className="flex  justify-end ">
           <button onClick={() => onHandleUpReport()} className="btn btn-md btn-outline ml-2">
             Charger un rapport (Excel)
+          </button>
+        </div>
+      </div>
+
+      <div className="flex shadow-md ">
+        <div className="flex mb-4 p-2 gap-2">
+          <label className="form-control w-full max-w-xs">
+            <div className="label">
+              <span className="label-text">Tri par période</span>
+            </div>
+            <select
+              value={labelPeriod}
+              className="select select-bordered select-md"
+              onChange={(e) => onHandleChangePeriodicity(e.target.value)}
+            >
+              <option value="">Tous</option>
+              {periodicities.map((period) => (
+                <option key={period.id * Math.random()} value={period.id}>
+                  {period.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="form-control w-[100rem] max-w-xs">
+            <div className="label">
+              <span className="label-text">Saisir un texte </span>
+            </div>
+            <input type="text" onChange={(e) => onHandleChangeTerm(e.target.value)} className="input input-bordered w-full" placeholder="Nom SGO, Dépositaire, Client / N° agré..." />
+          </label>
+          <label className="form-control w-48 max-w-xs">
+            <div className="label">
+              <span className="label-text">Date du rapport</span>
+            </div>
+            <input type="date" onChange={(e) => onHandleChangeDate(e.target.value)} className="input input-bordered w-full" />
+          </label>
+          <button onClick={() => onHandleSearch()} className="btn btn-md ml-2 mt-9">
+            <FiSearch size={24} />
           </button>
         </div>
       </div>
@@ -227,7 +302,7 @@ function MandatesPage(): JSX.Element {
                         </td>
                         <td className="px-4 py-2">
                           <label className="font-medium">
-                            {moment(mandate?.week?.end).format('DD, MMM YYYY')}
+                            {moment(mandate?.date).format('DD, MMM YYYY')}
                           </label>
                         </td>
                         <td className="px-4 py-2">

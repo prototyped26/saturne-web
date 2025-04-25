@@ -43,10 +43,7 @@ function Dash(): JSX.Element {
         display: true,
         text: 'Valeurs Liquidatives des fonds',
       },
-      chartDataLabels: {
-        display: true,
-        color: 'rgba(256, 256, 256, 1)'
-      }
+      ChartDataLabels
     },
   }
 
@@ -76,7 +73,8 @@ function Dash(): JSX.Element {
         actifsMandate: 0,
         totalActifs: 0,
         countSgo: 0,
-        actifsFund: 0
+        actifsFund: 0,
+        countMandate: 0,
       }
       setDashActifs(noData)
       console.log(getMessageErrorRequestEx(e))
@@ -119,7 +117,7 @@ function Dash(): JSX.Element {
           {
             label: 'V.L (XAF)',
             data: values,
-            backgroundColor: 'rgba(229, 182, 102, 0.8)'
+            backgroundColor: 'rgba(37, 136, 159, 0.3)'
           }
         ]
       }
@@ -147,86 +145,105 @@ function Dash(): JSX.Element {
             </div>
           )}
           {!loadActifs && (
-            <div className="flex gap-4">
-              <div className="w-1/2 pt-4">
-                <div className="stats shadow bg-app-secondary text-white w-full">
-                  <div className="stat">
-                    <div className="stat-title text-white font-bold">Total Actifs Gérés</div>
-                    <div className="stat-value text-2xl">
-                      <NumericFormat
-                        value={dashActifs?.totalActifs.toFixed(2)}
-                        displayType={'text'}
-                        thousandSeparator={' '}
-                        suffix={' XAF'}
-                      />{' '}
-                    </div>
-                    <div className="stat-desc"></div>
-                  </div>
-                </div>
-
-                <div className="rounded-lg shadow w-full mt-4 p2">
-                  <div className="px-4 my-2">
-                    <div className="flex justify-between">
-                      <p className="text-xs">
-                        <p>Total Actifs OPC </p>
-                        <p>{calculatePercentValue(dashActifs?.actifsFund as number)} %</p>
-                      </p>
-                      <p className="font-bold text-xs">
+            <div>
+              <div className="flex gap-4">
+                <div className="w-1/2 ">
+                  <div className="stats shadow bg-app-secondary text-white w-full">
+                    <div className="stat">
+                      <div className="stat-title text-white font-bold">Total Actifs Gérés</div>
+                      <div className="stat-value text-2xl">
                         <NumericFormat
-                          value={dashActifs?.actifsFund.toFixed(2)}
+                          value={dashActifs?.totalActifs.toFixed(2)}
                           displayType={'text'}
                           thousandSeparator={' '}
                           suffix={' XAF'}
-                        />
-                      </p>
+                        />{' '}
+                      </div>
+                      <div className="stat-desc"></div>
                     </div>
-                    <progress
-                      className="progress  w-full"
-                      value={calculatePercentValue(dashActifs?.actifsFund as number)}
-                      max="100"
-                    ></progress>
                   </div>
-                  <div className="px-4 my-2">
-                    <div className="flex justify-between">
-                      <p className="text-xs">
-                        <p>Total Actifs Mandats </p>
-                        <p>{calculatePercentValue(dashActifs?.actifsMandate as number)} %</p>
-                      </p>
-                      <p className="font-bold text-xs">
-                        <NumericFormat
-                          value={dashActifs?.actifsMandate.toFixed(2)}
-                          displayType={'text'}
-                          thousandSeparator={' '}
-                          suffix={' XAF'}
-                        />
-                      </p>
+
+                  <div className="rounded-lg shadow w-full mt-4 p2">
+                    <div className="px-4 my-2">
+                      <div className="flex justify-between">
+                        <p className="text-xs">
+                          <p>Total Actifs OPC </p>
+                          <p>{calculatePercentValue(dashActifs?.actifsFund as number)} %</p>
+                        </p>
+                        <p className="font-bold text-xs">
+                          <NumericFormat
+                            value={dashActifs?.actifsFund.toFixed(2)}
+                            displayType={'text'}
+                            thousandSeparator={' '}
+                            suffix={' XAF'}
+                          />
+                        </p>
+                      </div>
+                      <progress
+                        className="progress progress-primary w-full"
+                        value={calculatePercentValue(dashActifs?.actifsFund as number)}
+                        max="100"
+                      ></progress>
                     </div>
-                    <progress
-                      className="progress progress-accent w-full"
-                      value={calculatePercentValue(dashActifs?.actifsMandate as number)}
-                      max="100"
-                    ></progress>
+                    <div className="px-4 my-2">
+                      <div className="flex justify-between">
+                        <p className="text-xs">
+                          <p>Total Actifs Mandats </p>
+                          <p>{calculatePercentValue(dashActifs?.actifsMandate as number)} %</p>
+                        </p>
+                        <p className="font-bold text-xs">
+                          <NumericFormat
+                            value={dashActifs?.actifsMandate.toFixed(2)}
+                            displayType={'text'}
+                            thousandSeparator={' '}
+                            suffix={' XAF'}
+                          />
+                        </p>
+                      </div>
+                      <progress
+                        className="progress progress-accent w-full"
+                        value={calculatePercentValue(dashActifs?.actifsMandate as number)}
+                        max="100"
+                      ></progress>
+                    </div>
                   </div>
                 </div>
-
-                <div className="stats shadow w-full mt-4">
-                  <div className="stat">
-                    <div className="stat-title font-bold">Nombre de SGO</div>
-                    <div className="stat-value"> {dashActifs?.countSgo}</div>
-                    <div className="stat-desc"></div>
-                  </div>
+                <div className="w-1/2 flex items-center justify-center ">
+                  <ChartActifSousGestion
+                    mandate={calculatePercentValue(dashActifs?.actifsMandate as number)}
+                    fund={calculatePercentValue(dashActifs?.actifsFund as number)}
+                  />
+                 {/*  <ChartActifSousGestion
+                    mandate={dashActifs?.actifsMandate as number}
+                    fund={dashActifs?.actifsFund as number}
+                  /> */}
                 </div>
               </div>
-              <div className="w-1/2 flex items-center justify-center ">
-                <ChartActifSousGestion
-                  mandate={dashActifs?.actifsMandate as number}
-                  fund={dashActifs?.actifsFund as number}
-                />
+              <div className="flex gap-4">
+                <div className="w-full p-4">
+                  <div className="flex gap-2">
+                    <div className="stats shadow w-full mt-4">
+                      <div className="stat">
+                        <div className="stat-title text-[1rem] font-bold">Nombre de SGO</div>
+                        <div className="stat-value"> {dashActifs?.countSgo}</div>
+                        <div className="stat-desc"></div>
+                      </div>
+                    </div>
+
+                    <div className="stats shadow w-full mt-4">
+                      <div className="stat">
+                        <div className="stat-title text-[1rem] font-bold">Nombre de Mandats</div>
+                        <div className="stat-value"> {dashActifs?.countMandate}</div>
+                        <div className="stat-desc"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           )}
         </div>
-        <div className="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 flex items-center justify-center">
+        <div className="shadow-sm rounded-lg border-gray-300 dark:border-gray-600 flex items-start justify-center">
           {loadLiquidatives && (
             <div className="flex w-full items-center justify-center">
               <span className="loading loading-spinner"></span>

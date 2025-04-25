@@ -96,3 +96,29 @@ a:hover {
   color: black !important;
 }
 
+.progress-primary::-moz-progress-bar {
+  border-radius: var(--rounded-box, 1rem /* 16px */);
+  --tw-bg-opacity: 1;
+  background-color: #25889F;
+}
+.progress-primary:indeterminate {
+  --progress-color: #25889F;
+}
+.progress-primary::-webkit-progress-value {
+  --tw-bg-opacity: 1;
+  background-color: #25889F;
+}
+
+.progress-accent::-moz-progress-bar {
+  border-radius: var(--rounded-box, 1rem /* 16px */);
+  --tw-bg-opacity: 1;
+  background-color: #E5B666;
+}
+.progress-accent:indeterminate {
+  --progress-color: #E5B666;
+}
+.progress-accent::-webkit-progress-value {
+  --tw-bg-opacity: 1;
+  background-color: #E5B666;
+}
+

@@ -22,7 +22,7 @@ function DetailMandatePage(): JSX.Element {
           <div className="">
             <h3 className="tracking-tight font-bold text-2xl text-app-title">Détail de du mandat</h3>
             <p className="tracking-tight font-light text-1xl text-app-sub-title border-b-2">
-              au {moment(mandate?.week?.end).format('DD MMMM YYYY')}
+              au {moment(mandate?.date).format('DD MMMM YYYY')}
             </p>
             <div className="flex justify-between gap-14 mt-2">
               <div>
@@ -68,9 +68,9 @@ function DetailMandatePage(): JSX.Element {
         <div className="w-3/12">
           <div className="border bg-white dark:border-gray-50 h-auto rounded-lg p-4">
             {mandate?.assetLines?.map((line) => (
-              <div key={line.id} className="border-b mb-2 pb-1">
-                <p className="text-lg">{line?.label?.toUpperCase()}</p>
-                <p className="font-black"><NumericFormat value={Number(line?.value?.toFixed(2))} displayType={'text'}
+              <div key={line.id} className="border-b border-app-secondary mb-2 pb-1">
+                <p className="text-lg font-bold">{line?.label?.toLowerCase()}</p>
+                <p className="text-gray-700"><NumericFormat value={Number(line?.value?.toFixed(2))} displayType={'text'}
                                                          thousandSeparator={' '} suffix={' XAF'} /></p>
               </div>
             ))}

@@ -19,17 +19,17 @@ function ChartActifSousGestion({ mandate, fund }: Props): JSX.Element {
     setValues(val)
 
     const data = {
-      labels: ['Total actifs sous gestion des OPC', 'Total actifs sous gestion mandats'],
+      labels: ['Total actifs OPC', 'Total actifs mandats'],
       datasets: [
         {
-          label: 'XAF',
+          label: '%',
           data: val,
           backgroundColor: [
-            'rgba(26, 142, 142, 0.7)',
+            'rgba(37, 136, 159, 0.7)',
             'rgba(229, 182, 102, 0.7)',
           ],
           borderColor: [
-            'rgba(26, 142, 142, 1)',
+            'rgba(37, 136, 159, 1)',
             'rgba(229, 182, 102, 1)',
           ],
           borderWidth: 1,

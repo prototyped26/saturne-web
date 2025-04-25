@@ -268,7 +268,7 @@ function IntermediariesPage(): JSX.Element {
                         Agrément
                       </th>
                       <th scope="col" className="px-4 py-3">
-                        Dirigéant
+                        Dirigeant
                       </th>
                       <th scope="col" className="px-4 py-3">
                         Nb. Fonds

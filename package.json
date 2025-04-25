@@ -1,6 +1,6 @@
 {
   "name": "saturne",
-  "version": "1.6.0",
+  "version": "1.6.2",
   "description": "Plateforme de gestion collective de la COSUMAF",
   "main": "./out/main/index.js",
   "author": "ZERITEC",

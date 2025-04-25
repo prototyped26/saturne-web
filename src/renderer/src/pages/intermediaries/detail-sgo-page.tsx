@@ -294,7 +294,7 @@ function DetailSgoPage(): JSX.Element {
 
               <div className="stats shadow">
                 <div className="stat place-items-center">
-                  <div className="stat-title text-[18px]">Nombre de Mandants</div>
+                  <div className="stat-title text-[18px]">Nombre de Mandats</div>
                   <div className="stat-value text-md">{intermediary?.countMandatory}</div>
                 </div>
               </div>
@@ -314,7 +314,7 @@ function DetailSgoPage(): JSX.Element {
                 current === 'mandats' ? 'btn btn-sm bg-app-primary text-white' : 'btn btn-sm'
               }
             >
-              Liste des mandants
+              Liste des mandats
             </button>
           </div>
 

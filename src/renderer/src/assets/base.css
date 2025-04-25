@@ -2,13 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
+/* @font-face {
   font-family: 'segeo';
   src: local('segoe-ui-light'), url("./fonts/segoe-ui-light.ttf") format("truetype") ;
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
+ */
+@font-face {
+  font-family: 'poppins';
+  src: local('Poppins-Light'), url("./fonts/Poppins-Light.ttf") format("truetype") ;
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 
 
 body {
@@ -30,8 +39,8 @@ body {
     sans-serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;*/
-  font-family: 'segeo' ;
+  -moz-osx-font-smoothing: grayscale; font-family: 'segeo' ;*/
+  font-family: 'poppins' ;
 }
 
 

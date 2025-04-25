@@ -9,7 +9,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        segeo: ['segeo']
+        segeo: ['poppins']
       }
     }
   },
